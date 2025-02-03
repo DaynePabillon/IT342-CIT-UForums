@@ -1,9 +1,9 @@
 # IT342-CIT-UForums
 
 Team Members:
- <p>Member 1</p>
- <p>Name: Pabillon Dayne B </p>
- <p><Course & Year: BSIT-3</p>
+ Member 1
+ Name: Pabillon Dayne B
+ <Course & Year: BSIT-3
  
 <Short Description about yourself()>
   <p>I am a student at CIT-U and aspiring to be a game developer or a software engineer. 
