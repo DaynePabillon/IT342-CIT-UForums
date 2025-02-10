@@ -14,9 +14,6 @@ The CIT-U Community Forums is an interactive platform designed to keep students,
 ### ERD:https://lucid.app/lucidchart/9e330297-fc2c-4b79-acd6-efb755b45485/edit?invitationId=inv_730980a5-f061-4679-8c4f-ebc6ae3086a7
 
 
-
-
-
 ## Team Members:
 ### Member 1
 **Name:** Pabillon Dayne B  
