@@ -40,7 +40,6 @@ public class MemberServiceImpl implements MemberService {
         member.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
         member.setFirstName(registrationRequest.getFirstName());
         member.setLastName(registrationRequest.getLastName());
-        member.setAdmin(false); // Default is not admin
         
         // Save member
         Member savedMember = saveMember(member);
@@ -124,14 +123,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean toggleAdminStatus(Long memberId) {
-        Member member = getMemberEntity(memberId);
-        member.setAdmin(!member.isAdmin());
-        Member savedMember = saveMember(member);
-        return savedMember.isAdmin();
-    }
-
-    @Override
     public boolean existsByName(String name) {
         return memberRepository.existsByName(name);
     }
@@ -146,6 +137,13 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
     }
     
+    @Override
+    public MemberDto getMemberByEmail(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Member not found with email: " + email));
+        return mapToDto(member);
+    }
+    
     // Utility methods to map entities to DTOs
     private MemberDto mapToDto(Member member) {
         return MemberDto.builder()
@@ -154,7 +152,6 @@ public class MemberServiceImpl implements MemberService {
                 .email(member.getEmail())
                 .firstName(member.getFirstName())
                 .lastName(member.getLastName())
-                .isAdmin(member.isAdmin())
                 .build();
     }
     
@@ -164,7 +161,6 @@ public class MemberServiceImpl implements MemberService {
                 .name(member.getName())
                 .firstName(member.getFirstName())
                 .lastName(member.getLastName())
-                .isAdmin(member.isAdmin())
                 .build();
     }
 } 

@@ -31,6 +31,9 @@ public class Thread {
     @Column
     private LocalDateTime updatedAt;
 
+    @Column
+    private LocalDateTime lastActivity;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "forum_id", nullable = false)
     private Forum forum;
@@ -58,6 +61,7 @@ public class Thread {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        lastActivity = createdAt;
     }
     
     @PreUpdate

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thymeleaf Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        h1 {
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thymeleaf Test Page</h1>
+        
+        <div class="status success">
+            <p>If you can see this page, Thymeleaf is working correctly!</p>
+        </div>
+        
+        <h2>Environment Information</h2>
+        <ul>
+            <li>Current time: <span th:text="${#dates.format(#dates.createNow(), 'dd-MM-yyyy HH:mm:ss')}">01-01-2023 12:00:00</span></li>
+            <li>Java version: <span th:text="${T(System).getProperty('java.version')}">Unknown</span></li>
+            <li>Operating System: <span th:text="${T(System).getProperty('os.name')} + ' ' + ${T(System).getProperty('os.version')}">Unknown</span></li>
+        </ul>
+        
+        <h2>Model Test</h2>
+        <p>Test message: <span th:text="${testMessage ?: 'No test message found in model'}">Default message</span></p>
+        
+        <h2>Links Test</h2>
+        <ul>
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/login}">Login</a></li>
+            <li><a th:href="@{/register}">Register</a></li>
+        </ul>
+    </div>
+</body>
+</html> 

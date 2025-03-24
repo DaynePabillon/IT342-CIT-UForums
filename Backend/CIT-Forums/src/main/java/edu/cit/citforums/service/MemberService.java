@@ -15,6 +15,8 @@ public interface MemberService {
     
     MemberDto getMemberByName(String name);
     
+    MemberDto getMemberByEmail(String email);
+    
     List<MemberDto> getAllMembers();
     
     MemberDto updateMember(Long memberId, MemberRegistrationRequest updateRequest);
@@ -24,8 +26,6 @@ public interface MemberService {
     Member getMemberEntity(Long memberId);
     
     MemberSummaryDto getMemberSummary(Long memberId);
-    
-    boolean toggleAdminStatus(Long memberId);
     
     boolean existsByName(String name);
     

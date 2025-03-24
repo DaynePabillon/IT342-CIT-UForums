@@ -29,32 +29,20 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-    @Column
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean isAdmin;
-    
-    @Column(nullable = false, columnDefinition = "boolean default true")
-    private boolean active = true;
-    
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "member_roles",
-        joinColumns = @JoinColumn(name = "member_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
-    
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-    
-    @Column
-    private LocalDateTime lastLogin;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(nullable = false)
+    private boolean active = true;
 
     // Username getter/setter for convenience with Spring Security
     public String getUsername() {
@@ -63,14 +51,5 @@ public class Member {
     
     public void setUsername(String username) {
         this.name = username;
-    }
-    
-    // Convenience methods
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-    
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
     }
 } 

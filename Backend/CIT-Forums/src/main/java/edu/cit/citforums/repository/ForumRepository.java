@@ -19,11 +19,12 @@ public interface ForumRepository extends JpaRepository<Forum, Long> {
     
     Boolean existsByTitle(String title);
     
-    Page<Forum> findByActiveTrueOrderByCreatedAtDesc(Pageable pageable);
+    List<Forum> findAllByOrderByCreatedAtDesc();
     
-    List<Forum> findByActiveTrueOrderByCreatedAtDesc();
+    Page<Forum> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+            String title, String description, Pageable pageable);
     
-    @Query("SELECT f FROM Forum f WHERE f.active = true AND LOWER(f.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(f.description) LIKE LOWER(CONCAT('%', :query, '%'))")
+    @Query("SELECT f FROM Forum f WHERE LOWER(f.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(f.description) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<Forum> searchForums(String query, Pageable pageable);
 
     @Query("SELECT f FROM Forum f WHERE f.lastActivity < :thresholdDate OR f.lastActivity IS NULL")
