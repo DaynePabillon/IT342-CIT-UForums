@@ -21,6 +21,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +39,20 @@ public class WebSecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // React default port
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
@@ -46,7 +64,7 @@ public class WebSecurityConfig {
     @Primary
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configure(http))
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
@@ -56,6 +74,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 // Forum endpoints - allow authenticated users to create forums
                 .requestMatchers(HttpMethod.GET, "/api/forums/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/forums/delete-first-general").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/forums").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/forums/**").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/forums/**").authenticated()

@@ -1,3 +1,4 @@
+/* CIT-U Theme Colors */
 :root {
   --cit-maroon: #800000;
   --cit-gold: #FFD700;
@@ -12,18 +13,21 @@ body {
   background-image: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
+/* Navigation */
 .navbar {
-  background-color: var(--cit-maroon) !important;
+  background-color: var(--cit-maroon);
+  padding: 1rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .navbar-brand {
   color: var(--cit-gold) !important;
   font-weight: bold;
+  font-size: 1.5rem;
 }
 
 .nav-link {
-  color: rgba(255,255,255,0.9) !important;
+  color: white !important;
   transition: color 0.3s ease;
 }
 
@@ -31,9 +35,11 @@ body {
   color: var(--cit-gold) !important;
 }
 
+/* Buttons */
 .btn-primary {
   background-color: var(--cit-maroon);
   border-color: var(--cit-maroon);
+  color: white;
 }
 
 .btn-primary:hover {
@@ -50,56 +56,28 @@ body {
 .btn-secondary:hover {
   background-color: var(--cit-gold-light);
   border-color: var(--cit-gold-light);
-  color: var(--cit-maroon);
 }
 
+/* Cards */
 .card {
   border: none;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
+  margin-bottom: 1rem;
 }
 
 .card-header {
   background-color: var(--cit-maroon);
   color: var(--cit-gold);
+  font-weight: bold;
 }
 
+/* Forms */
 .form-control:focus {
   border-color: var(--cit-maroon);
-  box-shadow: 0 0 0 0.2rem rgba(128,0,0,0.25);
+  box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
 }
 
-.badge {
-  background-color: var(--cit-gold);
-  color: var(--cit-maroon);
-}
-
-.pagination .page-link {
-  color: var(--cit-maroon);
-}
-
-.pagination .page-item.active .page-link {
-  background-color: var(--cit-maroon);
-  border-color: var(--cit-maroon);
-}
-
-.alert-danger {
-  background-color: #fff3f3;
-  border-color: var(--cit-maroon);
-  color: var(--cit-maroon);
-}
-
-.alert-success {
-  background-color: #f3fff3;
-  border-color: #28a745;
-  color: #28a745;
-}
-
-/* Forum category badges */
+/* Forum Categories */
 .badge-freedom-wall {
   background-color: #FF69B4;
   color: white;
@@ -123,4 +101,80 @@ body {
 .badge-general {
   background-color: #808080;
   color: white;
+}
+
+/* Alerts */
+.alert-danger {
+  background-color: #fff3f3;
+  border-color: var(--cit-maroon);
+  color: var(--cit-maroon);
+}
+
+.alert-success {
+  background-color: #f3fff3;
+  border-color: #28a745;
+  color: #28a745;
+}
+
+/* Pagination */
+.page-link {
+  color: var(--cit-maroon);
+}
+
+.page-item.active .page-link {
+  background-color: var(--cit-maroon);
+  border-color: var(--cit-maroon);
+  color: white;
+}
+
+/* Welcome Section */
+.welcome-section {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.welcome-section h1 {
+  color: var(--cit-maroon);
+  margin-bottom: 1rem;
+}
+
+.welcome-section p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Forum List */
+.forum-list {
+  margin-top: 2rem;
+}
+
+.forum-title {
+  color: var(--cit-maroon);
+  text-decoration: none;
+}
+
+.forum-title:hover {
+  color: var(--cit-maroon-light);
+}
+
+/* Thread List */
+.thread-list {
+  margin-top: 2rem;
+}
+
+.thread-title {
+  color: var(--cit-maroon);
+  text-decoration: none;
+}
+
+.thread-title:hover {
+  color: var(--cit-maroon-light);
+}
+
+/* Comments */
+.comment {
+  padding: 1rem;
+  border-left: 4px solid var(--cit-maroon);
+  margin-bottom: 1rem;
+  background-color: #f8f9fa;
 } 

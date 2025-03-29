@@ -15,4 +15,5 @@ public class MemberDto {
     private String email;
     private String firstName;
     private String lastName;
+    private boolean admin;
 } 

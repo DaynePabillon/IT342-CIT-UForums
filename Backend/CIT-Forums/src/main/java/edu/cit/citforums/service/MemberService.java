@@ -32,4 +32,8 @@ public interface MemberService {
     boolean existsByEmail(String email);
     
     Member saveMember(Member member);
+
+    MemberDto getMemberByUsernameOrEmail(String usernameOrEmail);
+
+    Member findByNameOrEmail(String name, String email);
 } 

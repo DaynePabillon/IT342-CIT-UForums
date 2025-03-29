@@ -80,6 +80,20 @@ const Navbar: React.FC = () => {
                 Forums
               </Link>
             </li>
+            {admin && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/forums/create">
+                    Create Forum
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/admin">
+                    Admin
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
           <ul className="navbar-nav">
             {authenticated ? (

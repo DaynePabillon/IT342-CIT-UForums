@@ -44,6 +44,9 @@ public class Member {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(nullable = false)
+    private boolean admin = false;
+
     // Username getter/setter for convenience with Spring Security
     public String getUsername() {
         return name;

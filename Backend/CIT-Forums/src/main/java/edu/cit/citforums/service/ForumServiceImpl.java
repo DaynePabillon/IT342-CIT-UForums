@@ -5,6 +5,7 @@ import edu.cit.citforums.dto.MemberSummaryDto;
 import edu.cit.citforums.dto.PagedResponseDto;
 import edu.cit.citforums.dto.request.ForumRequest;
 import edu.cit.citforums.models.Forum;
+import edu.cit.citforums.models.ForumCategory;
 import edu.cit.citforums.models.Member;
 import edu.cit.citforums.repository.ForumRepository;
 import edu.cit.citforums.service.MemberService;
@@ -123,6 +124,31 @@ public class ForumServiceImpl implements ForumService {
     public Forum getForumEntity(Long forumId) {
         return forumRepository.findById(forumId)
                 .orElseThrow(() -> new RuntimeException("Forum not found with ID: " + forumId));
+    }
+    
+    @Override
+    public List<ForumDto> getAllActiveForums() {
+        logger.info("Fetching all active forums");
+        List<Forum> forums = forumRepository.findAllByOrderByCreatedAtDesc();
+        logger.info("Found {} active forums", forums.size());
+        return forums.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    @Transactional
+    public void deleteFirstForumByCategory(ForumCategory category) {
+        logger.info("Deleting first forum with category: {}", category);
+        List<Forum> forums = forumRepository.findByCategoryOrderByCreatedAtAsc(category);
+        if (!forums.isEmpty()) {
+            Forum firstForum = forums.get(0);
+            logger.info("Found forum to delete: {}", firstForum.getTitle());
+            forumRepository.delete(firstForum);
+            logger.info("Successfully deleted forum: {}", firstForum.getTitle());
+        } else {
+            logger.warn("No forums found with category: {}", category);
+        }
     }
     
     // Helper method to map Forum entity to ForumDto

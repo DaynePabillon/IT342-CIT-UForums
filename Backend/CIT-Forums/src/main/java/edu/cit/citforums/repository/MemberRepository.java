@@ -21,6 +21,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     
     Boolean existsByName(String name);
 
+    Optional<Member> findByNameOrEmail(String name, String email);
+
     @Query(value = 
            "SELECT TO_CHAR(m.created_at, :dateFormat) as period, COUNT(m.id) as count " +
            "FROM members m " +

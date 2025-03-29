@@ -39,10 +39,10 @@ public class Post {
     @OneToMany(mappedBy = "parentPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
     
-    @Column(nullable = false, columnDefinition = "boolean default true")
+    @Column(nullable = false)
     private boolean active = true;
     
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Column(nullable = false)
     private boolean edited = false;
     
     @PrePersist

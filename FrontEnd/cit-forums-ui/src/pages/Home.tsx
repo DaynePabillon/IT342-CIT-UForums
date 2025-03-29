@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getActiveForums, Forum } from '../services/forumService';
+import { getActiveForums, Forum, ForumCategory } from '../services/forumService';
 import { isAuthenticated } from '../services/authService';
 
 const Home: React.FC = () => {
@@ -17,8 +17,22 @@ const Home: React.FC = () => {
   const fetchActiveForums = async () => {
     setLoading(true);
     try {
+      console.log('Fetching active forums...');
       const data = await getActiveForums();
-      setForums(Array.isArray(data) ? data : []);
+      console.log('Received forums data:', data);
+      
+      // Filter for Announcements, Events, and Academic forums
+      const filteredForums = Array.isArray(data) 
+        ? data.filter(forum => {
+            console.log('Checking forum:', forum.title, 'Category:', forum.category);
+            return forum.category === ForumCategory.ANNOUNCEMENTS || 
+                   forum.category === ForumCategory.EVENTS ||
+                   forum.category === ForumCategory.ACADEMIC;
+          })
+        : [];
+      
+      console.log('Filtered forums:', filteredForums);
+      setForums(filteredForums);
     } catch (err: any) {
       console.error('Error fetching forums:', err);
       setError(err.response?.data?.message || 'Failed to load forums');
@@ -48,11 +62,11 @@ const Home: React.FC = () => {
         </Link>
       </div>
 
-      <h2 className="mb-4">Active Forums</h2>
+      <h2 className="mb-4">Announcements, Events & Academic</h2>
 
       {forums.length === 0 ? (
         <div className="alert alert-info">
-          <p>No active forums at the moment.</p>
+          <p>No announcements, events, or academic forums at the moment.</p>
           <p>Please check back later or browse all forums to see available content.</p>
         </div>
       ) : (
@@ -64,8 +78,8 @@ const Home: React.FC = () => {
                   <h5 className="card-title">{forum.title}</h5>
                   <p className="card-text">{forum.description}</p>
                   <div className="d-flex justify-content-between align-items-center">
-                    <Link to={`/forums/${forum.id}`} className="btn">
-                      View Forum
+                    <Link to={`/forums/${forum.id}/threads`} className="btn">
+                      View Threads
                     </Link>
                     <small className="text-muted">{forum.threadCount} threads</small>
                   </div>

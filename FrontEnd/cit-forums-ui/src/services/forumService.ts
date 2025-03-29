@@ -16,10 +16,11 @@ export interface Forum {
 }
 
 export enum ForumCategory {
+  ANNOUNCEMENTS = 'ANNOUNCEMENTS',
+  EVENTS = 'EVENTS',
   FREEDOM_WALL = 'FREEDOM_WALL',
   CONFESSION = 'CONFESSION',
   ACADEMIC = 'ACADEMIC',
-  EVENTS = 'EVENTS',
   GENERAL = 'GENERAL'
 }
 

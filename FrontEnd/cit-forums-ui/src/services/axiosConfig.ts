@@ -19,7 +19,15 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    console.log(`Making ${config.method?.toUpperCase()} request to ${config.url}`);
+    // Log the full request details
+    console.log('Making request:', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      headers: config.headers,
+      data: config.data,
+      params: config.params
+    });
+    
     return config;
   },
   (error) => {
@@ -31,9 +39,25 @@ axiosInstance.interceptors.request.use(
 // Response interceptor - handles common errors
 axiosInstance.interceptors.response.use(
   (response) => {
+    // Log successful responses
+    console.log('Successful response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data
+    });
     return response;
   },
   (error) => {
+    // Log detailed error information
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+      code: error.code
+    });
+
     if (error.code === 'ECONNABORTED') {
       console.error('Request timeout:', error);
       return Promise.reject(new Error('Request timeout - server is taking too long to respond'));
@@ -46,16 +70,22 @@ axiosInstance.interceptors.response.use(
     
     // Handle authentication errors
     if (error.response.status === 401) {
-      console.warn('Authentication error');
-      // Clear token and redirect to login
+      console.warn('Authentication error - redirecting to login');
       localStorage.removeItem('auth_token');
       window.location.href = '/login';
+      return Promise.reject(new Error('Authentication required'));
     }
     
     // Handle server errors
     if (error.response.status >= 500) {
       console.error('Server error:', error.response);
       return Promise.reject(new Error('Server error - please try again later'));
+    }
+    
+    // Handle CORS errors
+    if (error.message.includes('Network Error')) {
+      console.error('Possible CORS error:', error);
+      return Promise.reject(new Error('Unable to connect to server - possible CORS issue'));
     }
     
     return Promise.reject(error);
