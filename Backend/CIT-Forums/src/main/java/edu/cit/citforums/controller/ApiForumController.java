@@ -2,9 +2,12 @@ package edu.cit.citforums.controller;
 
 import edu.cit.citforums.dto.ForumDto;
 import edu.cit.citforums.dto.PagedResponseDto;
+import edu.cit.citforums.dto.ThreadDto;
 import edu.cit.citforums.dto.request.ForumRequest;
+import edu.cit.citforums.models.ForumCategory;
 import edu.cit.citforums.service.ForumService;
 import edu.cit.citforums.service.MemberService;
+import edu.cit.citforums.service.ThreadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,15 @@ public class ApiForumController {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private ThreadService threadService;
+    
+    @PostMapping("/delete-first-general")
+    public ResponseEntity<Void> deleteFirstGeneralForum() {
+        forumService.deleteFirstForumByCategory(ForumCategory.GENERAL);
+        return ResponseEntity.ok().build();
+    }
     
     @PostMapping
     public ResponseEntity<ForumDto> createForum(@RequestBody ForumRequest forumRequest, Principal principal) {
@@ -49,6 +61,14 @@ public class ApiForumController {
     @GetMapping("/{id}")
     public ResponseEntity<ForumDto> getForum(@PathVariable Long id) {
         return ResponseEntity.ok(forumService.getForum(id));
+    }
+
+    @GetMapping("/{id}/threads")
+    public ResponseEntity<Page<ThreadDto>> getForumThreads(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(threadService.getThreadsByForum(id, page, size));
     }
     
     @PutMapping("/{id}")

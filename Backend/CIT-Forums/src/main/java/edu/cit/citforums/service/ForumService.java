@@ -3,6 +3,7 @@ package edu.cit.citforums.service;
 import edu.cit.citforums.dto.ForumDto;
 import edu.cit.citforums.dto.request.ForumRequest;
 import edu.cit.citforums.models.Forum;
+import edu.cit.citforums.models.ForumCategory;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface ForumService {
     Page<ForumDto> getAllForums(int page, int size);
     Page<ForumDto> searchForums(String query, int page, int size);
     Forum getForumEntity(Long forumId);
+    List<ForumDto> getAllActiveForums();
+    void deleteFirstForumByCategory(ForumCategory category);
 } 

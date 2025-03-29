@@ -56,6 +56,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 // Forum endpoints - allow authenticated users to create forums
                 .requestMatchers(HttpMethod.GET, "/api/forums/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/forums/delete-first-general").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/forums").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/forums/**").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/forums/**").authenticated()

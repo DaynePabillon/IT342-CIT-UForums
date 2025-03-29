@@ -1,6 +1,7 @@
 package edu.cit.citforums.repository;
 
 import edu.cit.citforums.models.Forum;
+import edu.cit.citforums.models.ForumCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,8 @@ public interface ForumRepository extends JpaRepository<Forum, Long> {
     Boolean existsByTitle(String title);
     
     List<Forum> findAllByOrderByCreatedAtDesc();
+    
+    List<Forum> findByCategoryOrderByCreatedAtAsc(ForumCategory category);
     
     Page<Forum> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
             String title, String description, Pageable pageable);
