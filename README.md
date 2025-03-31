@@ -35,7 +35,7 @@ The CIT-U Community Forums is an interactive platform designed to keep students,
 - Node.js and npm
 
 ### Database Setup
-
+j
 1. Create a MySQL database named `citforums`
 2. Database configuration is in `application.properties`
 
