@@ -2,6 +2,8 @@ package edu.cit.citforums.controller;
 
 import edu.cit.citforums.dto.PostDto;
 import edu.cit.citforums.dto.request.PostRequest;
+import edu.cit.citforums.models.Member;
+import edu.cit.citforums.service.MemberService;
 import edu.cit.citforums.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,26 @@ public class ApiPostController {
     @Autowired
     private PostService postService;
     
+    @Autowired
+    private MemberService memberService;
+    
     @PostMapping("/thread/{threadId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PostDto> createPost(
             @Valid @RequestBody PostRequest postRequest,
             @PathVariable Long threadId,
             Principal principal) {
-        // TODO: Get actual user ID from Principal
-        Long currentUserId = 1L; // Placeholder - should be retrieved from authenticated user
         
-        PostDto createdPost = postService.createPost(postRequest, threadId, currentUserId);
+        // Get the authenticated user's email from the Principal
+        String userEmail = principal.getName();
+        
+        // Get the member entity from the email
+        Member member = memberService.findByNameOrEmail(null, userEmail);
+        if (member == null) {
+            throw new RuntimeException("User not found");
+        }
+        
+        PostDto createdPost = postService.createPost(postRequest, threadId, member.getId());
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
     
@@ -74,5 +86,12 @@ public class ApiPostController {
         
         Page<PostDto> posts = postService.searchPosts(query, page, size);
         return ResponseEntity.ok(posts);
+    }
+    
+    @PutMapping("/{id}/toggle")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PostDto> togglePostStatus(@PathVariable("id") Long id) {
+        PostDto updatedPost = postService.togglePostStatus(id);
+        return ResponseEntity.ok(updatedPost);
     }
 } 

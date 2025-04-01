@@ -8,6 +8,7 @@ import edu.cit.citforums.models.Forum;
 import edu.cit.citforums.models.ForumCategory;
 import edu.cit.citforums.models.Member;
 import edu.cit.citforums.repository.ForumRepository;
+import edu.cit.citforums.repository.ThreadRepository;
 import edu.cit.citforums.service.MemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +30,13 @@ public class ForumServiceImpl implements ForumService {
     private static final Logger logger = LoggerFactory.getLogger(ForumServiceImpl.class);
     private final ForumRepository forumRepository;
     private final MemberService memberService;
+    private final ThreadRepository threadRepository;
 
     @Autowired
-    public ForumServiceImpl(ForumRepository forumRepository, MemberService memberService) {
+    public ForumServiceImpl(ForumRepository forumRepository, MemberService memberService, ThreadRepository threadRepository) {
         this.forumRepository = forumRepository;
         this.memberService = memberService;
+        this.threadRepository = threadRepository;
     }
 
     @Override
@@ -170,6 +173,7 @@ public class ForumServiceImpl implements ForumService {
                 .updatedAt(forum.getUpdatedAt())
                 .createdBy(creatorDto)
                 .lastActivity(forum.getLastActivity())
+                .threadCount(threadRepository.countByForumId(forum.getId()).intValue())
                 .build();
     }
 } 

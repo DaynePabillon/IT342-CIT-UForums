@@ -46,6 +46,7 @@ public class ThreadServiceImpl implements ThreadService {
         thread.setContent(threadRequest.getContent());
         thread.setForum(forum);
         thread.setCreatedBy(creator);
+        thread.setAuthor(creator);
         thread.setLastActivity(thread.getCreatedAt());
         
         Thread savedThread = threadRepository.save(thread);

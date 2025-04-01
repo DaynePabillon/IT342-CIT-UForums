@@ -131,7 +131,14 @@ const CreateThread: React.FC = () => {
       const result = await createThread(threadData);
       console.log("Thread created successfully:", result);
       
-      navigate(`/forums/${parsedId}`);
+      // Navigate to the thread list with a refresh flag
+      navigate(`/forums/${parsedId}/threads`, { 
+        state: { 
+          refresh: true,
+          message: 'Thread created successfully!' 
+        },
+        replace: true // This replaces the current history entry
+      });
     } catch (err: any) {
       console.error("Error creating thread:", err);
       let errorMessage = 'Failed to create thread. Please try again.';

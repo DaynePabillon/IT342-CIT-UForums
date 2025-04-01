@@ -130,6 +130,15 @@ public class PostServiceImpl implements PostService {
         Post post = getPostEntity(postId);
         return post.isActive();
     }
+
+    @Override
+    @Transactional
+    public PostDto togglePostStatus(Long postId) {
+        Post post = getPostEntity(postId);
+        post.setActive(!post.isActive());
+        post.setUpdatedAt(LocalDateTime.now());
+        return mapToDto(postRepository.save(post));
+    }
     
     // Helper method to map Post entity to PostDto
     private PostDto mapToDto(Post post) {

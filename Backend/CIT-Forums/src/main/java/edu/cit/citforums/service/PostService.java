@@ -14,4 +14,5 @@ public interface PostService {
     Page<PostDto> searchPosts(String query, int page, int size);
     Post getPostEntity(Long postId);
     boolean isPostActive(Long postId);
+    PostDto togglePostStatus(Long postId);
 } 
