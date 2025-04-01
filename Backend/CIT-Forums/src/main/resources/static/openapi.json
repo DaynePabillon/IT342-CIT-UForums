@@ -1,0 +1,1238 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "CIT Forums API",
+    "description": "API documentation for CIT Forums platform",
+    "version": "1.0.0",
+    "contact": {
+      "name": "CIT Forums Admin",
+      "email": "admin@citforums.com"
+    },
+    "license": {
+      "name": "MIT License",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Forums",
+      "description": "Forum management endpoints"
+    },
+    {
+      "name": "Threads",
+      "description": "Thread management endpoints"
+    },
+    {
+      "name": "System Monitor",
+      "description": "System health and performance monitoring"
+    },
+    {
+      "name": "User Management",
+      "description": "User administration endpoints"
+    },
+    {
+      "name": "Content Management",
+      "description": "Forum and thread content management"
+    },
+    {
+      "name": "Analytics",
+      "description": "Platform usage analytics and metrics"
+    }
+  ],
+  "paths": {
+    "/api/forums": {
+      "get": {
+        "summary": "Get all forums",
+        "description": "Returns a paginated list of all forums",
+        "tags": ["Forums"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-based)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of forums",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedForumResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new forum",
+        "description": "Creates a new forum with the given details",
+        "tags": ["Forums"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForumRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Forum created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForumResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/forums/{id}": {
+      "get": {
+        "summary": "Get forum by ID",
+        "description": "Returns a forum by its ID",
+        "tags": ["Forums"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Forum ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Forum found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForumResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Forum not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update forum",
+        "description": "Updates an existing forum",
+        "tags": ["Forums"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Forum ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForumRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Forum updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForumResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Forum not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete forum",
+        "description": "Deletes an existing forum",
+        "tags": ["Forums"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Forum ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Forum deleted successfully"
+          },
+          "404": {
+            "description": "Forum not found"
+          }
+        }
+      }
+    },
+    "/api/threads": {
+      "get": {
+        "summary": "Get all threads",
+        "description": "Returns a paginated list of all threads",
+        "tags": ["Threads"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-based)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of threads",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedThreadResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/threads/{id}": {
+      "get": {
+        "summary": "Get thread by ID",
+        "description": "Returns a thread by its ID",
+        "tags": ["Threads"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Thread ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update thread",
+        "description": "Updates an existing thread",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Thread ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThreadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Thread updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete thread",
+        "description": "Deletes an existing thread",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Thread ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Thread deleted successfully"
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        }
+      }
+    },
+    "/api/threads/forum/{forumId}": {
+      "get": {
+        "summary": "Get threads by forum",
+        "description": "Returns a paginated list of threads in a specific forum",
+        "tags": ["Threads"],
+        "parameters": [
+          {
+            "name": "forumId",
+            "in": "path",
+            "required": true,
+            "description": "Forum ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-based)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of threads",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedThreadResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Forum not found"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create thread in forum",
+        "description": "Creates a new thread in a specific forum",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "forumId",
+            "in": "path",
+            "required": true,
+            "description": "Forum ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThreadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Thread created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Forum not found"
+          }
+        }
+      }
+    },
+    "/api/admin/monitor/health": {
+      "get": {
+        "summary": "Check if the system is up and running",
+        "description": "Simple health check endpoint that returns the current system status and timestamp",
+        "tags": [
+          "System Monitor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "UP"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-03-22T14:30:15Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/monitor/stats": {
+      "get": {
+        "summary": "Get detailed system statistics",
+        "description": "Provides comprehensive statistics about the system including user counts, content counts, and server metrics",
+        "tags": [
+          "System Monitor"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "System statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/monitor/memory": {
+      "get": {
+        "summary": "Get memory usage statistics",
+        "description": "Provides detailed memory usage statistics including heap and non-heap memory",
+        "tags": [
+          "System Monitor"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Memory usage statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemoryUsageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "summary": "Get all users",
+        "description": "Retrieve a paginated list of all users with optional filters",
+        "tags": [
+          "User Management"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-based)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort field and direction (e.g., createdAt,desc)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UserSummary"
+                      }
+                    },
+                    "totalElements": {
+                      "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "number": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/forums/inactive": {
+      "get": {
+        "summary": "Get inactive forums",
+        "description": "Retrieve forums that have been inactive for a specified period",
+        "tags": [
+          "Content Management"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "description": "Number of days of inactivity",
+            "schema": {
+              "type": "integer",
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of inactive forums",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ForumSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/analytics/user-activity": {
+      "get": {
+        "summary": "Get user activity metrics",
+        "description": "Retrieve user activity metrics over time",
+        "tags": [
+          "Analytics"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Period for analysis (daily, weekly, monthly)",
+            "schema": {
+              "type": "string",
+              "enum": ["daily", "weekly", "monthly"],
+              "default": "monthly"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Start date (ISO format)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "End date (ISO format)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User activity metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserActivityMetrics"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SystemStatusResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "UP"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uptime": {
+            "type": "string"
+          },
+          "forumCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "threadCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "systemMetrics": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "MemoryUsageResponse": {
+        "type": "object",
+        "properties": {
+          "heapMemoryUsage": {
+            "type": "object",
+            "properties": {
+              "init": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Initial heap memory allocation in bytes"
+              },
+              "used": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Currently used heap memory in bytes"
+              },
+              "committed": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Committed heap memory in bytes"
+              },
+              "max": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Maximum heap memory in bytes"
+              },
+              "usagePercentage": {
+                "type": "number",
+                "format": "double",
+                "description": "Percentage of heap memory used"
+              }
+            }
+          },
+          "nonHeapMemoryUsage": {
+            "type": "object",
+            "properties": {
+              "init": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "used": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "committed": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "max": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          },
+          "totalMemory": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total memory available to JVM in bytes"
+          },
+          "freeMemory": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Free memory available to JVM in bytes"
+          }
+        }
+      },
+      "UserSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastLogin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "threadCount": {
+            "type": "integer"
+          },
+          "commentCount": {
+            "type": "integer"
+          }
+        }
+      },
+      "ForumSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "threadCount": {
+            "type": "integer"
+          },
+          "lastActivityDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserActivityMetrics": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "example": "monthly"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "newUserRegistrations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "count": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "activeUsers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "count": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "contentCreation": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "threads": {
+                  "type": "integer"
+                },
+                "comments": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "totalActiveUsers": {
+            "type": "integer"
+          },
+          "totalNewThreads": {
+            "type": "integer"
+          },
+          "totalNewComments": {
+            "type": "integer"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        }
+      },
+      "ForumRequest": {
+        "type": "object",
+        "required": ["title", "description", "category"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "General Discussion"
+          },
+          "description": {
+            "type": "string",
+            "example": "A place for general discussions"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["ANNOUNCEMENTS", "EVENTS", "FREEDOM_WALL", "CONFESSION", "ACADEMIC", "GENERAL"],
+            "example": "GENERAL"
+          }
+        }
+      },
+      "ForumResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "General Discussion"
+          },
+          "description": {
+            "type": "string",
+            "example": "A place for general discussions"
+          },
+          "category": {
+            "type": "string",
+            "example": "GENERAL"
+          },
+          "active": {
+            "type": "boolean",
+            "example": true
+          },
+          "threadCount": {
+            "type": "integer",
+            "example": 10
+          },
+          "createdBy": {
+            "type": "string",
+            "example": "admin@example.com"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PagedForumResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ForumResponse"
+            }
+          },
+          "totalElements": {
+            "type": "integer",
+            "example": 100
+          },
+          "totalPages": {
+            "type": "integer",
+            "example": 10
+          },
+          "size": {
+            "type": "integer",
+            "example": 10
+          },
+          "number": {
+            "type": "integer",
+            "example": 0
+          }
+        }
+      },
+      "ThreadRequest": {
+        "type": "object",
+        "required": ["title", "content"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Welcome to the forum!"
+          },
+          "content": {
+            "type": "string",
+            "example": "This is the first post in our new forum."
+          }
+        }
+      },
+      "ThreadResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Welcome to the forum!"
+          },
+          "content": {
+            "type": "string",
+            "example": "This is the first post in our new forum."
+          },
+          "forumId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "commentCount": {
+            "type": "integer",
+            "example": 5
+          },
+          "createdBy": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PagedThreadResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ThreadResponse"
+            }
+          },
+          "totalElements": {
+            "type": "integer",
+            "example": 100
+          },
+          "totalPages": {
+            "type": "integer",
+            "example": 10
+          },
+          "size": {
+            "type": "integer",
+            "example": 10
+          },
+          "number": {
+            "type": "integer",
+            "example": 0
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+} 
