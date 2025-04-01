@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getForums, Forum, ForumCategory } from '../services/forumService';
 import { isAuthenticated } from '../services/authService';
@@ -12,10 +12,9 @@ const ForumList: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<ForumCategory | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [totalElements, setTotalElements] = useState<number>(0);
   const location = useLocation();
 
-  const fetchForums = async () => {
+  const fetchForums = useCallback(async () => {
     try {
       setLoading(true);
       console.log('Fetching forums...');
@@ -24,27 +23,24 @@ const ForumList: React.FC = () => {
       if (response && response.content) {
         setForums(response.content);
         setTotalPages(response.totalPages);
-        setTotalElements(response.totalElements);
       } else {
         setForums([]);
         setTotalPages(0);
-        setTotalElements(0);
       }
     } catch (err: any) {
       console.error('Error in ForumList component:', err);
       setError(err.message || 'Failed to load forums');
       setForums([]);
       setTotalPages(0);
-      setTotalElements(0);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
 
   // Fetch forums when component mounts and when currentPage changes
   useEffect(() => {
     fetchForums();
-  }, [currentPage]);
+  }, [fetchForums]);
 
   // Handle navigation state (refresh and messages)
   useEffect(() => {
@@ -68,7 +64,7 @@ const ForumList: React.FC = () => {
       // Clear the state
       window.history.replaceState({}, document.title);
     }
-  }, [location]);
+  }, [location, fetchForums]);
 
   const getCategoryBadgeClass = (category: ForumCategory): string => {
     switch (category) {
@@ -178,7 +174,7 @@ const ForumList: React.FC = () => {
             <div className="card h-100">
               <div className="card-body">
                 <h5 className="card-title">
-                  <Link to={`/forums/${forum.id}`} className="text-decoration-none">
+                  <Link to={`/forums/${forum.id}/threads`} className="text-decoration-none">
                     {forum.title}
                   </Link>
                 </h5>

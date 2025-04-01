@@ -5,7 +5,7 @@ const API_URL = '/api/comments';
 export interface Comment {
   id: number;
   content: string;
-  threadId: number;
+  postId: number;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -13,7 +13,7 @@ export interface Comment {
 
 export interface CommentRequest {
   content: string;
-  threadId: number;
+  postId: number;
 }
 
 export interface PagedResponse<T> {
@@ -25,15 +25,19 @@ export interface PagedResponse<T> {
   last: boolean;
 }
 
-export const getCommentsByThreadId = async (
-  threadId: number,
-  page: number = 0,
-  size: number = 100
-): Promise<Comment[]> => {
-  const response = await axios.get(`/api/threads/${threadId}/comments`, {
-    params: { page, size },
-  });
-  return response.data.content;
+export const getCommentsByPostId = async (postId: number): Promise<Comment[]> => {
+  const response = await axios.get(`${API_URL}/post/${postId}`);
+  const data = response.data;
+  
+  // Handle both array and paged responses
+  if (Array.isArray(data)) {
+    return data;
+  } else if (data && typeof data === 'object' && 'content' in data) {
+    return (data as PagedResponse<Comment>).content;
+  }
+  
+  console.error('Unexpected response format:', data);
+  return [];
 };
 
 export const getCommentById = async (id: number): Promise<Comment> => {

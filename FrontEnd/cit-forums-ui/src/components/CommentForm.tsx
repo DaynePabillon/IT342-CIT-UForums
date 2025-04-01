@@ -3,11 +3,11 @@ import { createComment } from '../services/commentService';
 import { getUserProfile } from '../services/authService';
 
 interface CommentFormProps {
-  threadId: number;
+  postId: number;
   onCommentAdded: (newComment: any) => void;
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ threadId, onCommentAdded }) => {
+const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,10 +20,12 @@ const CommentForm: React.FC<CommentFormProps> = ({ threadId, onCommentAdded }) =
     setError(null);
 
     try {
+      console.log('Creating comment with postId:', postId);
       const newComment = await createComment({
         content,
-        threadId,
+        postId,
       });
+      console.log('Comment created successfully:', newComment);
       
       // Add the user's name to the comment for immediate display
       try {
@@ -42,6 +44,11 @@ const CommentForm: React.FC<CommentFormProps> = ({ threadId, onCommentAdded }) =
       setContent('');
     } catch (err: any) {
       console.error('Error creating comment:', err);
+      console.error('Error details:', {
+        response: err.response?.data,
+        status: err.response?.status,
+        message: err.message
+      });
       setError(err.response?.data?.message || 'Failed to add comment. Please try again.');
     } finally {
       setLoading(false);

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import axiosInstance from './axiosConfig';
 
 const API_URL = '/api/threads';
@@ -9,7 +8,13 @@ export interface Thread {
   content: string;
   forumId: number;
   commentCount: number;
-  createdBy: string;
+  createdBy: {
+    id: number;
+    name: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -36,7 +41,7 @@ export const getThreadsByForumId = async (
 ): Promise<PagedResponse<Thread>> => {
   try {
     console.log(`Fetching threads for forum ${forumId}: page=${page}, size=${size}`);
-    const response = await axiosInstance.get(`/api/forums/${forumId}/threads`, {
+    const response = await axiosInstance.get(`/api/threads/forum/${forumId}`, {
       params: { page, size },
     });
     console.log(`Threads for forum ${forumId} fetched successfully:`, response.status);
@@ -74,9 +79,9 @@ export const createThread = async (threadRequest: ThreadRequest): Promise<Thread
       throw new Error(`Invalid forum ID: ${threadRequest.forumId}`);
     }
     
-    // Use the correct endpoint and include forumId in the request body
-    console.log('Sending request to /api/threads');
-    const response = await axiosInstance.post('/api/threads', {
+    // Use the correct endpoint with forumId in the URL and include it in the request body
+    console.log(`Sending request to /api/threads/forum/${forumId}`);
+    const response = await axiosInstance.post(`/api/threads/forum/${forumId}`, {
       title: threadRequest.title,
       content: threadRequest.content,
       forumId: forumId

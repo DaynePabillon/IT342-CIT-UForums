@@ -1,65 +1,93 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getThreadById } from '../services/threadService';
-import { getCommentsByThreadId, Comment } from '../services/commentService';
+import { getThreadById, Thread } from '../services/threadService';
+import { getCommentsByPostId, Comment, PagedResponse } from '../services/commentService';
+import { createPost, Post } from '../services/postService';
 import { isAuthenticated } from '../services/authService';
 import CommentForm from '../components/CommentForm';
 
-interface ThreadData {
-  id: number;
-  title: string;
-  content: string;
-  forumId: number;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-const Thread: React.FC = () => {
+const ThreadComponent: React.FC = () => {
   const { forumId, threadId } = useParams<{ forumId: string; threadId: string }>();
-  const [thread, setThread] = useState<ThreadData | null>(null);
+  const [thread, setThread] = useState<Thread | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
 
+  const fetchThread = useCallback(async () => {
+    if (!threadId) {
+      setError('Invalid thread ID');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const data = await getThreadById(parseInt(threadId));
+      setThread(data);
+      
+      // Create a post for this thread
+      try {
+        // Ensure content meets validation requirements
+        const content = data.content || '';
+        if (content.length < 10) {
+          throw new Error('Thread content is too short to create a post');
+        }
+
+        const newPost = await createPost({
+          content: content,
+          threadId: parseInt(threadId)
+        });
+        
+        if (!newPost || !newPost.id) {
+          throw new Error('Failed to create post: Invalid post data received');
+        }
+        
+        setPost(newPost);
+        
+        // Fetch comments for the post
+        await fetchComments(newPost.id);
+      } catch (postError: any) {
+        console.error('Error creating post:', postError);
+        setError('Failed to create post: ' + (postError.message || 'Unknown error'));
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to load thread');
+    } finally {
+      setLoading(false);
+    }
+  }, [threadId]);
+
   useEffect(() => {
     // Check authentication status
     setUserAuthenticated(isAuthenticated());
     
-    // Fetch thread and comments
-    if (threadId && forumId) {
-      fetchThread(parseInt(threadId));
-      fetchComments(parseInt(threadId));
-    } else {
-      setError('Invalid thread or forum ID');
-      setLoading(false);
-    }
-  }, [threadId, forumId]);
-
-  const fetchThread = async (id: number) => {
-    setLoading(true);
-    try {
-      const data = await getThreadById(id);
-      setThread(data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load thread');
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchThread();
+  }, [fetchThread]);
 
   const fetchComments = async (id: number) => {
     try {
-      const data = await getCommentsByThreadId(id);
-      setComments(data);
+      const data = await getCommentsByPostId(id);
+      // Ensure we have an array of comments
+      if (Array.isArray(data)) {
+        setComments(data);
+      } else if (data && typeof data === 'object' && 'content' in data) {
+        // If the response is a paged response
+        const pagedData = data as PagedResponse<Comment>;
+        setComments(pagedData.content || []);
+      } else {
+        console.error('Unexpected comments data format:', data);
+        setComments([]);
+      }
     } catch (err: any) {
       console.error('Error fetching comments:', err);
+      setComments([]);
     }
   };
 
   const handleCommentAdded = (newComment: Comment) => {
-    setComments([...comments, newComment]);
+    setComments(prevComments => [...prevComments, newComment]);
   };
 
   if (loading) {
@@ -70,64 +98,51 @@ const Thread: React.FC = () => {
     return <div className="alert alert-danger">{error}</div>;
   }
 
-  if (!thread) {
+  if (!thread || !post) {
     return <div className="alert alert-warning">Thread not found</div>;
   }
 
   return (
     <div className="container">
       <div className="mb-3">
-        <Link to={`/forums/${forumId}`} className="btn btn-outline-secondary">
+        <Link to={`/forums/${forumId}/threads`} className="btn btn-outline-secondary">
           ← Back to Forum
         </Link>
       </div>
 
       <div className="card mb-4">
         <div className="card-header d-flex justify-content-between">
-          <h2 className="mb-0">{thread.title}</h2>
-          <small>
-            Posted by {thread.createdBy} on{' '}
-            {new Date(thread.createdAt).toLocaleDateString()}
-          </small>
+          <h2>{thread.title}</h2>
         </div>
         <div className="card-body">
           <p className="card-text">{thread.content}</p>
+          <div className="text-muted">
+            <small>Posted by {thread.createdBy.name} on {new Date(thread.createdAt).toLocaleString()}</small>
+          </div>
         </div>
       </div>
 
-      <h3 className="mb-3">Comments ({comments.length})</h3>
-
-      {comments.length === 0 ? (
-        <div className="alert alert-info">No comments yet. Be the first to comment!</div>
-      ) : (
-        <div className="mb-4">
-          {comments.map((comment) => (
-            <div key={comment.id} className="card mb-3">
-              <div className="card-body">
-                <p className="card-text">{comment.content}</p>
-                <div className="d-flex justify-content-between">
-                  <small>
-                    Posted by {comment.createdBy}
-                  </small>
-                  <small>
-                    {new Date(comment.createdAt).toLocaleDateString()}
-                  </small>
-                </div>
+      {/* Comments Section */}
+      <div className="comments-section">
+        <h3>Comments</h3>
+        {comments.map((comment) => (
+          <div key={comment.id} className="card mb-3">
+            <div className="card-body">
+              <p className="card-text">{comment.content}</p>
+              <div className="text-muted">
+                <small>Posted by {comment.createdBy} on {new Date(comment.createdAt).toLocaleString()}</small>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
 
-      {userAuthenticated ? (
-        <CommentForm threadId={parseInt(threadId || '0')} onCommentAdded={handleCommentAdded} />
-      ) : (
-        <div className="alert alert-info">
-          <Link to="/login" className="alert-link">Login</Link> to post a comment.
-        </div>
-      )}
+        {/* Comment Form - Only render if we have a valid post ID */}
+        {userAuthenticated && post && post.id && (
+          <CommentForm postId={post.id} onCommentAdded={handleCommentAdded} />
+        )}
+      </div>
     </div>
   );
 };
 
-export default Thread; 
+export default ThreadComponent; 

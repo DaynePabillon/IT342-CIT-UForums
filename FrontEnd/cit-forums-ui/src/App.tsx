@@ -29,7 +29,7 @@ const App: React.FC = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/forums" element={<ForumList />} />
           <Route path="/forums/create" element={<CreateForum />} />
-          <Route path="/forums/:forumId" element={<ThreadList />} />
+          <Route path="/forums/:forumId/threads" element={<ThreadList />} />
           <Route path="/forums/:forumId/threads/create" element={<CreateThread />} />
           <Route path="/forums/:forumId/threads/:threadId" element={<Thread />} />
         </Routes>

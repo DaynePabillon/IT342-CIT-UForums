@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getForumById, ForumCategory } from '../services/forumService';
 import { getThreadsByForumId, Thread } from '../services/threadService';
 import { isAuthenticated } from '../services/authService';
@@ -18,6 +18,7 @@ interface ForumData {
 const ThreadList: React.FC = () => {
   const { forumId } = useParams<{ forumId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [forum, setForum] = useState<ForumData | null>(null);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -25,6 +26,69 @@ const ThreadList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [validForumId, setValidForumId] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const fetchThreads = useCallback(async () => {
+    if (!forumId) {
+      setError('Invalid forum ID');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await getThreadsByForumId(parseInt(forumId), currentPage);
+      if (response && response.content) {
+        setThreads(response.content);
+        setTotalPages(response.totalPages);
+      } else {
+        setThreads([]);
+        setTotalPages(0);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to load threads');
+      setThreads([]);
+      setTotalPages(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [forumId, currentPage]);
+
+  useEffect(() => {
+    fetchThreads();
+  }, [fetchThreads]);
+
+  useEffect(() => {
+    if (location.state) {
+      const state = location.state as { refresh?: boolean; message?: string };
+      
+      if (state.refresh) {
+        fetchThreads();
+      }
+      
+      if (state.message) {
+        setSuccessMessage(state.message);
+        const timer = setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+        return () => clearTimeout(timer);
+      }
+      
+      window.history.replaceState({}, document.title);
+    }
+  }, [location, fetchThreads]);
+
+  useEffect(() => {
+    if (forumId) {
+      fetchThreads();
+    }
+  }, [forumId, fetchThreads]);
+
+  useEffect(() => {
+    if (currentPage) {
+      fetchThreads();
+    }
+  }, [currentPage, fetchThreads]);
 
   useEffect(() => {
     // Validate forumId
@@ -42,27 +106,20 @@ const ThreadList: React.FC = () => {
     
     setValidForumId(parsedId);
     fetchForum(parsedId);
-    fetchThreads(parsedId);
   }, [forumId]);
-  
-  useEffect(() => {
-    if (validForumId) {
-      fetchThreads(validForumId);
-    }
-  }, [currentPage, validForumId]);
 
   // Add effect to refresh threads when component receives focus
   useEffect(() => {
     const handleFocus = () => {
       if (validForumId) {
         console.log('ThreadList received focus, refreshing threads');
-        fetchThreads(validForumId);
+        fetchThreads();
       }
     };
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [validForumId]);
+  }, [validForumId, fetchThreads]);
 
   const fetchForum = async (id: number) => {
     try {
@@ -73,28 +130,6 @@ const ThreadList: React.FC = () => {
     } catch (err: any) {
       console.error("Error fetching forum:", err);
       setError(err.response?.data?.message || 'Failed to load forum');
-    }
-  };
-
-  const fetchThreads = async (id: number) => {
-    setLoading(true);
-    try {
-      console.log("Fetching threads for forum ID:", id, "page:", currentPage);
-      const response = await getThreadsByForumId(id, currentPage);
-      if (response && response.content) {
-        setThreads(response.content);
-        setTotalPages(response.totalPages || 0);
-      } else {
-        setThreads([]);
-        setTotalPages(0);
-      }
-    } catch (err: any) {
-      console.error('Error fetching threads:', err);
-      setError(err.response?.data?.message || 'Failed to load threads');
-      setThreads([]);
-      setTotalPages(0);
-    } finally {
-      setLoading(false);
     }
   };
   
@@ -181,6 +216,18 @@ const ThreadList: React.FC = () => {
 
   return (
     <div className="container">
+      {successMessage && (
+        <div className="alert alert-success alert-dismissible fade show" role="alert">
+          {successMessage}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setSuccessMessage(null)}
+            aria-label="Close"
+          ></button>
+        </div>
+      )}
+      
       <div className="row mb-4">
         <div className="col">
           <div className="card">
@@ -249,7 +296,7 @@ const ThreadList: React.FC = () => {
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
                       <small className="text-muted">
-                        Created by {thread.createdBy}
+                        Created by {thread.createdBy?.name || 'Unknown User'}
                       </small>
                     </div>
                     <div>
