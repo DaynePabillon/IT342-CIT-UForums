@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getThreadById, Thread } from '../services/threadService';
 import { getCommentsByPostId, Comment, PagedResponse } from '../services/commentService';
-import { createPost, Post } from '../services/postService';
+// import { createPost, Post } from '../services/postService';
 import { isAuthenticated } from '../services/authService';
 import CommentForm from '../components/CommentForm';
 
