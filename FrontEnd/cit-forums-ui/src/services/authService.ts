@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = '/api/auth'; // This will be proxied to http://localhost:8080/api/auth
+const TOKEN_KEY = 'auth_token'; // Use the same key as in axiosConfig.ts
 
 export interface LoginRequest {
   usernameOrEmail: string;
@@ -26,30 +27,17 @@ export interface UserProfile {
 
 // Store the JWT token in localStorage
 export const setAuthToken = (token: string): void => {
-  try {
-    localStorage.setItem('auth_token', token);
-  } catch (error) {
-    console.error('Error setting auth token:', error);
-  }
+  localStorage.setItem(TOKEN_KEY, token);
 };
 
 // Get the JWT token from localStorage
 export const getAuthToken = (): string | null => {
-  try {
-    return localStorage.getItem('auth_token');
-  } catch (error) {
-    console.error('Error getting auth token:', error);
-    return null;
-  }
+  return localStorage.getItem(TOKEN_KEY);
 };
 
 // Remove the JWT token from localStorage
 export const removeAuthToken = (): void => {
-  try {
-    localStorage.removeItem('auth_token');
-  } catch (error) {
-    console.error('Error removing auth token:', error);
-  }
+  localStorage.removeItem(TOKEN_KEY);
 };
 
 export const setUserProfile = (profile: UserProfile): void => {

@@ -18,4 +18,6 @@ public interface ForumService {
     Forum getForumEntity(Long forumId);
     List<ForumDto> getAllActiveForums();
     void deleteFirstForumByCategory(ForumCategory category);
+    List<Forum> getForumsByCategory(ForumCategory category);
+    List<ForumDto> getForumsByCategoryDto(ForumCategory category);
 } 

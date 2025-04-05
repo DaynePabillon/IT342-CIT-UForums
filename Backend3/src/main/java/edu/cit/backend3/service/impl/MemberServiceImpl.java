@@ -7,8 +7,11 @@ import edu.cit.backend3.models.Member;
 import edu.cit.backend3.repository.MemberRepository;
 import edu.cit.backend3.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,31 +19,55 @@ import java.util.stream.Collectors;
 @Service
 public class MemberServiceImpl implements MemberService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MemberServiceImpl.class);
+
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    /**
+     * Registers a new member with the provided registration details.
+     * WARNING: This implementation stores passwords in plaintext, which is NOT secure
+     * and should NOT be used in production environments. This is only for development/testing.
+     */
     @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public MemberDto registerMember(MemberRegistrationRequest registrationRequest) {
-        if (existsByName(registrationRequest.getName())) {
-            throw new RuntimeException("Username is already taken!");
-        }
-        if (existsByEmail(registrationRequest.getEmail())) {
-            throw new RuntimeException("Email is already in use!");
-        }
+        logger.info("Starting member registration process");
+        logger.info("Registration request: name={}, email={}", registrationRequest.getName(), registrationRequest.getEmail());
+        
+        try {
+            // Check for existing username or email within the transaction
+            if (existsByName(registrationRequest.getName())) {
+                logger.error("Username already exists: {}", registrationRequest.getName());
+                throw new RuntimeException("Username is already taken!");
+            }
+            if (existsByEmail(registrationRequest.getEmail())) {
+                logger.error("Email already exists: {}", registrationRequest.getEmail());
+                throw new RuntimeException("Email is already in use!");
+            }
 
-        Member member = new Member();
-        member.setName(registrationRequest.getName());
-        member.setEmail(registrationRequest.getEmail());
-        member.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-        member.setFirstName(registrationRequest.getFirstName());
-        member.setLastName(registrationRequest.getLastName());
-        member.setAdmin(false);
+            Member member = new Member();
+            member.setName(registrationRequest.getName());
+            member.setEmail(registrationRequest.getEmail());
+            
+            // Encode the password
+            String rawPassword = registrationRequest.getPassword();
+            logger.info("Storing password directly: {}", rawPassword);
+            member.setPassword(rawPassword);
+            
+            member.setFirstName(registrationRequest.getFirstName());
+            member.setLastName(registrationRequest.getLastName());
+            member.setAdmin(false);
 
-        Member savedMember = memberRepository.save(member);
-        return convertToDto(savedMember);
+            logger.info("Saving member to database...");
+            Member savedMember = memberRepository.save(member);
+            logger.info("Member saved successfully with ID: {}", savedMember.getId());
+            
+            return convertToDto(savedMember);
+        } catch (Exception e) {
+            logger.error("Error during member registration: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Override
@@ -86,7 +113,8 @@ public class MemberServiceImpl implements MemberService {
         member.setName(updateRequest.getName());
         member.setEmail(updateRequest.getEmail());
         if (updateRequest.getPassword() != null && !updateRequest.getPassword().isEmpty()) {
-            member.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+            logger.info("Storing password directly: {}", updateRequest.getPassword());
+            member.setPassword(updateRequest.getPassword());
         }
         member.setFirstName(updateRequest.getFirstName());
         member.setLastName(updateRequest.getLastName());
@@ -138,15 +166,28 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDto getMemberByUsernameOrEmail(String usernameOrEmail) {
-        Member member = memberRepository.findByNameOrEmail(usernameOrEmail, usernameOrEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        List<Member> members = memberRepository.findByNameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (members.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        // Take the first member if multiple exist
+        Member member = members.get(0);
+        logger.warn("Multiple users found for username/email: {}. Using first one with ID: {}", 
+            usernameOrEmail, member.getId());
         return convertToDto(member);
     }
 
     @Override
     public Member findByNameOrEmail(String name, String email) {
-        return memberRepository.findByNameOrEmail(name, email)
-            .orElseThrow(() -> new RuntimeException("Member not found"));
+        List<Member> members = memberRepository.findByNameOrEmail(name, email);
+        if (members.isEmpty()) {
+            throw new RuntimeException("Member not found");
+        }
+        // Take the first member if multiple exist
+        Member member = members.get(0);
+        logger.warn("Multiple users found for name/email: {}/{}. Using first one with ID: {}", 
+            name, email, member.getId());
+        return member;
     }
 
     private MemberDto convertToDto(Member member) {

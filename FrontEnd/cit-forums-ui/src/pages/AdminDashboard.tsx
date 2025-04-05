@@ -92,7 +92,7 @@ const AdminDashboard: React.FC = () => {
                             {forums.map(forum => (
                                 <tr key={forum.id}>
                                     <td className="px-6 py-4 whitespace-nowrap">{forum.title}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{forum.category}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{forum.categoryName}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <button
                                             onClick={() => handleDeleteForum(forum.id)}

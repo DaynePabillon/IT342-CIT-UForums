@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+// Token storage key - use a consistent key across the application
+const TOKEN_KEY = 'auth_token';
+
 // Create an axios instance with default configuration
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8080', // Adjust to your backend URL
@@ -14,7 +17,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // Add auth token if available
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -71,7 +74,7 @@ axiosInstance.interceptors.response.use(
     // Handle authentication errors
     if (error.response.status === 401) {
       console.warn('Authentication error - redirecting to login');
-      localStorage.removeItem('auth_token');
+      localStorage.removeItem(TOKEN_KEY);
       window.location.href = '/login';
       return Promise.reject(new Error('Authentication required'));
     }

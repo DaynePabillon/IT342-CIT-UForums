@@ -32,4 +32,12 @@ public interface ForumRepository extends JpaRepository<Forum, Long> {
 
     @Query("SELECT f FROM Forum f WHERE f.lastActivity < :thresholdDate OR f.lastActivity IS NULL")
     List<Forum> findForumsWithNoActivitySince(@Param("thresholdDate") LocalDateTime thresholdDate);
+
+    List<Forum> findByCategory(ForumCategory category);
+
+    @Query(value = "DELETE FROM forums WHERE id IN (SELECT id FROM forums f JOIN forum_categories fc ON f.category_id = fc.id WHERE fc.name = 'GENERAL' AND f.id NOT IN (SELECT MIN(f2.id) FROM forums f2 JOIN forum_categories fc2 ON f2.category_id = fc2.id WHERE fc2.name = 'GENERAL'))", nativeQuery = true)
+    void deleteExtraGeneralForums();
+
+    @Query("SELECT f FROM Forum f WHERE f.category.name = 'GENERAL' AND f.id > (SELECT MIN(f2.id) FROM Forum f2 WHERE f2.category.name = 'GENERAL')")
+    List<Forum> findExtraGeneralForums();
 } 

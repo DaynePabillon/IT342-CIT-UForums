@@ -24,10 +24,10 @@ const Home: React.FC = () => {
       // Filter for Announcements, Events, and Academic forums
       const filteredForums = Array.isArray(data) 
         ? data.filter(forum => {
-            console.log('Checking forum:', forum.title, 'Category:', forum.category);
-            return forum.category === ForumCategory.ANNOUNCEMENTS || 
-                   forum.category === ForumCategory.EVENTS ||
-                   forum.category === ForumCategory.ACADEMIC;
+            console.log('Checking forum:', forum.title, 'Category:', forum.categoryName);
+            return forum.categoryName === ForumCategory.ANNOUNCEMENTS || 
+                   forum.categoryName === ForumCategory.EVENTS ||
+                   forum.categoryName === ForumCategory.ACADEMIC;
           })
         : [];
       

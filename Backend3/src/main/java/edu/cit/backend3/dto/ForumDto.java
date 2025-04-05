@@ -1,6 +1,5 @@
 package edu.cit.backend3.dto;
 
-import edu.cit.backend3.models.ForumCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +20,6 @@ public class ForumDto {
     private int threadCount;
     private MemberSummaryDto createdBy;
     private boolean active;
-    private ForumCategory category;
+    private String categoryName;
     private LocalDateTime lastActivity;
 } 

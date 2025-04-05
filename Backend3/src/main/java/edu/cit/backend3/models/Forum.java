@@ -41,8 +41,8 @@ public class Forum {
     @Column
     private LocalDateTime lastActivity;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
     private ForumCategory category;
     
     @PrePersist

@@ -9,7 +9,7 @@ interface ForumData {
   id: number;
   title: string;
   description: string;
-  category: ForumCategory;
+  categoryName: string;
 }
 
 const CreateThread: React.FC = () => {
@@ -211,8 +211,8 @@ const CreateThread: React.FC = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <h2 className="mb-0">Create New Thread</h2>
                 {forum && (
-                  <span className={`badge ${getCategoryBadgeClass(forum.category)}`}>
-                    {getCategoryDisplayName(forum.category)}
+                  <span className={`badge ${getCategoryBadgeClass(forum.categoryName as ForumCategory)}`}>
+                    {getCategoryDisplayName(forum.categoryName as ForumCategory)}
                   </span>
                 )}
               </div>

@@ -32,16 +32,6 @@ public class ApiAuthController {
 
     @PostMapping("/register")
     public ResponseEntity<MemberDto> registerMember(@Valid @RequestBody MemberRegistrationRequest registrationRequest) {
-        // Check if username already exists
-        if(memberService.existsByName(registrationRequest.getName())) {
-            throw new RuntimeException("Username is already taken!");
-        }
-        
-        // Check if email already exists
-        if(memberService.existsByEmail(registrationRequest.getEmail())) {
-            throw new RuntimeException("Email is already in use!");
-        }
-        
         MemberDto registeredMember = memberService.registerMember(registrationRequest);
         return new ResponseEntity<>(registeredMember, HttpStatus.CREATED);
     }

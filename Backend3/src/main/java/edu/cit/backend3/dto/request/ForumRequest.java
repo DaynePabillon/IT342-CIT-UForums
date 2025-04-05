@@ -1,6 +1,5 @@
 package edu.cit.backend3.dto.request;
 
-import edu.cit.backend3.models.ForumCategory;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,6 +23,6 @@ public class ForumRequest {
     
     private boolean active = true;
 
-    @NotNull(message = "Category is required")
-    private ForumCategory category;
+    @NotBlank(message = "Category is required")
+    private String categoryName;
 } 

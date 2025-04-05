@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { getForums, Forum, ForumCategory } from '../services/forumService';
-import { isAuthenticated } from '../services/authService';
+import { getForums, Forum, ForumCategory, cleanupGeneralForums } from '../services/forumService';
+import { isAuthenticated, isAdmin } from '../services/authService';
 import '../styles/custom.css';
 
 const ForumList: React.FC = () => {
@@ -66,38 +66,48 @@ const ForumList: React.FC = () => {
     }
   }, [location, fetchForums]);
 
-  const getCategoryBadgeClass = (category: ForumCategory): string => {
-    switch (category) {
-      case ForumCategory.FREEDOM_WALL:
-        return 'badge-freedom-wall';
-      case ForumCategory.CONFESSION:
-        return 'badge-confession';
-      case ForumCategory.ACADEMIC:
-        return 'badge-academic';
+  // Add a refresh button handler
+  const handleRefresh = () => {
+    console.log('Manually refreshing forums...');
+    fetchForums();
+  };
+
+  const getCategoryBadgeClass = (categoryName: string): string => {
+    switch (categoryName) {
+      case ForumCategory.ANNOUNCEMENTS:
+        return 'bg-danger';
       case ForumCategory.EVENTS:
-        return 'badge-events';
+        return 'bg-primary';
+      case ForumCategory.ACADEMIC:
+        return 'bg-success';
+      case ForumCategory.FREEDOM_WALL:
+        return 'bg-warning';
+      case ForumCategory.CONFESSION:
+        return 'bg-info';
       default:
-        return 'badge-general';
+        return 'bg-secondary';
     }
   };
 
-  const getCategoryDisplayName = (category: ForumCategory): string => {
-    switch (category) {
+  const getCategoryDisplayName = (categoryName: string): string => {
+    switch (categoryName) {
+      case ForumCategory.ANNOUNCEMENTS:
+        return 'Announcements';
+      case ForumCategory.EVENTS:
+        return 'Events';
+      case ForumCategory.ACADEMIC:
+        return 'Academic';
       case ForumCategory.FREEDOM_WALL:
         return 'Freedom Wall';
       case ForumCategory.CONFESSION:
         return 'Confession';
-      case ForumCategory.ACADEMIC:
-        return 'Academic';
-      case ForumCategory.EVENTS:
-        return 'Events';
       default:
         return 'General';
     }
   };
 
   const filteredForums = selectedCategory
-    ? forums.filter(forum => forum.category === selectedCategory)
+    ? forums.filter(forum => forum.categoryName === selectedCategory)
     : forums;
 
   if (loading) {
@@ -120,27 +130,52 @@ const ForumList: React.FC = () => {
   }
 
   return (
-    <div className="container">
+    <div className="container mt-4">
       {successMessage && (
         <div className="alert alert-success alert-dismissible fade show" role="alert">
           {successMessage}
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setSuccessMessage(null)}
-            aria-label="Close"
-          ></button>
+          <button type="button" className="btn-close" onClick={() => setSuccessMessage(null)}></button>
         </div>
       )}
       
-      <div className="row mb-4">
-        <div className="col">
-          <h2>Forums</h2>
+      {error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          {error}
+          <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+        </div>
+      )}
+
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2>Forums</h2>
+        <div>
           {isAuthenticated() && (
-            <Link to="/forums/create" className="btn btn-primary">
+            <Link to="/forums/create" className="btn btn-primary me-2">
               Create New Forum
             </Link>
           )}
+          {isAdmin() && (
+            <button 
+              className="btn btn-warning me-2"
+              onClick={async () => {
+                try {
+                  const result = await cleanupGeneralForums();
+                  setSuccessMessage(result);
+                  fetchForums();
+                } catch (err: any) {
+                  setError(err.message || 'Failed to cleanup forums');
+                }
+              }}
+            >
+              Cleanup General Forums
+            </button>
+          )}
+          <button 
+            className="btn btn-primary" 
+            onClick={handleRefresh}
+            disabled={loading}
+          >
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
         </div>
       </div>
 
@@ -181,8 +216,8 @@ const ForumList: React.FC = () => {
                 <p className="card-text">{forum.description}</p>
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
-                    <span className={`badge ${getCategoryBadgeClass(forum.category)} me-2`}>
-                      {getCategoryDisplayName(forum.category)}
+                    <span className={`badge ${getCategoryBadgeClass(forum.categoryName)} me-2`}>
+                      {getCategoryDisplayName(forum.categoryName)}
                     </span>
                     <Link 
                       to={`/forums/${forum.id}/threads`} 
@@ -243,4 +278,4 @@ const ForumList: React.FC = () => {
   );
 };
 
-export default ForumList; 
+export default ForumList;

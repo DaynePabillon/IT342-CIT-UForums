@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -43,7 +42,8 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // React default port
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
         
@@ -74,7 +74,8 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 // Forum endpoints - allow authenticated users to create forums
                 .requestMatchers(HttpMethod.GET, "/api/forums/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/forums/delete-first-general").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/forums/delete-first-general").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/forums/cleanup-general").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/forums").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/forums/**").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/forums/**").authenticated()
@@ -108,10 +109,9 @@ public class WebSecurityConfig {
                 .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .permitAll());
-
-        // Add JWT filter
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .permitAll())
+            // Add JWT filter
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }
@@ -123,6 +123,8 @@ public class WebSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        // Using NoOpPasswordEncoder to store plain text passwords
+        // WARNING: This is NOT recommended for production use!
+        return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
     }
 } 

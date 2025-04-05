@@ -11,7 +11,7 @@ export interface Forum {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-  category: ForumCategory;
+  categoryName: string;
 }
 
 export enum ForumCategory {
@@ -20,13 +20,16 @@ export enum ForumCategory {
   FREEDOM_WALL = 'FREEDOM_WALL',
   CONFESSION = 'CONFESSION',
   ACADEMIC = 'ACADEMIC',
-  GENERAL = 'GENERAL'
+  GENERAL = 'GENERAL',
+  TECHNOLOGY = 'TECHNOLOGY',
+  SPORTS = 'SPORTS',
+  ENTERTAINMENT = 'ENTERTAINMENT'
 }
 
 export interface ForumRequest {
   title: string;
   description: string;
-  category: ForumCategory;
+  categoryName: string;
 }
 
 export interface PagedResponse<T> {
@@ -96,22 +99,41 @@ export const getForumById = async (id: number): Promise<Forum> => {
 export const createForum = async (forumRequest: ForumRequest): Promise<Forum> => {
   try {
     console.log('Creating forum with data:', forumRequest);
+    
+    // Make sure we have a categoryName
+    if (!forumRequest.categoryName) {
+      forumRequest.categoryName = 'GENERAL'; // Default category
+      console.log('Using default category GENERAL');
+    }
+    
+    const TOKEN_KEY = 'auth_token'; // Use the same key as in axiosConfig.ts
+    const token = localStorage.getItem(TOKEN_KEY);
+    console.log('Current auth token:', token ? 'Present' : 'Missing');
+    
     const response = await axiosInstance.post(API_URL, forumRequest);
     console.log('Forum creation response:', response);
     console.log('Forum created successfully:', response.data);
+    
+    // Refresh the forums list after creation
+    const forums = await getActiveForums();
+    console.log('Refreshed forums list:', forums);
+    
     return response.data;
   } catch (error: any) {
     console.error('Error creating forum:', error);
     console.error('Error details:', {
       response: error.response?.data,
       status: error.response?.status,
-      message: error.message
+      message: error.message,
+      headers: error.response?.headers
     });
     
     if (error.response && error.response.status === 403) {
       throw new Error('You do not have permission to create forums');
+    } else if (error.response && error.response.status === 401) {
+      throw new Error('Authentication required - please log in again');
     } else {
-      throw error; // Let the interceptor handle other errors
+      throw error;
     }
   }
 };
@@ -143,4 +165,14 @@ export const searchForums = async (
     params: { query, page, size },
   });
   return response.data;
+};
+
+export const cleanupGeneralForums = async (): Promise<string> => {
+  try {
+    const response = await axiosInstance.post('/api/forums/cleanup-general');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error cleaning up general forums:', error);
+    throw error;
+  }
 }; 

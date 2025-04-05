@@ -12,7 +12,7 @@ interface ForumData {
   active: boolean;
   createdBy: string;
   createdAt: string;
-  category: ForumCategory;
+  categoryName: string;
 }
 
 const ThreadList: React.FC = () => {
@@ -234,8 +234,8 @@ const ThreadList: React.FC = () => {
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-center">
                 <h2 className="mb-0">{forum.title}</h2>
-                <span className={`badge ${getCategoryBadgeClass(forum.category)}`}>
-                  {getCategoryDisplayName(forum.category)}
+                <span className={`badge ${getCategoryBadgeClass(forum.categoryName as ForumCategory)}`}>
+                  {getCategoryDisplayName(forum.categoryName as ForumCategory)}
                 </span>
               </div>
               <p className="text-muted mb-0">{forum.description}</p>

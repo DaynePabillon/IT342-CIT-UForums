@@ -2,9 +2,8 @@ package edu.cit.backend3.security;
 
 import edu.cit.backend3.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.context.annotation.Bean;
-// import org.springframework.context.annotation.Configuration;
-// import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,7 +20,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * @deprecated This configuration is inactive. See WebSecurityConfig.
  */
 @Deprecated
-// Configuration annotation removed to prevent Spring from loading this class
 public class LegacySecurityConfig {
 
     @Autowired
@@ -33,7 +31,8 @@ public class LegacySecurityConfig {
      * 
      * @deprecated Use the passwordEncoder in WebSecurityConfig instead.
      */
-    // @Bean(name = "legacyPasswordEncoder") - Disabled to prevent conflicts with the primary security config
+    @Bean(name = "legacyPasswordEncoder")
+    @Deprecated
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -44,9 +43,10 @@ public class LegacySecurityConfig {
      * 
      * @deprecated This method is not used anymore.
      */
-    // @Bean - Bean annotation commented out to avoid conflicts
-    // @Order(2)
-    public SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    @Deprecated
+    @Order(2)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // This configuration is no longer active
         http
             .securityMatcher("/auth/**", "/db-test/**", "/welcome/**", "/basic-login/**")

@@ -22,6 +22,11 @@ public class WebConfig implements WebMvcConfigurer {
         
         registry.addResourceHandler("/*.html")
                 .addResourceLocations("classpath:/static/");
+
+        // Add a resource handler for favicon.ico that returns a 404
+        registry.addResourceHandler("/favicon.ico")
+               .addResourceLocations("classpath:/static/")
+               .setCachePeriod(0);
     }
     
     @Override
