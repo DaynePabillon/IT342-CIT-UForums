@@ -179,14 +179,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member findByNameOrEmail(String name, String email) {
+        logger.info("Finding member by name: {} or email: {}", name, email);
         List<Member> members = memberRepository.findByNameOrEmail(name, email);
         if (members.isEmpty()) {
+            logger.error("Member not found for name: {} or email: {}", name, email);
             throw new RuntimeException("Member not found");
         }
         // Take the first member if multiple exist
         Member member = members.get(0);
-        logger.warn("Multiple users found for name/email: {}/{}. Using first one with ID: {}", 
-            name, email, member.getId());
+        if (members.size() > 1) {
+            logger.warn("Multiple users found for name/email: {}/{}. Using first one with ID: {}", 
+                name, email, member.getId());
+        }
+        logger.info("Found member with ID: {}", member.getId());
         return member;
     }
 

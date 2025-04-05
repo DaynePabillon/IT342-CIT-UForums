@@ -18,11 +18,31 @@ export interface CreatePostRequest {
 
 export const createPost = async (postData: CreatePostRequest): Promise<Post> => {
     try {
-        const response = await axiosInstance.post<Post>('/api/posts', postData);
+        // Validate content length
+        if (!postData.content || postData.content.trim().length < 10) {
+            throw new Error('Post content must be at least 10 characters long');
+        }
+
+        console.log('Creating post with data:', postData);
+        const response = await axiosInstance.post<Post>(`/api/posts/thread/${postData.threadId}`, {
+            content: postData.content.trim() // Trim whitespace
+        });
+        console.log('Post created successfully:', response.data);
         return response.data;
     } catch (error) {
+        console.error('Error creating post:', error);
         if (axios.isAxiosError(error)) {
-            throw new Error(error.response?.data?.message || 'Failed to create post');
+            if (error.response?.status === 401) {
+                throw new Error('Session expired - please login again');
+            }
+            const errorMessage = error.response?.data?.message || 
+                               error.response?.data?.error || 
+                               'Failed to create post';
+            throw new Error(errorMessage);
+        }
+        // If it's our validation error, throw it directly
+        if (error instanceof Error) {
+            throw error;
         }
         throw new Error('Failed to create post');
     }

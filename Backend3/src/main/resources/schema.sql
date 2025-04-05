@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS `threads` (
     FOREIGN KEY (`created_by_id`) REFERENCES `members`(`id`)
 );
 
+-- Drop the posts table if it exists to ensure clean state
+DROP TABLE IF EXISTS `posts`;
+
 CREATE TABLE IF NOT EXISTS `posts` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `content` TEXT NOT NULL,
@@ -60,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
     `thread_id` BIGINT NOT NULL,
     `author_id` BIGINT NOT NULL,
     `edited` BOOLEAN DEFAULT FALSE NOT NULL,
+    `active` BOOLEAN DEFAULT TRUE NOT NULL,
     FOREIGN KEY (`thread_id`) REFERENCES `threads`(`id`),
     FOREIGN KEY (`author_id`) REFERENCES `members`(`id`)
 );

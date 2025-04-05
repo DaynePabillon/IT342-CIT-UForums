@@ -33,8 +33,8 @@ public class Post {
     private Thread thread;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_id", nullable = false)
-    private Member createdBy;
+    @JoinColumn(name = "author_id", nullable = false)
+    private Member author;
     
     @OneToMany(mappedBy = "parentPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();

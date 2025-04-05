@@ -12,10 +12,14 @@ import Thread from './pages/Thread';
 import Profile from './pages/Profile';
 import CreateThread from './pages/CreateThread';
 import CreateForum from './pages/CreateForum';
-import { initializeAuth } from './services/authService';
+import axiosInstance from './services/axiosInstance';
+import { getAuthToken } from './services/authService';
 
-// Initialize authentication on app start
-initializeAuth();
+// Initialize axios with token if it exists
+const token = getAuthToken();
+if (token) {
+  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
 
 const App: React.FC = () => {
   return (

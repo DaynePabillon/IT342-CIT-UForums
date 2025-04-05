@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../services/axiosInstance';
 
+const TOKEN_KEY = 'auth_token';
+
 interface User {
   id: number;
   name: string;
@@ -37,15 +39,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem(TOKEN_KEY);
         if (token) {
-          console.log('Checking auth with token:', token);
+          console.log('Checking auth with token');
           const response = await axiosInstance.get('/api/auth/me');
           console.log('Auth check response:', response.data);
           setUser(response.data);
         }
       } catch (err) {
         console.error('Auth check failed:', err);
+        localStorage.removeItem(TOKEN_KEY);
         setUser(null);
       } finally {
         setLoading(false);
@@ -58,6 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const handleUnauthorized = () => {
       console.log('Unauthorized event received');
+      localStorage.removeItem(TOKEN_KEY);
       setUser(null);
       navigate('/login');
     };
@@ -79,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       console.log('Login response:', response.data);
       const { token, user } = response.data;
-      localStorage.setItem('token', token);
+      localStorage.setItem(TOKEN_KEY, token);
       setUser(user);
       console.log('User state after login:', user);
     } catch (err: any) {
@@ -92,20 +96,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    console.log('Logging out');
-    localStorage.removeItem('token');
+    localStorage.removeItem(TOKEN_KEY);
     setUser(null);
     navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      loading,
-      error,
-      login,
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      error, 
+      login, 
       logout,
-      isAdmin: user?.admin || false
+      isAdmin: user?.admin || false 
     }}>
       {children}
     </AuthContext.Provider>

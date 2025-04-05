@@ -21,7 +21,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     
     Boolean existsByName(String name);
 
-    @Query("SELECT m FROM Member m WHERE m.name = :name OR m.email = :email")
+    @Query("SELECT m FROM Member m WHERE (:name IS NULL OR m.name = :name) OR (:email IS NULL OR m.email = :email)")
     List<Member> findByNameOrEmail(@Param("name") String name, @Param("email") String email);
 
     @Query(value = 

@@ -6,6 +6,8 @@ import edu.cit.backend3.models.Member;
 import edu.cit.backend3.service.MemberService;
 import edu.cit.backend3.service.PostService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/posts")
 public class ApiPostController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ApiPostController.class);
 
     @Autowired
     private PostService postService;
@@ -32,17 +36,28 @@ public class ApiPostController {
             @PathVariable Long threadId,
             Principal principal) {
         
+        logger.info("Received post creation request - Thread ID: {}, Content length: {}", 
+            threadId, postRequest.getContent().length());
+        
         // Get the authenticated user's email from the Principal
         String userEmail = principal.getName();
+        logger.info("Authenticated user: {}", userEmail);
         
-        // Get the member entity from the email
-        Member member = memberService.findByNameOrEmail(null, userEmail);
-        if (member == null) {
-            throw new RuntimeException("User not found");
+        try {
+            // Get the member entity from the email
+            Member member = memberService.findByNameOrEmail(null, userEmail);
+            logger.info("Found member with ID: {}", member.getId());
+            
+            PostDto createdPost = postService.createPost(postRequest, threadId, member.getId());
+            logger.info("Post created successfully with ID: {}", createdPost.getId());
+            return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            logger.error("Error creating post: {}", e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            logger.error("Error creating post: {}", e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
-        PostDto createdPost = postService.createPost(postRequest, threadId, member.getId());
-        return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
     
     @GetMapping("/thread/{threadId}")

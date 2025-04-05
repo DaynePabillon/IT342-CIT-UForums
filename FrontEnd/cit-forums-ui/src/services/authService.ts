@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 
 const API_URL = '/api/auth'; // This will be proxied to http://localhost:8080/api/auth
 const TOKEN_KEY = 'auth_token'; // Use the same key as in axiosConfig.ts
@@ -28,6 +28,8 @@ export interface UserProfile {
 // Store the JWT token in localStorage
 export const setAuthToken = (token: string): void => {
   localStorage.setItem(TOKEN_KEY, token);
+  // Update axios instance headers
+  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 };
 
 // Get the JWT token from localStorage
@@ -38,46 +40,41 @@ export const getAuthToken = (): string | null => {
 // Remove the JWT token from localStorage
 export const removeAuthToken = (): void => {
   localStorage.removeItem(TOKEN_KEY);
+  // Remove from axios instance headers
+  delete axiosInstance.defaults.headers.common['Authorization'];
 };
 
 export const setUserProfile = (profile: UserProfile): void => {
-  try {
-    localStorage.setItem('user_profile', JSON.stringify(profile));
-  } catch (error) {
-    console.error('Error setting user profile:', error);
-  }
+  localStorage.setItem('user_profile', JSON.stringify(profile));
 };
 
 export const getUserProfile = (): UserProfile | null => {
-  try {
-    const profileString = localStorage.getItem('user_profile');
-    return profileString ? JSON.parse(profileString) : null;
-  } catch (error) {
-    console.error('Error getting user profile:', error);
-    return null;
-  }
+  const profile = localStorage.getItem('user_profile');
+  return profile ? JSON.parse(profile) : null;
 };
 
 export const removeUserProfile = (): void => {
-  try {
-    localStorage.removeItem('user_profile');
-  } catch (error) {
-    console.error('Error removing user profile:', error);
-  }
+  localStorage.removeItem('user_profile');
 };
 
 // Login a user
 export const login = async (credentials: LoginRequest): Promise<boolean> => {
   try {
-    const response = await axios.post(`${API_URL}/login`, credentials);
+    const response = await axiosInstance.post(`${API_URL}/login`, credentials);
     const token = response.data.token;
+    console.log('Login successful, received token:', token ? 'Present' : 'Missing');
+    
+    if (!token) {
+      console.error('No token received in login response');
+      return false;
+    }
+    
     setAuthToken(token);
     
     // Set user profile from response
     if (response.data.user) {
       console.log('User profile from login:', response.data.user);
       
-      // Make sure username is set correctly
       const userProfile: UserProfile = {
         id: response.data.user.id,
         username: response.data.user.name || response.data.user.username || credentials.usernameOrEmail,
@@ -92,7 +89,6 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
     } else {
       console.warn('No user data in login response');
       
-      // Create a minimal profile based on login credentials
       const minimalProfile: UserProfile = {
         id: 0,
         username: credentials.usernameOrEmail,
@@ -104,9 +100,6 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
       setUserProfile(minimalProfile);
     }
     
-    // Set axios default headers for future requests
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    
     return true;
   } catch (error) {
     console.error('Login error:', error);
@@ -117,7 +110,7 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
 // Register a user
 export const register = async (userData: RegisterRequest): Promise<boolean> => {
   try {
-    await axios.post(`${API_URL}/register`, userData);
+    await axiosInstance.post(`${API_URL}/register`, userData);
     return true;
   } catch (error) {
     console.error('Registration error:', error);
@@ -126,23 +119,13 @@ export const register = async (userData: RegisterRequest): Promise<boolean> => {
 };
 
 export const logout = (): void => {
-  try {
-    removeAuthToken();
-    removeUserProfile();
-    delete axios.defaults.headers.common['Authorization'];
-  } catch (error) {
-    console.error('Logout error:', error);
-  }
+  removeAuthToken();
+  removeUserProfile();
 };
 
 export const isAuthenticated = (): boolean => {
-  try {
-    const token = getAuthToken();
-    return !!token;
-  } catch (error) {
-    console.error('Error checking authentication:', error);
-    return false;
-  }
+  const token = getAuthToken();
+  return !!token;
 };
 
 export const hasRole = (role: string): boolean => {
@@ -154,17 +137,8 @@ export const isAdmin = (): boolean => {
   return hasRole('ROLE_ADMIN');
 };
 
-// Initialize axios with token if it exists
-export const initializeAuth = (): void => {
-  try {
-    const token = getAuthToken();
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-  } catch (error) {
-    console.error('Error initializing auth:', error);
-  }
-};
-
 // Initialize auth on module import
-initializeAuth(); 
+const token = getAuthToken();
+if (token) {
+  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+} 

@@ -19,7 +19,7 @@ public class PostDto {
     private LocalDateTime updatedAt;
     private Long threadId;
     private String threadTitle;
-    private MemberSummaryDto createdBy;
+    private MemberSummaryDto author;
     private boolean active;
     private boolean edited;
     private List<CommentDto> comments;

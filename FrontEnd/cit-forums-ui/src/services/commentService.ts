@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 
 const API_URL = '/api/comments';
 
@@ -18,15 +18,14 @@ export interface CommentRequest {
 
 export interface PagedResponse<T> {
   content: T[];
-  page: number;
-  size: number;
   totalElements: number;
   totalPages: number;
-  last: boolean;
+  size: number;
+  number: number;
 }
 
 export const getCommentsByPostId = async (postId: number): Promise<Comment[]> => {
-  const response = await axios.get(`${API_URL}/post/${postId}`);
+  const response = await axiosInstance.get(`${API_URL}/post/${postId}`);
   const data = response.data;
   
   // Handle both array and paged responses
@@ -41,20 +40,20 @@ export const getCommentsByPostId = async (postId: number): Promise<Comment[]> =>
 };
 
 export const getCommentById = async (id: number): Promise<Comment> => {
-  const response = await axios.get(`${API_URL}/${id}`);
+  const response = await axiosInstance.get(`${API_URL}/${id}`);
   return response.data;
 };
 
 export const createComment = async (commentRequest: CommentRequest): Promise<Comment> => {
-  const response = await axios.post(API_URL, commentRequest);
+  const response = await axiosInstance.post(API_URL, commentRequest);
   return response.data;
 };
 
 export const updateComment = async (id: number, commentRequest: CommentRequest): Promise<Comment> => {
-  const response = await axios.put(`${API_URL}/${id}`, commentRequest);
+  const response = await axiosInstance.put(`${API_URL}/${id}`, commentRequest);
   return response.data;
 };
 
 export const deleteComment = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/${id}`);
+  await axiosInstance.delete(`${API_URL}/${id}`);
 }; 

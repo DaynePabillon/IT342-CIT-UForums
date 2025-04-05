@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostDto createPost(PostRequest postRequest, Long threadId, Long authorId) {
-        logger.info("Creating post with request: {}", postRequest);
+        logger.info("Creating post for thread ID: {} with content length: {}", threadId, postRequest.getContent().length());
         
         Thread thread = threadService.getThreadEntity(threadId);
         Member author = memberService.getMemberEntity(authorId);
@@ -56,7 +56,7 @@ public class PostServiceImpl implements PostService {
         Post post = new Post();
         post.setContent(postRequest.getContent());
         post.setThread(thread);
-        post.setCreatedBy(author);
+        post.setAuthor(author);
         post.setActive(true);
         
         Post savedPost = postRepository.save(post);
@@ -142,11 +142,11 @@ public class PostServiceImpl implements PostService {
     
     // Helper method to map Post entity to PostDto
     private PostDto mapToDto(Post post) {
-        MemberSummaryDto creatorDto = null;
-        if (post.getCreatedBy() != null) {
-            creatorDto = MemberSummaryDto.builder()
-                    .id(post.getCreatedBy().getId())
-                    .name(post.getCreatedBy().getName())
+        MemberSummaryDto authorDto = null;
+        if (post.getAuthor() != null) {
+            authorDto = MemberSummaryDto.builder()
+                    .id(post.getAuthor().getId())
+                    .name(post.getAuthor().getName())
                     .build();
         }
         
@@ -158,7 +158,7 @@ public class PostServiceImpl implements PostService {
                 .updatedAt(post.getUpdatedAt())
                 .threadId(thread.getId())
                 .threadTitle(thread.getTitle())
-                .createdBy(creatorDto)
+                .author(authorDto)
                 .active(post.isActive())
                 .edited(post.isEdited())
                 .comments(Collections.emptyList())

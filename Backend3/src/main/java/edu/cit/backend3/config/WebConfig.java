@@ -27,6 +27,17 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/favicon.ico")
                .addResourceLocations("classpath:/static/")
                .setCachePeriod(0);
+
+        // Handle manifest.json and other static resources
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/")
+                .addResourceLocations("classpath:/public/")
+                .addResourceLocations("classpath:/META-INF/resources/");
+                
+        // Specific handler for manifest.json
+        registry.addResourceHandler("/manifest.json")
+                .addResourceLocations("classpath:/static/")
+                .addResourceLocations("classpath:/public/");
     }
     
     @Override

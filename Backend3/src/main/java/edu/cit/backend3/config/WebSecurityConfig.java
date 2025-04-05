@@ -66,51 +66,21 @@ public class WebSecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Legacy paths
-                .requestMatchers("/auth/**", "/db-test/**", "/welcome/**", "/basic-login/**").permitAll()
-                // API Auth paths
+                // Public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
-                // Forum endpoints - allow authenticated users to create forums
-                .requestMatchers(HttpMethod.GET, "/api/forums/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/forums/delete-first-general").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/forums/cleanup-general").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/forums").authenticated()
-                .requestMatchers(HttpMethod.PUT, "/api/forums/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/forums/**").authenticated()
-                // Thread endpoints
-                .requestMatchers(HttpMethod.GET, "/api/threads/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/threads/**").authenticated()
-                .requestMatchers(HttpMethod.PUT, "/api/threads/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/threads/**").authenticated()
-                // Static resources
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico", "/*/favicon.ico").permitAll()
-                // Swagger UI
-                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**").permitAll()
-                // Actuator endpoints
+                .requestMatchers("/api/forums/**").permitAll()
+                .requestMatchers("/api/threads/**").permitAll()
+                .requestMatchers("/api/posts/**").permitAll()
+                .requestMatchers("/api/comments/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
-                // Thymeleaf views for backward compatibility
-                .requestMatchers("/", "/error", "/login", "/register").permitAll()
-                // Frontend static files
-                .requestMatchers("/*.js", "/*.css", "/*.html", "/*.json", "/*.ico", "/static/**").permitAll()
+                // Static resources
+                .requestMatchers("/", "/error", "/login", "/register", "/manifest.json", "/favicon.ico").permitAll()
+                .requestMatchers("/*.js", "/*.css", "/*.html", "/*.json", "/*.ico", "/static/**", "/assets/**").permitAll()
                 // Protected URLs
                 .anyRequest().authenticated())
-            // Configure login (for backward compatibility)
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/home")
-                .failureUrl("/login?error=true")
-                .permitAll())
-            // Configure logout
-            .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login?logout=true")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .permitAll())
-            // Add JWT filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
