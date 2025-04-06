@@ -54,7 +54,13 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
       <div className="container">
-        <Link className="navbar-brand" to="/">
+        <Link className="navbar-brand d-flex align-items-center" to="/">
+          <img 
+            src="/images/logo.png" 
+            alt="CIT Forums Logo" 
+            height="30" 
+            className="me-2"
+          />
           CIT Forums
         </Link>
         <button

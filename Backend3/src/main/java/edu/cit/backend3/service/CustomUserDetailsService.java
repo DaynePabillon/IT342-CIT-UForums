@@ -31,6 +31,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         logger.info("Loading user by username/email: {}", username);
         
         List<Member> members = memberRepository.findByNameOrEmail(username, username);
+        logger.debug("Found {} members matching username/email: {}", members.size(), username);
+        
         if (members.isEmpty()) {
             logger.error("User not found: {}", username);
             throw new UsernameNotFoundException("User not found");
@@ -43,19 +45,27 @@ public class CustomUserDetailsService implements UserDetailsService {
                 username, member.getId());
         }
         
-        logger.info("Found member: email={}, passwordHash={}, active={}", 
-            member.getEmail(), member.getPassword(), member.isActive());
+        logger.info("Found member: name={}, email={}, password={}, active={}, isAdmin={}", 
+            member.getName(), member.getEmail(), member.getPassword(), member.isActive(), member.isAdmin());
             
         if (!member.isActive()) {
             logger.error("Account is not active: {}", username);
             throw new UsernameNotFoundException("Account is not active");
         }
+
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        
+        if (member.isAdmin()) {
+            logger.info("User {} is an admin, adding ROLE_ADMIN", username);
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
         
         return new org.springframework.security.core.userdetails.User(
-                member.getEmail(),
+                member.getName(),
                 member.getPassword(),
-            true, true, true, true,
-            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                true, true, true, true,
+                authorities
         );
     }
 } 

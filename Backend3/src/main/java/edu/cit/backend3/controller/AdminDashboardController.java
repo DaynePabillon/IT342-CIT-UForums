@@ -27,7 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
-@Tag(name = "Admin Dashboard", description = "Endpoints for admin monitoring and management")
+@Tag(name = "Admin Dashboard", description = "Admin dashboard statistics endpoints")
 public class AdminDashboardController {
 
     private final ForumRepository forumRepository;
@@ -110,6 +110,34 @@ public class AdminDashboardController {
     )
     public ResponseEntity<ApiResponse> healthCheck() {
         ApiResponse response = new ApiResponse(true, "API is running normally");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Get all users",
+        description = "Get a list of all users in the system",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<Map<String, Object>> getAllUsers() {
+        long userCount = memberRepository.count();
+        Map<String, Object> response = new HashMap<>();
+        response.put("length", userCount);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/threads-count")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Get thread count",
+        description = "Get the total number of threads in the system",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<Map<String, Object>> getThreadCount() {
+        long threadCount = threadRepository.count();
+        Map<String, Object> response = new HashMap<>();
+        response.put("length", threadCount);
         return ResponseEntity.ok(response);
     }
 } 

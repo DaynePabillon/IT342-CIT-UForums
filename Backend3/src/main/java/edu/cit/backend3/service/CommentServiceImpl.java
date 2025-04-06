@@ -40,8 +40,17 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createComment(CommentRequest commentRequest, Long postId, Long authorId) {
         logger.info("Creating comment for post ID: {} with content length: {}", postId, commentRequest.getContent().length());
         
+        // First try to find the post directly
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
+                .orElseGet(() -> {
+                    // If post not found, try to get the first post of the thread
+                    Page<Post> posts = postRepository.findByThreadId(postId, PageRequest.of(0, 1, Sort.by("createdAt").ascending()));
+                    if (posts.isEmpty()) {
+                        throw new RuntimeException("No posts found for thread ID: " + postId);
+                    }
+                    return posts.getContent().get(0);
+                });
+        
         Member author = memberService.getMemberEntity(authorId);
         
         Comment comment = new Comment();
@@ -85,15 +94,17 @@ public class CommentServiceImpl implements CommentService {
     public Page<CommentDto> getCommentsByThread(Long threadId, int page, int size) {
         logger.info("Fetching comments for thread ID: {} - page: {}, size: {}", threadId, page, size);
         
-        // First get the post for this thread
-        Page<Post> postPage = postRepository.findByThreadId(threadId, PageRequest.of(0, 1));
-        Post post = postPage.getContent().stream()
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Post not found for thread: " + threadId));
-        
-        // Then get all comments for this post with pagination
+        // First get all posts for this thread with pagination
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-        Page<Comment> comments = commentRepository.findByParentPost(post, pageRequest);
+        Page<Post> posts = postRepository.findByThreadId(threadId, PageRequest.of(0, 1));
+        
+        // If no posts found, return an empty page
+        if (posts.isEmpty()) {
+            return Page.empty(pageRequest);
+        }
+        
+        Post firstPost = posts.getContent().get(0);
+        Page<Comment> comments = commentRepository.findByParentPost(firstPost, pageRequest);
         
         logger.info("Found {} comments out of {} total", comments.getContent().size(), comments.getTotalElements());
         

@@ -14,4 +14,5 @@ public interface ThreadService {
     Page<ThreadDto> searchThreads(String query, int page, int size);
     Thread getThreadEntity(Long threadId);
     Page<ThreadDto> getThreadsByAuthor(Long authorId, int page, int size);
+    Page<ThreadDto> getAllThreads(int page, int size);
 } 

@@ -78,4 +78,8 @@ public class Member {
     public void setUsername(String username) {
         this.name = username;
     }
+
+    public Long getId() {
+        return id;
+    }
 } 

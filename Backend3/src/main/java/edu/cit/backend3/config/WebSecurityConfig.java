@@ -76,6 +76,8 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                // Admin endpoints
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Static resources
                 .requestMatchers("/", "/error", "/login", "/register", "/manifest.json", "/favicon.ico").permitAll()
                 .requestMatchers("/*.js", "/*.css", "/*.html", "/*.json", "/*.ico", "/static/**", "/assets/**").permitAll()
@@ -93,8 +95,6 @@ public class WebSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Using NoOpPasswordEncoder to store plain text passwords
-        // WARNING: This is NOT recommended for production use!
         return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
     }
 } 

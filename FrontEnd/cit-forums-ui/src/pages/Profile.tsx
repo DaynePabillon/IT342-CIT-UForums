@@ -18,6 +18,7 @@ interface UserCommentData {
   content: string;
   threadId: number;
   threadTitle: string;
+  forumId: number;
   createdAt: string;
 }
 
@@ -286,7 +287,7 @@ const Profile: React.FC = () => {
                     {comments.map(comment => (
                       <Link
                         key={comment.id}
-                        to={`/forums/threads/${comment.threadId}`}
+                        to={`/threads/${comment.threadId}`}
                         className="list-group-item list-group-item-action"
                       >
                         <div className="d-flex w-100 justify-content-between align-items-center">
