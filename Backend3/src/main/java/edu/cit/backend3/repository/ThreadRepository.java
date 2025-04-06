@@ -4,6 +4,7 @@ import edu.cit.backend3.models.Forum;
 import edu.cit.backend3.models.Thread;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,8 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
     Page<Thread> findByForumOrderByPinnedDescCreatedAtDesc(Forum forum, Pageable pageable);
     
     Page<Thread> findByForumId(Long forumId, Pageable pageable);
+    
+    Page<Thread> findByAuthorId(Long authorId, Pageable pageable);
     
     List<Thread> findTop5ByOrderByCreatedAtDesc();
     

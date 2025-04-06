@@ -1,6 +1,6 @@
 import axiosInstance from './axiosInstance';
 import { Thread } from './threadService';
-import { PagedResponse } from './threadService';
+import { PagedResponse } from '../types/common';
 
 export const checkAdminStatus = async (): Promise<boolean> => {
     try {

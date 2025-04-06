@@ -1,15 +1,13 @@
 package edu.cit.backend3.service;
 
 import edu.cit.backend3.dto.CommentDto;
-import edu.cit.backend3.dto.PagedResponseDto;
 import edu.cit.backend3.dto.request.CommentRequest;
 import edu.cit.backend3.models.Comment;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface CommentService {
     
-    CommentDto createComment(CommentRequest commentRequest, Long authorId);
+    CommentDto createComment(CommentRequest commentRequest, Long postId, Long authorId);
     
     CommentDto updateComment(Long commentId, CommentRequest commentRequest);
     
@@ -17,11 +15,11 @@ public interface CommentService {
     
     CommentDto getComment(Long commentId);
     
-    List<CommentDto> getCommentsByPost(Long postId);
+    Page<CommentDto> getCommentsByThread(Long threadId, int page, int size);
     
-    PagedResponseDto<CommentDto> getCommentsByPostPaged(Long postId, int page, int size);
+    Page<CommentDto> getCommentsByPost(Long postId, int page, int size);
     
-    PagedResponseDto<CommentDto> getCommentsByAuthor(Long authorId, int page, int size);
+    Page<CommentDto> getCommentsByAuthor(Long authorId, int page, int size);
     
     Comment getCommentEntity(Long commentId);
 } 

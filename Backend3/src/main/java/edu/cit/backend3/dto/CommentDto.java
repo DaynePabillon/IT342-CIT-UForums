@@ -14,9 +14,13 @@ import java.time.LocalDateTime;
 public class CommentDto {
     private Long id;
     private String content;
+    private Long authorId;
+    private String authorName;
+    private MemberSummaryDto author;
+    private Long threadId;
+    private String threadTitle;
+    private Long parentPostId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long parentPostId;
-    private MemberSummaryDto author;
     private boolean edited;
 } 

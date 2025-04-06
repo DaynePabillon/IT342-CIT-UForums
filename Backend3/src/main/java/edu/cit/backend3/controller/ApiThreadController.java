@@ -3,6 +3,7 @@ package edu.cit.backend3.controller;
 import edu.cit.backend3.dto.ThreadDto;
 import edu.cit.backend3.dto.request.ThreadRequest;
 import edu.cit.backend3.service.ThreadService;
+import edu.cit.backend3.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,6 +29,9 @@ public class ApiThreadController {
     @Autowired
     private ThreadService threadService;
     
+    @Autowired
+    private MemberService memberService;
+    
     @Operation(summary = "Create a new thread", description = "Creates a new thread in a specific forum")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Thread created successfully",
@@ -42,9 +46,7 @@ public class ApiThreadController {
             @Parameter(description = "Thread details") @Valid @RequestBody ThreadRequest threadRequest,
             @Parameter(description = "Forum ID") @PathVariable Long forumId,
             Principal principal) {
-        // TODO: Get actual user ID from Principal
-        Long currentUserId = 1L; // Placeholder - should be retrieved from authenticated user
-        
+        Long currentUserId = memberService.getMemberByUsernameOrEmail(principal.getName()).getId();
         ThreadDto createdThread = threadService.createThread(threadRequest, forumId, currentUserId);
         return new ResponseEntity<>(createdThread, HttpStatus.CREATED);
     }
@@ -122,6 +124,23 @@ public class ApiThreadController {
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size) {
         
         Page<ThreadDto> threads = threadService.searchThreads(query, page, size);
+        return ResponseEntity.ok(threads);
+    }
+    
+    @Operation(summary = "Get user's threads", description = "Returns a paginated list of threads created by the current user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Threads retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = Page.class))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Page<ThreadDto>> getCurrentUserThreads(
+            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "50") int size,
+            Principal principal) {
+        Long currentUserId = memberService.getMemberByUsernameOrEmail(principal.getName()).getId();
+        Page<ThreadDto> threads = threadService.getThreadsByAuthor(currentUserId, page, size);
         return ResponseEntity.ok(threads);
     }
 } 

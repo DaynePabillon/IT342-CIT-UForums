@@ -15,15 +15,16 @@ public class ThreadDto {
     private Long id;
     private String title;
     private String content;
+    private Long authorId;
+    private String authorName;
+    private Long forumId;
+    private String forumTitle;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastActivity;
-    private Long forumId;
-    private String forumTitle;
-    private MemberSummaryDto createdBy;
-    private int postCount;
     private int viewCount;
-    private boolean active;
     private boolean pinned;
     private boolean locked;
+    private int commentCount;
+    private MemberSummaryDto createdBy;
 } 

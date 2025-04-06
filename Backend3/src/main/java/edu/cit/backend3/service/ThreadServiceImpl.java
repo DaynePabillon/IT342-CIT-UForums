@@ -109,6 +109,18 @@ public class ThreadServiceImpl implements ThreadService {
                 .orElseThrow(() -> new RuntimeException("Thread not found with ID: " + threadId));
     }
 
+    @Override
+    public Page<ThreadDto> getThreadsByAuthor(Long authorId, int page, int size) {
+        logger.info("Fetching threads for author ID: {} - page: {}, size: {}", authorId, page, size);
+        
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Thread> threadPage = threadRepository.findByAuthorId(authorId, pageRequest);
+        
+        logger.info("Found {} threads out of {} total", threadPage.getContent().size(), threadPage.getTotalElements());
+        
+        return threadPage.map(this::mapToDto);
+    }
+
     private ThreadDto mapToDto(Thread thread) {
         MemberSummaryDto creatorDto = null;
         if (thread.getCreatedBy() != null) {

@@ -18,7 +18,7 @@ export interface RegisterRequest {
 
 export interface UserProfile {
   id: number;
-  username: string;
+  name: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -77,7 +77,7 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
       
       const userProfile: UserProfile = {
         id: response.data.user.id,
-        username: response.data.user.name || response.data.user.username || credentials.usernameOrEmail,
+        name: response.data.user.name || credentials.usernameOrEmail,
         email: response.data.user.email || credentials.usernameOrEmail,
         firstName: response.data.user.firstName || '',
         lastName: response.data.user.lastName || '',
@@ -91,7 +91,7 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
       
       const minimalProfile: UserProfile = {
         id: 0,
-        username: credentials.usernameOrEmail,
+        name: credentials.usernameOrEmail,
         email: credentials.usernameOrEmail,
         firstName: '',
         lastName: '',

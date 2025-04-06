@@ -1,4 +1,5 @@
 import axiosInstance from './axiosInstance';
+import { PagedResponse } from '../types/common';
 
 const API_URL = '/api/comments';
 
@@ -8,7 +9,8 @@ export interface Comment {
   postId: number;
   createdBy: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+  edited?: boolean;
 }
 
 export interface CommentRequest {
@@ -16,13 +18,20 @@ export interface CommentRequest {
   postId: number;
 }
 
-export interface PagedResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
+export const getCommentsByThreadId = async (threadId: number): Promise<Comment[]> => {
+  const response = await axiosInstance.get(`${API_URL}/thread/${threadId}`);
+  const data = response.data;
+  
+  // Handle both array and paged responses
+  if (Array.isArray(data)) {
+    return data;
+  } else if (data && typeof data === 'object' && 'content' in data) {
+    return (data as PagedResponse<Comment>).content;
+  }
+  
+  console.error('Unexpected response format:', data);
+  return [];
+};
 
 export const getCommentsByPostId = async (postId: number): Promise<Comment[]> => {
   const response = await axiosInstance.get(`${API_URL}/post/${postId}`);
@@ -45,7 +54,7 @@ export const getCommentById = async (id: number): Promise<Comment> => {
 };
 
 export const createComment = async (commentRequest: CommentRequest): Promise<Comment> => {
-  const response = await axiosInstance.post(API_URL, commentRequest);
+  const response = await axiosInstance.post(`${API_URL}/post/${commentRequest.postId}`, commentRequest);
   return response.data;
 };
 

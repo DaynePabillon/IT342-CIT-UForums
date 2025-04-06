@@ -18,8 +18,8 @@ const Navbar: React.FC = () => {
         if (authed) {
           const profile = getUserProfile();
           console.log('User profile in Navbar:', profile);
-          if (profile && profile.username) {
-            setUsername(profile.username);
+          if (profile && profile.name) {
+            setUsername(profile.name);
             setAdmin(isAdmin());
           } else {
             // If we can't get the profile but token exists, fetch user data from backend

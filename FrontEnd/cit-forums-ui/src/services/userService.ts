@@ -1,12 +1,13 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance from './axiosInstance';
 import { getUserProfile, setUserProfile, UserProfile } from './authService';
 
-const API_URL = '/api/users';
+const API_URL = '/api/members';
 
 interface UpdateProfileRequest {
   firstName: string;
   lastName: string;
   email: string;
+  name: string;
 }
 
 interface ChangePasswordRequest {
@@ -15,35 +16,29 @@ interface ChangePasswordRequest {
 }
 
 export const getCurrentUser = async (): Promise<UserProfile> => {
-  // First try to get from local storage
-  const storedProfile = getUserProfile();
-  if (storedProfile) return storedProfile;
-  
-  // If not in storage, fetch from API
-  const response = await axiosInstance.get(`${API_URL}/me`);
-  const user = response.data;
-  setUserProfile(user);
-  return user;
+  try {
+    const response = await axiosInstance.get(`${API_URL}/me`);
+    const user = response.data;
+    setUserProfile(user);
+    return user;
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    const storedProfile = getUserProfile();
+    if (storedProfile) return storedProfile;
+    throw error;
+  }
 };
 
-export const updateProfile = async (request: UpdateProfileRequest): Promise<UserProfile> => {
+export const updateProfile = async (data: UpdateProfileRequest): Promise<UserProfile> => {
   try {
-    console.log('Updating profile with:', request);
-    const response = await axiosInstance.put(`${API_URL}/me`, request);
+    const response = await axiosInstance.put(`${API_URL}/profile`, data);
     const updatedUser = response.data;
     
     // Update the stored profile
-    const currentProfile = getUserProfile();
-    if (currentProfile) {
-      const mergedProfile = { 
-        ...currentProfile, 
-        firstName: updatedUser.firstName || currentProfile.firstName,
-        lastName: updatedUser.lastName || currentProfile.lastName,
-        email: updatedUser.email || currentProfile.email
-      };
-      console.log('Updated profile:', mergedProfile);
-      setUserProfile(mergedProfile);
-    }
+    setUserProfile(updatedUser);
+    
+    // Refresh the current user data
+    await getCurrentUser();
     
     return updatedUser;
   } catch (error) {
@@ -56,16 +51,26 @@ export const changePassword = async (request: ChangePasswordRequest): Promise<vo
   await axiosInstance.post(`${API_URL}/change-password`, request);
 };
 
-export const getUserThreads = async (page: number = 0, size: number = 10): Promise<any> => {
-  const response = await axiosInstance.get(`${API_URL}/threads`, {
-    params: { page, size }
-  });
-  return response.data;
+export const getUserThreads = async (page: number = 0, size: number = 50): Promise<any> => {
+  try {
+    const response = await axiosInstance.get(`${API_URL}/me/threads`, {
+      params: { page, size }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user threads:', error);
+    throw error;
+  }
 };
 
-export const getUserComments = async (page: number = 0, size: number = 10): Promise<any> => {
-  const response = await axiosInstance.get(`${API_URL}/comments`, {
-    params: { page, size }
-  });
-  return response.data;
+export const getUserComments = async (page: number = 0, size: number = 50): Promise<any> => {
+  try {
+    const response = await axiosInstance.get(`${API_URL}/me/comments`, {
+      params: { page, size }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user comments:', error);
+    throw error;
+  }
 }; 

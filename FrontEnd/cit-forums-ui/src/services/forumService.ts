@@ -1,4 +1,5 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance from './axiosInstance';
+import { PagedResponse } from '../types/common';
 
 const API_URL = '/api/forums';
 
@@ -30,15 +31,6 @@ export interface ForumRequest {
   title: string;
   description: string;
   categoryName: string;
-}
-
-export interface PagedResponse<T> {
-  content: T[];
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-  last: boolean;
 }
 
 // Get all forums with pagination

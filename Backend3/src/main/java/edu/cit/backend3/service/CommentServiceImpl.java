@@ -2,27 +2,25 @@ package edu.cit.backend3.service;
 
 import edu.cit.backend3.dto.CommentDto;
 import edu.cit.backend3.dto.MemberSummaryDto;
-import edu.cit.backend3.dto.PagedResponseDto;
 import edu.cit.backend3.dto.request.CommentRequest;
 import edu.cit.backend3.models.Comment;
 import edu.cit.backend3.models.Member;
 import edu.cit.backend3.models.Post;
 import edu.cit.backend3.repository.CommentRepository;
 import edu.cit.backend3.repository.PostRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommentServiceImpl implements CommentService {
 
+    private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final MemberService memberService;
@@ -38,104 +36,97 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto createComment(CommentRequest commentRequest, Long authorId) {
-        // Get the post
-        Post post = postRepository.findById(commentRequest.getPostId())
-                .orElseThrow(() -> new RuntimeException("Post not found with ID: " + commentRequest.getPostId()));
+    @Transactional
+    public CommentDto createComment(CommentRequest commentRequest, Long postId, Long authorId) {
+        logger.info("Creating comment for post ID: {} with content length: {}", postId, commentRequest.getContent().length());
         
-        // Get the author
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
         Member author = memberService.getMemberEntity(authorId);
         
-        // Create the comment
         Comment comment = new Comment();
         comment.setContent(commentRequest.getContent());
         comment.setParentPost(post);
         comment.setAuthor(author);
-        comment.setCreatedAt(LocalDateTime.now());
-        comment.setUpdatedAt(LocalDateTime.now());
         
-        // Save and return
         Comment savedComment = commentRepository.save(comment);
+        logger.info("Comment saved successfully with ID: {}", savedComment.getId());
+        
         return mapToDto(savedComment);
     }
 
     @Override
+    @Transactional
     public CommentDto updateComment(Long commentId, CommentRequest commentRequest) {
         Comment comment = getCommentEntity(commentId);
         
-        // Update fields
         comment.setContent(commentRequest.getContent());
-        comment.setUpdatedAt(LocalDateTime.now());
+        comment.setEdited(true);
         
-        // Save and return
-        Comment updatedComment = commentRepository.save(comment);
-        return mapToDto(updatedComment);
+        return mapToDto(commentRepository.save(comment));
     }
 
     @Override
+    @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = getCommentEntity(commentId);
         commentRepository.delete(comment);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CommentDto getComment(Long commentId) {
         Comment comment = getCommentEntity(commentId);
         return mapToDto(comment);
     }
 
     @Override
-    public List<CommentDto> getCommentsByPost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
+    @Transactional(readOnly = true)
+    public Page<CommentDto> getCommentsByThread(Long threadId, int page, int size) {
+        logger.info("Fetching comments for thread ID: {} - page: {}, size: {}", threadId, page, size);
         
-        List<Comment> comments = commentRepository.findByParentPostOrderByCreatedAt(post);
-        return comments.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        // First get the post for this thread
+        Page<Post> postPage = postRepository.findByThreadId(threadId, PageRequest.of(0, 1));
+        Post post = postPage.getContent().stream()
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Post not found for thread: " + threadId));
+        
+        // Then get all comments for this post with pagination
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        Page<Comment> comments = commentRepository.findByParentPost(post, pageRequest);
+        
+        logger.info("Found {} comments out of {} total", comments.getContent().size(), comments.getTotalElements());
+        
+        return comments.map(this::mapToDto);
     }
 
     @Override
-    public PagedResponseDto<CommentDto> getCommentsByPostPaged(Long postId, int page, int size) {
+    @Transactional(readOnly = true)
+    public Page<CommentDto> getCommentsByPost(Long postId, int page, int size) {
+        logger.info("Fetching comments for post ID: {} - page: {}, size: {}", postId, page, size);
+        
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
         
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Comment> commentPage = commentRepository.findByParentPostOrderByCreatedAt(post, pageable);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        Page<Comment> comments = commentRepository.findByParentPost(post, pageRequest);
         
-        List<CommentDto> comments = commentPage.getContent().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        logger.info("Found {} comments out of {} total", comments.getContent().size(), comments.getTotalElements());
         
-        return new PagedResponseDto<>(
-                comments,
-                commentPage.getNumber(),
-                commentPage.getSize(),
-                commentPage.getTotalElements(),
-                commentPage.getTotalPages(),
-                commentPage.isLast()
-        );
+        return comments.map(this::mapToDto);
     }
 
     @Override
-    public PagedResponseDto<CommentDto> getCommentsByAuthor(Long authorId, int page, int size) {
-        Member author = memberService.getMemberEntity(authorId);
+    @Transactional(readOnly = true)
+    public Page<CommentDto> getCommentsByAuthor(Long authorId, int page, int size) {
+        logger.info("Fetching comments for author ID: {} - page: {}, size: {}", authorId, page, size);
         
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Comment> commentPage = commentRepository.findByAuthorOrderByCreatedAtDesc(author, pageable);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Comment> comments = commentRepository.findByAuthorId(authorId, pageRequest);
         
-        List<CommentDto> comments = commentPage.getContent().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        logger.info("Found {} comments out of {} total", comments.getContent().size(), comments.getTotalElements());
         
-        return new PagedResponseDto<>(
-                comments,
-                commentPage.getNumber(),
-                commentPage.getSize(),
-                commentPage.getTotalElements(),
-                commentPage.getTotalPages(),
-                commentPage.isLast()
-        );
+        return comments.map(this::mapToDto);
     }
 
     @Override
@@ -143,22 +134,24 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found with ID: " + commentId));
     }
-    
-    // Helper method to map Comment entity to CommentDto
+
     private CommentDto mapToDto(Comment comment) {
-        MemberSummaryDto authorDto = MemberSummaryDto.builder()
-                .id(comment.getAuthor().getId())
-                .name(comment.getAuthor().getName())
-                .build();
-                
+        MemberSummaryDto authorDto = null;
+        if (comment.getAuthor() != null) {
+            authorDto = MemberSummaryDto.builder()
+                    .id(comment.getAuthor().getId())
+                    .name(comment.getAuthor().getName())
+                    .build();
+        }
+        
         return CommentDto.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
-                .author(authorDto)
-                .parentPostId(comment.getParentPost().getId())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .edited(comment.isEdited())
+                .author(authorDto)
+                .parentPostId(comment.getParentPost().getId())
                 .build();
     }
 } 

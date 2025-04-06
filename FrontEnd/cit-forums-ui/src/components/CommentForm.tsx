@@ -30,8 +30,8 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => 
       // Add the user's name to the comment for immediate display
       try {
         const userProfile = getUserProfile();
-        if (userProfile && userProfile.username) {
-          newComment.createdBy = userProfile.username;
+        if (userProfile && userProfile.name) {
+          newComment.createdBy = userProfile.name;
         } else {
           newComment.createdBy = 'User';
         }

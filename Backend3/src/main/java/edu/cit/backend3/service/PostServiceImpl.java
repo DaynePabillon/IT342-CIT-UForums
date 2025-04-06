@@ -89,8 +89,9 @@ public class PostServiceImpl implements PostService {
         Post post = getPostEntity(postId);
         PostDto postDto = mapToDto(post);
         
-        // Get comments for this post
-        postDto.setComments(commentService.getCommentsByPost(postId));
+        // Get comments for this post with default pagination
+        Page<CommentDto> commentPage = commentService.getCommentsByPost(postId, 0, 50);
+        postDto.setComments(commentPage.getContent());
         
         return postDto;
     }

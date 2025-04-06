@@ -40,4 +40,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             @Param("startDate") LocalDateTime startDate, 
             @Param("endDate") LocalDateTime endDate, 
             @Param("dateFormat") String dateFormat);
+
+    Page<Comment> findByParentPost(Post post, Pageable pageable);
+    Page<Comment> findByAuthorId(Long authorId, Pageable pageable);
 } 

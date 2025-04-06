@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getThreadById, Thread } from '../services/threadService';
-import { getCommentsByPostId, Comment, PagedResponse } from '../services/commentService';
+import { getCommentsByThreadId, Comment } from '../services/commentService';
 import { createPost, Post } from '../services/postService';
 import { isAuthenticated, getUserProfile } from '../services/authService';
 import CommentForm from '../components/CommentForm';
@@ -28,28 +28,13 @@ const ThreadComponent: React.FC = () => {
       const data = await getThreadById(parseInt(threadId));
       setThread(data);
       
-      // Create a post for this thread
+      // Get comments for this thread
       try {
-        // Ensure content meets validation requirements
-        const content = data.content || '';
-        if (content.length < 10) {
-          // Pad the content if needed
-          const paddedContent = content.padEnd(10, ' ');
-          const newPost = await createPost({
-            content: paddedContent,
-            threadId: parseInt(threadId)
-          });
-          setPost(newPost);
-        } else {
-          const newPost = await createPost({
-            content: content,
-            threadId: parseInt(threadId)
-          });
-          setPost(newPost);
-        }
-      } catch (postError: any) {
-        // Don't set the error state for post creation issues
-        // This allows the thread to still be displayed
+        const threadComments = await getCommentsByThreadId(parseInt(threadId));
+        setComments(threadComments);
+      } catch (commentError: any) {
+        console.error('Error fetching comments:', commentError);
+        setComments([]);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load thread');
@@ -66,31 +51,6 @@ const ThreadComponent: React.FC = () => {
     fetchThread();
   }, [fetchThread]);
 
-  // Add a new useEffect to fetch comments when post is available
-  useEffect(() => {
-    if (post?.id) {
-      fetchComments(post.id);
-    }
-  }, [post]);
-
-  const fetchComments = async (id: number) => {
-    try {
-      const data = await getCommentsByPostId(id);
-      // Ensure we have an array of comments
-      if (Array.isArray(data)) {
-        setComments(data);
-      } else if (data && typeof data === 'object' && 'content' in data) {
-        // If the response is a paged response
-        const pagedData = data as PagedResponse<Comment>;
-        setComments(pagedData.content || []);
-      } else {
-        setComments([]);
-      }
-    } catch (err: any) {
-      setComments([]);
-    }
-  };
-
   const handleCommentAdded = (newComment: Comment) => {
     setComments(prevComments => [...prevComments, newComment]);
   };
@@ -103,7 +63,7 @@ const ThreadComponent: React.FC = () => {
     return <div className="alert alert-danger">{error}</div>;
   }
 
-  if (!thread || !post) {
+  if (!thread) {
     return <div className="alert alert-warning">Thread not found</div>;
   }
 
@@ -141,9 +101,9 @@ const ThreadComponent: React.FC = () => {
           </div>
         ))}
 
-        {/* Comment Form - Only render if we have a valid post ID */}
-        {userAuthenticated && post && post.id && (
-          <CommentForm postId={post.id} onCommentAdded={handleCommentAdded} />
+        {/* Comment Form - Only render if user is authenticated */}
+        {userAuthenticated && (
+          <CommentForm postId={thread.id} onCommentAdded={handleCommentAdded} />
         )}
       </div>
     </div>

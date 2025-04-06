@@ -3,9 +3,13 @@ package edu.cit.backend3.service;
 import edu.cit.backend3.dto.MemberDto;
 import edu.cit.backend3.dto.MemberSummaryDto;
 import edu.cit.backend3.dto.request.MemberRegistrationRequest;
+import edu.cit.backend3.dto.request.ProfileUpdateRequest;
 import edu.cit.backend3.models.Member;
+import edu.cit.backend3.dto.ThreadDto;
+import edu.cit.backend3.dto.CommentDto;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface MemberService {
     
@@ -20,6 +24,8 @@ public interface MemberService {
     List<MemberDto> getAllMembers();
     
     MemberDto updateMember(Long memberId, MemberRegistrationRequest updateRequest);
+    
+    MemberDto updateProfile(Long memberId, ProfileUpdateRequest updateRequest);
     
     void deleteMember(Long memberId);
     
@@ -36,4 +42,8 @@ public interface MemberService {
     MemberDto getMemberByUsernameOrEmail(String usernameOrEmail);
 
     Member findByNameOrEmail(String name, String email);
+
+    Page<ThreadDto> getMemberThreads(Long memberId, int page, int size);
+    
+    Page<CommentDto> getMemberComments(Long memberId, int page, int size);
 } 

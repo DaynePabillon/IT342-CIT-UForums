@@ -72,9 +72,9 @@ public class WebSecurityConfig {
                 // Public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/forums/**").permitAll()
-                .requestMatchers("/api/threads/**").permitAll()
-                .requestMatchers("/api/posts/**").permitAll()
-                .requestMatchers("/api/comments/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/threads/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 // Static resources
                 .requestMatchers("/", "/error", "/login", "/register", "/manifest.json", "/favicon.ico").permitAll()

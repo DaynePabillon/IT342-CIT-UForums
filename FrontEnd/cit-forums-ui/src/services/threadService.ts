@@ -1,4 +1,5 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance from './axiosInstance';
+import { PagedResponse } from '../types/common';
 
 const API_URL = '/api/threads';
 
@@ -23,15 +24,6 @@ export interface ThreadRequest {
   title: string;
   content: string;
   forumId: number;
-}
-
-export interface PagedResponse<T> {
-  content: T[];
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-  last: boolean;
 }
 
 export const getThreadsByForumId = async (
