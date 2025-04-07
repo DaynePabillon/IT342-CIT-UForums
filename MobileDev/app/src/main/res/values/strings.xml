@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">CITUForums</string>
+    <string name="app_name">CIT-UForums</string>
+    <string name="LoginTitle">Login</string>
+    <string name="EmailLabel">Email:</string>
+    <string name="PasswordLabel">Password:</string>
+    <string name="LoginButtonLabel">Log in</string>
+    <string name="RegisterButtonSentence">Don\'t have an account?</string>
+    <string name="RegisterButtonLabel">Register</string>
+    <string name="RegisterTitle">Register</string>
+    <string name="UsernameLabel">Username:</string>
+    <string name="RetypePasswordLabel">Re-type Password:</string>
+    <string name="FirstNameLabel">First Name:</string>
+    <string name="LastNameLabel">Last Name:</string>
+    <string name="LoginButtonSentence">Already have an account?</string>
 </resources>
