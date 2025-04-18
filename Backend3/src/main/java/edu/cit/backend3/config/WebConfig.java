@@ -28,16 +28,23 @@ public class WebConfig implements WebMvcConfigurer {
                .addResourceLocations("classpath:/static/")
                .setCachePeriod(0);
 
-        // Handle manifest.json and other static resources
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations("classpath:/public/")
-                .addResourceLocations("classpath:/META-INF/resources/");
-                
         // Specific handler for manifest.json
         registry.addResourceHandler("/manifest.json")
                 .addResourceLocations("classpath:/static/")
                 .addResourceLocations("classpath:/public/");
+                
+        // Handle static resources but NOT API paths
+        // Use more specific patterns instead of /** to avoid capturing API paths
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
+                
+        registry.addResourceHandler("/assets/**")
+                .addResourceLocations("classpath:/static/assets/");
+                
+        registry.addResourceHandler("/*.js", "/*.css", "/*.html", "/*.json", "/*.ico")
+                .addResourceLocations("classpath:/static/")
+                .addResourceLocations("classpath:/public/")
+                .addResourceLocations("classpath:/META-INF/resources/");
     }
     
     @Override

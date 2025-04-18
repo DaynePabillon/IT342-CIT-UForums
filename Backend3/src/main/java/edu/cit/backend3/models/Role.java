@@ -2,6 +2,7 @@ package edu.cit.backend3.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "roles")

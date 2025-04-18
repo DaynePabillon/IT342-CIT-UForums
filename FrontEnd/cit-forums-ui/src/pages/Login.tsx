@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { login, LoginRequest, isAuthenticated } from '../services/authService';
 
 interface LocationState {
@@ -17,11 +17,12 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Check if user is already logged in
   useEffect(() => {
     if (isAuthenticated()) {
-      window.location.href = '/';
+      navigate('/');
     }
     
     // Check for messages in location state (e.g., from registration)
@@ -37,7 +38,7 @@ const Login: React.FC = () => {
         usernameOrEmail: state.usernameOrEmail || ''
       }));
     }
-  }, [location]);
+  }, [location, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,7 +58,7 @@ const Login: React.FC = () => {
       if (success) {
         // Redirect to original intended destination or home
         const state = location.state as LocationState;
-        window.location.href = state?.from || '/';
+        navigate(state?.from || '/', { replace: true });
       } else {
         setError('Invalid credentials. Please try again.');
       }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface ThreadRepository extends JpaRepository<Thread, Long> {
@@ -23,6 +24,7 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
     
     Page<Thread> findByAuthorId(Long authorId, Pageable pageable);
     
+    // Find recent threads
     List<Thread> findTop5ByOrderByCreatedAtDesc();
     
     @Query("SELECT t FROM Thread t ORDER BY t.createdAt DESC")
@@ -50,4 +52,12 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
             @Param("startDate") LocalDateTime startDate, 
             @Param("endDate") LocalDateTime endDate, 
             @Param("dateFormat") String dateFormat);
+    
+    // Count threads created per day for the last n days
+    @Query(value = "SELECT CAST(created_at AS DATE) as date, COUNT(*) as count " +
+            "FROM threads " +
+            "WHERE created_at >= CURRENT_DATE - ?1 " +
+            "GROUP BY CAST(created_at AS DATE) " +
+            "ORDER BY date ASC", nativeQuery = true)
+    List<Map<String, Object>> countThreadsByDay(int days);
 } 

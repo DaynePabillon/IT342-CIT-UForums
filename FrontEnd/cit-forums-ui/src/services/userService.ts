@@ -1,5 +1,5 @@
 import axiosInstance from './axiosInstance';
-import { getUserProfile, setUserProfile, UserProfile } from './authService';
+import { getUserProfile, setUserProfile, removeUserProfile, UserProfile } from './authService';
 
 const API_URL = '/api/members';
 
@@ -19,12 +19,23 @@ export const getCurrentUser = async (): Promise<UserProfile> => {
   try {
     const response = await axiosInstance.get(`${API_URL}/me`);
     const user = response.data;
-    setUserProfile(user);
-    return user;
+    
+    // Always update the stored profile with fresh data from the server
+    const userProfile: UserProfile = {
+      id: user.id,
+      name: user.name || '',
+      email: user.email || '',
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      roles: user.roles || []
+    };
+    
+    setUserProfile(userProfile);
+    return userProfile;
   } catch (error) {
     console.error('Error fetching current user:', error);
-    const storedProfile = getUserProfile();
-    if (storedProfile) return storedProfile;
+    // If there's an error, clear the profile to force a re-login
+    removeUserProfile();
     throw error;
   }
 };
@@ -34,13 +45,18 @@ export const updateProfile = async (data: UpdateProfileRequest): Promise<UserPro
     const response = await axiosInstance.put(`${API_URL}/profile`, data);
     const updatedUser = response.data;
     
-    // Update the stored profile
-    setUserProfile(updatedUser);
+    // Update the stored profile with the new data
+    const userProfile: UserProfile = {
+      id: updatedUser.id,
+      name: updatedUser.name || '',
+      email: updatedUser.email || '',
+      firstName: updatedUser.firstName || '',
+      lastName: updatedUser.lastName || '',
+      roles: updatedUser.roles || []
+    };
     
-    // Refresh the current user data
-    await getCurrentUser();
-    
-    return updatedUser;
+    setUserProfile(userProfile);
+    return userProfile;
   } catch (error) {
     console.error('Error updating profile:', error);
     throw error;

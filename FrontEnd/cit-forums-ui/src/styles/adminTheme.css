@@ -1,0 +1,235 @@
+/* Admin Dashboard Theme - Maroon and Gold */
+
+:root {
+  --maroon-500: #800000;
+  --maroon-600: #6B0000;
+  --maroon-700: #570000;
+  --maroon-800: #430000;
+  --maroon-900: #2F0000;
+  
+  --gold-400: #FFD700;
+  --gold-500: #FFC000;
+  --gold-600: #E6AF00;
+  --gold-700: #CC9900;
+  
+  --white: #FFFFFF;
+  --gray-200: #E5E7EB;
+  --gray-400: #9CA3AF;
+  --gray-600: #4B5563;
+  --gray-800: #1F2937;
+}
+
+/* Background Colors */
+.bg-maroon-primary {
+  background-color: var(--maroon-800);
+}
+
+.bg-maroon-secondary {
+  background-color: var(--maroon-700);
+}
+
+.bg-maroon-card {
+  background-color: var(--maroon-600);
+}
+
+.bg-gold-highlight {
+  background-color: var(--gold-500);
+}
+
+/* Text Colors */
+.text-primary {
+  color: var(--white);
+}
+
+.text-secondary {
+  color: var(--gray-200);
+}
+
+.text-highlight {
+  color: var(--gold-500);
+}
+
+.text-dark {
+  color: var(--maroon-900);
+}
+
+/* Border Colors */
+.border-gold {
+  border-color: var(--gold-500);
+}
+
+.border-maroon {
+  border-color: var(--maroon-500);
+}
+
+/* Card Styles */
+.admin-card {
+  background-color: var(--maroon-600);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--gold-500);
+}
+
+.admin-stat-card {
+  background-color: var(--maroon-600);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--gold-500);
+}
+
+.admin-stat-card h3 {
+  color: var(--gray-200);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.admin-stat-card p {
+  color: var(--gold-500);
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+/* Dashboard Container */
+.admin-dashboard {
+  min-height: 100vh;
+  background-color: var(--maroon-800);
+  color: var(--white);
+}
+
+/* Navigation */
+.admin-nav {
+  background-color: var(--maroon-700);
+}
+
+.admin-nav-title {
+  color: var(--gold-500);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.admin-nav-link {
+  color: var(--gray-200);
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.admin-nav-link:hover {
+  color: var(--gold-400);
+  border-color: var(--gray-300);
+}
+
+.admin-nav-link.active {
+  color: var(--gold-500);
+  border-color: var(--gold-500);
+}
+
+/* Content Sections */
+.admin-section {
+  background-color: var(--maroon-700);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-section-title {
+  color: var(--gold-500);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.admin-btn-primary {
+  background-color: var(--gold-500);
+  color: var(--maroon-900);
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s;
+}
+
+.admin-btn-primary:hover {
+  background-color: var(--gold-600);
+}
+
+.admin-btn-secondary {
+  background-color: var(--maroon-700);
+  color: var(--white);
+  border: 1px solid var(--gold-500);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s;
+}
+
+.admin-btn-secondary:hover {
+  background-color: var(--maroon-600);
+}
+
+.admin-btn-danger {
+  background-color: #b71c1c; /* Dark red */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 1px solid #8b0000;
+}
+
+.admin-btn-danger:hover {
+  background-color: #d32f2f; /* Lighter red on hover */
+}
+
+.admin-btn-danger:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(183, 28, 28, 0.5);
+}
+
+/* Item Lists */
+.admin-list-item {
+  background-color: var(--maroon-700);
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-list-item:hover {
+  background-color: var(--maroon-500);
+}
+
+/* User Avatar */
+.admin-avatar {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--gold-500);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--maroon-900);
+  font-weight: 700;
+}
+
+/* Status Badges */
+.admin-badge-pending {
+  background-color: #F59E0B;
+  color: #FEF3C7;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.admin-badge-resolved {
+  background-color: #10B981;
+  color: #D1FAE5;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}

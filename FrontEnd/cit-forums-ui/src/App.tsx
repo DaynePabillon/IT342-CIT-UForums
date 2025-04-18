@@ -17,6 +17,7 @@ import CreateThread from './pages/CreateThread';
 import CreateForum from './pages/CreateForum';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminReports from './pages/AdminReports';
 import axiosInstance from './services/axiosInstance';
 import { getAuthToken } from './services/authService';
 
@@ -51,6 +52,7 @@ const App: React.FC = () => {
                 <AdminDashboard />
               </ProtectedAdminRoute>
             } />
+            <Route path="/admin/reports" element={<AdminReports />} />
 
             {/* Protected user routes */}
             <Route path="/user/dashboard" element={

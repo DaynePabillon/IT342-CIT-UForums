@@ -45,6 +45,10 @@ export const removeAuthToken = (): void => {
 };
 
 export const setUserProfile = (profile: UserProfile): void => {
+  if (!profile) {
+    removeUserProfile();
+    return;
+  }
   localStorage.setItem('user_profile', JSON.stringify(profile));
 };
 
@@ -60,6 +64,10 @@ export const removeUserProfile = (): void => {
 // Login a user
 export const login = async (credentials: LoginRequest): Promise<boolean> => {
   try {
+    // Clear any existing auth data first
+    removeAuthToken();
+    removeUserProfile();
+    
     const response = await axiosInstance.post(`${API_URL}/login`, credentials);
     const token = response.data.token;
     console.log('Login successful, received token:', token ? 'Present' : 'Missing');
@@ -103,6 +111,9 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
     return true;
   } catch (error) {
     console.error('Login error:', error);
+    // Clear any partial auth data on error
+    removeAuthToken();
+    removeUserProfile();
     return false;
   }
 };

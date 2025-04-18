@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getThreadById, Thread } from '../services/threadService';
-import { getCommentsByThreadId, Comment } from '../services/commentService';
-import { createPost, Post } from '../services/postService';
-import { isAuthenticated, getUserProfile } from '../services/authService';
+import { getCommentsByThreadId, Comment as CommentType } from '../services/commentService';
+import { isAuthenticated } from '../services/authService';
 import CommentForm from '../components/CommentForm';
-import axiosInstance from '../services/axiosInstance';
+import ThreadComponent from '../components/Thread';
+import CommentComponent from '../components/Comment';
 
-const ThreadComponent: React.FC = () => {
+const ThreadPage: React.FC = () => {
   const { forumId, threadId } = useParams<{ forumId: string; threadId: string }>();
   const [thread, setThread] = useState<Thread | null>(null);
-  const [post, setPost] = useState<Post | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
@@ -51,8 +50,18 @@ const ThreadComponent: React.FC = () => {
     fetchThread();
   }, [fetchThread]);
 
-  const handleCommentAdded = (newComment: Comment) => {
+  const handleCommentAdded = (newComment: CommentType) => {
     setComments(prevComments => [...prevComments, newComment]);
+  };
+
+  const handleThreadDelete = async (threadId: number) => {
+    // Implement thread deletion if needed
+    console.log('Thread deletion not implemented yet');
+  };
+
+  const handleCommentDelete = async (commentId: number) => {
+    // Implement comment deletion if needed
+    console.log('Comment deletion not implemented yet');
   };
 
   if (loading) {
@@ -75,30 +84,40 @@ const ThreadComponent: React.FC = () => {
         </Link>
       </div>
 
-      <div className="card mb-4">
-        <div className="card-header d-flex justify-content-between">
-          <h2>{thread.title}</h2>
-        </div>
-        <div className="card-body">
-          <p className="card-text">{thread.content}</p>
-          <div className="text-muted">
-            <small>Posted by {thread.createdBy.name} on {new Date(thread.createdAt).toLocaleString()}</small>
-          </div>
-        </div>
-      </div>
+      {/* Use the Thread component */}
+      <ThreadComponent
+        thread={{
+          id: thread.id,
+          title: thread.title,
+          content: thread.content,
+          forumId: thread.forumId,
+          commentCount: thread.commentCount,
+          createdBy: thread.createdBy,
+          createdAt: thread.createdAt,
+          updatedAt: thread.updatedAt,
+          isLocked: false, // Add proper lock status if available
+          isPinned: false // Add proper pin status if available
+        }}
+        onDelete={handleThreadDelete}
+      />
 
       {/* Comments Section */}
-      <div className="comments-section">
+      <div className="comments-section mt-4">
         <h3>Comments</h3>
         {comments.map((comment) => (
-          <div key={comment.id} className="card mb-3">
-            <div className="card-body">
-              <p className="card-text">{comment.content}</p>
-              <div className="text-muted">
-                <small>Posted by {comment.createdBy} on {new Date(comment.createdAt).toLocaleString()}</small>
-              </div>
-            </div>
-          </div>
+          <CommentComponent
+            key={comment.id}
+            comment={{
+              id: comment.id,
+              content: comment.content,
+              authorId: comment.author?.id || 0,
+              authorName: comment.author?.name || 'Anonymous',
+              threadId: threadId ? parseInt(threadId) : 0,
+              createdAt: comment.createdAt,
+              updatedAt: comment.updatedAt || comment.createdAt,
+            }}
+            onDelete={handleCommentDelete}
+          />
         ))}
 
         {/* Comment Form - Only render if user is authenticated */}
@@ -110,4 +129,4 @@ const ThreadComponent: React.FC = () => {
   );
 };
 
-export default ThreadComponent; 
+export default ThreadPage; 

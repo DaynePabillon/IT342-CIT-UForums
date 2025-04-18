@@ -7,7 +7,13 @@ export interface Comment {
   id: number;
   content: string;
   postId: number;
-  createdBy: string;
+  author: {
+    id: number;
+    name: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+  };
   createdAt: string;
   updatedAt?: string;
   edited?: boolean;

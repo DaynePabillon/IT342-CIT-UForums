@@ -1,45 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isAuthenticated, logout, getUserProfile, isAdmin } from '../services/authService';
+import { getCurrentUser } from '../services/userService';
+import ReportModal from './ReportModal';
+import ReportContentSelector from './ReportContentSelector';
 
 const Navbar: React.FC = () => {
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [username, setUsername] = useState<string>('');
   const [admin, setAdmin] = useState<boolean>(false);
+  const [showReportModal, setShowReportModal] = useState<boolean>(false);
+  const [showContentSelector, setShowContentSelector] = useState<boolean>(false);
+  const [selectedContent, setSelectedContent] = useState<{
+    type: 'THREAD' | 'COMMENT';
+    id: number;
+    title: string;
+  } | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check authentication on component mount and route change
-    const checkAuth = () => {
-      try {
-        const authed = isAuthenticated();
-        setAuthenticated(authed);
-        
-        if (authed) {
-          const profile = getUserProfile();
-          console.log('User profile in Navbar:', profile);
-          if (profile && profile.name) {
-            setUsername(profile.name);
-            setAdmin(isAdmin());
-          } else {
-            // If we can't get the profile but token exists, fetch user data from backend
-            // For now, use placeholder
-            setUsername('User');
-            setAdmin(false);
-          }
+  const updateUserProfile = async () => {
+    try {
+      const authed = isAuthenticated();
+      setAuthenticated(authed);
+      
+      if (authed) {
+        // Always fetch fresh user data from the server
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          setUsername(currentUser.name);
+          setAdmin(currentUser.roles?.includes('ROLE_ADMIN') || false);
         } else {
-          setUsername('');
+          setUsername('User');
           setAdmin(false);
         }
-      } catch (error) {
-        console.error('Error in auth check:', error);
-        setAuthenticated(false);
+      } else {
         setUsername('');
         setAdmin(false);
       }
-    };
-    
-    checkAuth();
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      setAuthenticated(false);
+      setUsername('');
+      setAdmin(false);
+    }
+  };
+
+  useEffect(() => {
+    updateUserProfile();
   }, [location.pathname]); // Re-check when route changes
 
   const handleLogout = () => {
@@ -47,20 +55,19 @@ const Navbar: React.FC = () => {
     setAuthenticated(false);
     setUsername('');
     setAdmin(false);
-    // Navigate to login page using window.location instead of useNavigate
-    window.location.href = '/login';
+    navigate('/login');
+  };
+
+  const handleContentSelect = (type: 'THREAD' | 'COMMENT', id: number, title: string) => {
+    setSelectedContent({ type, id, title });
+    setShowContentSelector(false);
+    setShowReportModal(true);
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
-        <Link className="navbar-brand d-flex align-items-center" to="/">
-          <img 
-            src="/images/logo.png" 
-            alt="CIT Forums Logo" 
-            height="30" 
-            className="me-2"
-          />
+        <Link className="navbar-brand" to="/">
           CIT Forums
         </Link>
         <button
@@ -76,29 +83,36 @@ const Navbar: React.FC = () => {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">
-                Home
-              </Link>
-            </li>
+            {authenticated && (
+              <li className="nav-item">
+                <button
+                  className="nav-link btn btn-link"
+                  onClick={() => setShowContentSelector(true)}
+                >
+                  <i className="bi bi-flag me-1"></i>
+                  Report
+                </button>
+              </li>
+            )}
             <li className="nav-item">
               <Link className="nav-link" to="/forums">
                 Forums
               </Link>
             </li>
             {admin && (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/forums/create">
-                    Create Forum
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin">
-                    Admin
-                  </Link>
-                </li>
-              </>
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin">
+                  Admin Dashboard
+                </Link>
+              </li>
+            )}
+            {isAdmin() && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin/reports">
+                  <i className="bi bi-flag-fill me-1"></i>
+                  Reports
+                </Link>
+              </li>
             )}
           </ul>
           <ul className="navbar-nav">
@@ -115,10 +129,7 @@ const Navbar: React.FC = () => {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <button
-                    className="btn btn-link nav-link"
-                    onClick={handleLogout}
-                  >
+                  <button className="nav-link btn btn-link" onClick={handleLogout}>
                     Logout
                   </button>
                 </li>
@@ -140,6 +151,27 @@ const Navbar: React.FC = () => {
           </ul>
         </div>
       </div>
+
+      {/* Report Content Selector */}
+      <ReportContentSelector
+        show={showContentSelector}
+        onClose={() => setShowContentSelector(false)}
+        onSelect={handleContentSelect}
+      />
+
+      {/* Report Modal */}
+      {selectedContent && (
+        <ReportModal
+          show={showReportModal}
+          onClose={() => {
+            setShowReportModal(false);
+            setSelectedContent(null);
+          }}
+          contentType={selectedContent.type}
+          contentId={selectedContent.id}
+          contentTitle={selectedContent.title}
+        />
+      )}
     </nav>
   );
 };

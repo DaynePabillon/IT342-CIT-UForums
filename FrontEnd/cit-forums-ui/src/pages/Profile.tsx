@@ -68,6 +68,7 @@ const Profile: React.FC = () => {
     const loadUserData = async () => {
       setLoading(true);
       try {
+        // Always fetch fresh user data from the server
         const currentUser = await getCurrentUser();
         if (currentUser) {
           setProfileData({
@@ -106,20 +107,16 @@ const Profile: React.FC = () => {
     
     try {
       const updatedUser = await updateProfile(profileData);
-      setUserProfile(updatedUser); // Update local storage
       setSuccess('Profile updated successfully!');
       setIsEditing(false);
       
-      // Refresh user data
-      const currentUser = await getCurrentUser();
-      if (currentUser) {
-        setProfileData({
-          name: currentUser.name || 'User',
-          email: currentUser.email || '',
-          firstName: currentUser.firstName || '',
-          lastName: currentUser.lastName || '',
-        });
-      }
+      // Update local state with the fresh data
+      setProfileData({
+        name: updatedUser.name || 'User',
+        email: updatedUser.email || '',
+        firstName: updatedUser.firstName || '',
+        lastName: updatedUser.lastName || '',
+      });
       
       // Refresh content
       await loadUserContent();

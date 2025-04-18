@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -40,4 +41,21 @@ public interface ForumRepository extends JpaRepository<Forum, Long> {
 
     @Query("SELECT f FROM Forum f WHERE f.category.name = 'GENERAL' AND f.id > (SELECT MIN(f2.id) FROM Forum f2 WHERE f2.category.name = 'GENERAL')")
     List<Forum> findExtraGeneralForums();
+
+    // Find top forums by thread count
+    @Query(value = "SELECT f.id as id, f.title as title, COUNT(t.id) as thread_count " +
+            "FROM forums f " +
+            "LEFT JOIN threads t ON f.id = t.forum_id " +
+            "GROUP BY f.id, f.title " +
+            "ORDER BY thread_count DESC " +
+            "LIMIT 5", nativeQuery = true)
+    List<Map<String, Object>> findTopForumsByThreadCount();
+    
+    // Count threads by category
+    @Query(value = "SELECT c.name as category, COUNT(t.id) as thread_count " +
+            "FROM forums f " +
+            "JOIN categories c ON f.category_id = c.id " +
+            "LEFT JOIN threads t ON f.id = t.forum_id " +
+            "GROUP BY c.name", nativeQuery = true)
+    List<Map<String, Object>> countThreadsByCategory();
 } 

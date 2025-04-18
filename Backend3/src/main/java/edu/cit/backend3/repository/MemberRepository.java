@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -53,4 +54,22 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("startDate") LocalDateTime startDate, 
             @Param("endDate") LocalDateTime endDate, 
             @Param("dateFormat") String dateFormat);
+
+    // Count users by role
+    // @Query("SELECT COUNT(m) FROM Member m JOIN m.roles r WHERE r.name = :roleName")
+    // long countByRole(@Param("roleName") String roleName);
+    
+    // Count users by status
+    // @Query("SELECT COUNT(m) FROM Member m WHERE m.status = :status")
+    // long countByStatus(@Param("status") String status);
+
+    // Count users registered by month
+    // @Query(value = "SELECT MONTH(created_at) as month, YEAR(created_at) as year, COUNT(*) as count " +
+    //         "FROM members " +
+    //         "GROUP BY YEAR(created_at), MONTH(created_at) " +
+    //         "ORDER BY year DESC, month DESC LIMIT 12", nativeQuery = true)
+    // List<Map<String, Object>> countUsersByMonth();
+
+    // Find recent users
+    List<Member> findTop5ByOrderByCreatedAtDesc();
 } 

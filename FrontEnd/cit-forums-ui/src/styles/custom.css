@@ -8,14 +8,54 @@
   --cit-gold-dark: #CCB000;
 }
 
+/* Global Styles */
 body {
   background-color: #f8f9fa;
   background-image: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+/* Modal Styles */
+.modal-open {
+  overflow: hidden;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  outline: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 1.75rem auto;
+  max-width: 500px;
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 0.3rem;
+  outline: 0;
+}
+
+.modal-backdrop {
+  display: none !important;
 }
 
 /* Navigation */
 .navbar {
-  background-color: var(--cit-maroon);
+  background-color: var(--cit-maroon) !important;
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -37,110 +77,90 @@ body {
 
 /* Buttons */
 .btn-primary {
-  background-color: var(--cit-maroon);
-  border-color: var(--cit-maroon);
-  color: white;
+  background-color: var(--cit-maroon) !important;
+  border-color: var(--cit-maroon) !important;
+  color: white !important;
 }
 
 .btn-primary:hover {
-  background-color: var(--cit-maroon-light);
-  border-color: var(--cit-maroon-light);
+  background-color: var(--cit-maroon-light) !important;
+  border-color: var(--cit-maroon-light) !important;
 }
 
 .btn-secondary {
-  background-color: var(--cit-gold);
-  border-color: var(--cit-gold);
-  color: var(--cit-maroon);
+  background-color: var(--cit-gold) !important;
+  border-color: var(--cit-gold) !important;
+  color: var(--cit-maroon) !important;
 }
 
 .btn-secondary:hover {
-  background-color: var(--cit-gold-light);
-  border-color: var(--cit-gold-light);
+  background-color: var(--cit-gold-light) !important;
+  border-color: var(--cit-gold-light) !important;
 }
 
 /* Cards */
 .card {
-  border: none;
+  border: none !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   margin-bottom: 1rem;
+  background-color: white !important;
 }
 
 .card-header {
-  background-color: var(--cit-maroon);
-  color: var(--cit-gold);
+  background-color: var(--cit-maroon) !important;
+  color: var(--cit-gold) !important;
   font-weight: bold;
 }
 
 /* Forms */
 .form-control:focus {
-  border-color: var(--cit-maroon);
-  box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
+  border-color: var(--cit-maroon) !important;
+  box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25) !important;
 }
 
 /* Forum Categories */
+.badge {
+  padding: 0.5em 1em;
+  font-size: 0.875em;
+  font-weight: 600;
+}
+
 .badge-freedom-wall {
-  background-color: #FF69B4;
-  color: white;
+  background-color: #FF69B4 !important;
+  color: white !important;
 }
 
 .badge-confession {
-  background-color: #9370DB;
-  color: white;
+  background-color: #9370DB !important;
+  color: white !important;
 }
 
 .badge-academic {
-  background-color: #20B2AA;
-  color: white;
+  background-color: #20B2AA !important;
+  color: white !important;
 }
 
 .badge-events {
-  background-color: #FFA500;
-  color: white;
+  background-color: #FFA500 !important;
+  color: white !important;
 }
 
 .badge-general {
-  background-color: #808080;
-  color: white;
+  background-color: #808080 !important;
+  color: white !important;
 }
 
 /* Alerts */
 .alert-danger {
-  background-color: #fff3f3;
-  border-color: var(--cit-maroon);
-  color: var(--cit-maroon);
+  background-color: #fff3f3 !important;
+  border-color: var(--cit-maroon) !important;
+  color: var(--cit-maroon) !important;
 }
 
 .alert-success {
-  background-color: #f3fff3;
-  border-color: #28a745;
-  color: #28a745;
-}
-
-/* Pagination */
-.page-link {
-  color: var(--cit-maroon);
-}
-
-.page-item.active .page-link {
-  background-color: var(--cit-maroon);
-  border-color: var(--cit-maroon);
-  color: white;
-}
-
-/* Welcome Section */
-.welcome-section {
-  text-align: center;
-  padding: 3rem 0;
-}
-
-.welcome-section h1 {
-  color: var(--cit-maroon);
-  margin-bottom: 1rem;
-}
-
-.welcome-section p {
-  color: #666;
-  margin-bottom: 2rem;
+  background-color: #f3fff3 !important;
+  border-color: #28a745 !important;
+  color: #28a745 !important;
 }
 
 /* Forum List */
@@ -151,10 +171,13 @@ body {
 .forum-title {
   color: var(--cit-maroon);
   text-decoration: none;
+  font-weight: bold;
+  font-size: 1.25rem;
 }
 
 .forum-title:hover {
   color: var(--cit-maroon-light);
+  text-decoration: none;
 }
 
 /* Thread List */
@@ -165,10 +188,12 @@ body {
 .thread-title {
   color: var(--cit-maroon);
   text-decoration: none;
+  font-weight: bold;
 }
 
 .thread-title:hover {
   color: var(--cit-maroon-light);
+  text-decoration: none;
 }
 
 /* Comments */
@@ -176,5 +201,47 @@ body {
   padding: 1rem;
   border-left: 4px solid var(--cit-maroon);
   margin-bottom: 1rem;
-  background-color: #f8f9fa;
+  background-color: white;
+  border-radius: 0.375rem;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.comment-author {
+  font-weight: bold;
+  color: var(--cit-maroon);
+}
+
+.comment-date {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Utilities */
+.text-maroon {
+  color: var(--cit-maroon) !important;
+}
+
+.text-gold {
+  color: var(--cit-gold) !important;
+}
+
+.bg-maroon {
+  background-color: var(--cit-maroon) !important;
+}
+
+.bg-gold {
+  background-color: var(--cit-gold) !important;
 } 

@@ -110,38 +110,20 @@ const ForumList: React.FC = () => {
     ? forums.filter(forum => forum.categoryName === selectedCategory)
     : forums;
 
-  if (loading) {
-    return (
-      <div className="text-center">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="alert alert-danger">
-        <h4>Error</h4>
-        <p>{error}</p>
-      </div>
-    );
-  }
+  // Filter out duplicate categories
+  const uniqueCategories = Array.from(new Set(Object.values(ForumCategory)));
 
   return (
     <div className="container mt-4">
       {successMessage && (
         <div className="alert alert-success alert-dismissible fade show" role="alert">
           {successMessage}
-          <button type="button" className="btn-close" onClick={() => setSuccessMessage(null)}></button>
-        </div>
-      )}
-      
-      {error && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          {error}
-          <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setSuccessMessage(null)}
+            aria-label="Close"
+          ></button>
         </div>
       )}
 
@@ -189,7 +171,7 @@ const ForumList: React.FC = () => {
             >
               All
             </button>
-            {Object.values(ForumCategory).map((category) => (
+            {uniqueCategories.map((category) => (
               <button
                 key={category}
                 type="button"
@@ -204,36 +186,56 @@ const ForumList: React.FC = () => {
       </div>
 
       <div className="row">
-        {filteredForums.map((forum) => (
-          <div key={forum.id} className="col-md-6 mb-4">
-            <div className="card h-100">
-              <div className="card-body">
-                <h5 className="card-title">
-                  <Link to={`/forums/${forum.id}/threads`} className="text-decoration-none">
-                    {forum.title}
-                  </Link>
-                </h5>
-                <p className="card-text">{forum.description}</p>
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>
-                    <span className={`badge ${getCategoryBadgeClass(forum.categoryName)} me-2`}>
-                      {getCategoryDisplayName(forum.categoryName)}
-                    </span>
-                    <Link 
-                      to={`/forums/${forum.id}/threads`} 
-                      className="btn btn-sm btn-outline-primary"
-                    >
-                      View Threads
+        {loading ? (
+          <div className="col text-center">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="col">
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          </div>
+        ) : filteredForums.length === 0 ? (
+          <div className="col">
+            <div className="alert alert-info" role="alert">
+              No forums found.
+            </div>
+          </div>
+        ) : (
+          filteredForums.map((forum) => (
+            <div key={forum.id} className="col-md-6 mb-4">
+              <div className="card h-100">
+                <div className="card-body">
+                  <h5 className="card-title">
+                    <Link to={`/forums/${forum.id}/threads`} className="text-decoration-none">
+                      {forum.title}
                     </Link>
+                  </h5>
+                  <p className="card-text">{forum.description}</p>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span className={`badge ${getCategoryBadgeClass(forum.categoryName)} me-2`}>
+                        {getCategoryDisplayName(forum.categoryName)}
+                      </span>
+                      <Link 
+                        to={`/forums/${forum.id}/threads`} 
+                        className="btn btn-sm btn-outline-primary"
+                      >
+                        View Threads
+                      </Link>
+                    </div>
+                    <small className="text-muted">
+                      {forum.threadCount} {forum.threadCount === 1 ? 'thread' : 'threads'}
+                    </small>
                   </div>
-                  <small className="text-muted">
-                    {forum.threadCount} {forum.threadCount === 1 ? 'thread' : 'threads'}
-                  </small>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {totalPages > 1 && (

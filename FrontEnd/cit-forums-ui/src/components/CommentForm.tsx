@@ -27,19 +27,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => 
       });
       console.log('Comment created successfully:', newComment);
       
-      // Add the user's name to the comment for immediate display
-      try {
-        const userProfile = getUserProfile();
-        if (userProfile && userProfile.name) {
-          newComment.createdBy = userProfile.name;
-        } else {
-          newComment.createdBy = 'User';
-        }
-      } catch (profileError) {
-        console.error('Error getting user profile:', profileError);
-        newComment.createdBy = 'User';
-      }
-      
       onCommentAdded(newComment);
       setContent('');
     } catch (err: any) {
