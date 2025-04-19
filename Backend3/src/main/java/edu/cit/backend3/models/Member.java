@@ -45,12 +45,18 @@ public class Member {
     private LocalDateTime updatedAt;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean active = true;
+    
+    @Column(name = "status")
+    @Builder.Default
+    private String status = "ACTIVE";
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
     @Column(name = "is_admin", nullable = false)
+    @Builder.Default
     private boolean admin = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -60,6 +66,7 @@ public class Member {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @JsonManagedReference
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @PrePersist
@@ -80,6 +87,23 @@ public class Member {
     
     public void setUsername(String username) {
         this.name = username;
+    }
+    
+    // Get the highest role for the user
+    public String getRole() {
+        if (roles == null || roles.isEmpty()) {
+            return admin ? "ROLE_ADMIN" : "ROLE_USER";
+        }
+        
+        // Check if user has admin role
+        for (Role role : roles) {
+            if (role.getName().name().equals("ADMIN")) {
+                return "ROLE_ADMIN";
+            }
+        }
+        
+        // Return the first role or default to USER
+        return "ROLE_" + roles.iterator().next().getName().name();
     }
 
     public Long getId() {

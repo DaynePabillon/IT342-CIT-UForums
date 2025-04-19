@@ -76,6 +76,13 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                // Swagger UI and API docs
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui-standalone.html").permitAll()
+                .requestMatchers("/openapi.json").permitAll()
+                .requestMatchers("/openapi/**").permitAll()
                 // Admin endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Static resources

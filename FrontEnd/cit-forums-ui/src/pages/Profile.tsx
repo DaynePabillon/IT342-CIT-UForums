@@ -71,12 +71,17 @@ const Profile: React.FC = () => {
         // Always fetch fresh user data from the server
         const currentUser = await getCurrentUser();
         if (currentUser) {
+          // Update the local state with fresh data
           setProfileData({
             name: currentUser.name || 'User',
             email: currentUser.email || '',
             firstName: currentUser.firstName || '',
             lastName: currentUser.lastName || '',
           });
+          
+          // Also update the stored profile to ensure consistency
+          setUserProfile(currentUser);
+          
           await loadUserContent();
         } else {
           setError('Could not load profile data. Please try logging out and back in.');

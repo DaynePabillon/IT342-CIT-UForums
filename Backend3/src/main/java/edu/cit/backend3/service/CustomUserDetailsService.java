@@ -1,6 +1,7 @@
 package edu.cit.backend3.service;
 
 import edu.cit.backend3.models.Member;
+import edu.cit.backend3.models.Role;
 import edu.cit.backend3.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -30,34 +31,63 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         logger.info("Loading user by username/email: {}", username);
         
+        // First try to find by exact email match
+        logger.debug("Attempting to find user by email: {}", username);
+        Optional<Member> memberByEmail = memberRepository.findByEmail(username);
+        
+        if (memberByEmail.isPresent()) {
+            logger.info("User found by email: {}", username);
+            Member member = memberByEmail.get();
+            return buildUserDetails(member);
+        }
+        
+        // If not found by email, try by exact username match
+        logger.debug("User not found by email, attempting to find by username: {}", username);
+        Optional<Member> memberByName = memberRepository.findByName(username);
+        
+        if (memberByName.isPresent()) {
+            logger.info("User found by username: {}", username);
+            Member member = memberByName.get();
+            return buildUserDetails(member);
+        }
+        
+        // If still not found, try a more flexible search
+        logger.debug("User not found by exact matches, trying flexible search for: {}", username);
         List<Member> members = memberRepository.findByNameOrEmail(username, username);
-        logger.debug("Found {} members matching username/email: {}", members.size(), username);
         
-        if (members.isEmpty()) {
-            logger.error("User not found: {}", username);
-            throw new UsernameNotFoundException("User not found");
+        if (!members.isEmpty()) {
+            logger.info("Found {} users with flexible search for: {}", members.size(), username);
+            Member member = members.get(0);
+            return buildUserDetails(member);
         }
         
-        // Take the first member if multiple exist
-        Member member = members.get(0);
-        if (members.size() > 1) {
-            logger.warn("Multiple users found for username/email: {}. Using first one with ID: {}", 
-                username, member.getId());
-        }
-        
-        logger.info("Found member: name={}, email={}, password={}, active={}, isAdmin={}", 
-            member.getName(), member.getEmail(), member.getPassword(), member.isActive(), member.isAdmin());
+        // No user found with any method
+        logger.error("User not found with any search method: {}", username);
+        throw new UsernameNotFoundException("User not found");
+    }
+    
+    private UserDetails buildUserDetails(Member member) {
+        logger.info("Building UserDetails for member: id={}, name={}, email={}, active={}", 
+            member.getId(), member.getName(), member.getEmail(), member.isActive());
             
         if (!member.isActive()) {
-            logger.error("Account is not active: {}", username);
+            logger.error("Account is not active: {}", member.getName());
             throw new UsernameNotFoundException("Account is not active");
         }
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         
-        if (member.isAdmin()) {
-            logger.info("User {} is an admin, adding ROLE_ADMIN", username);
+        // Check roles collection or admin flag
+        if (member.getRoles() != null && !member.getRoles().isEmpty()) {
+            // Add all roles from the roles collection
+            for (Role role : member.getRoles()) {
+                String roleName = "ROLE_" + role.getName().name();
+                logger.info("Adding role {} for user {}", roleName, member.getName());
+                authorities.add(new SimpleGrantedAuthority(roleName));
+            }
+        } else if (member.isAdmin()) { // Fallback to the admin flag if roles collection is empty
+            logger.info("User {} is an admin (from admin flag), adding ROLE_ADMIN", member.getName());
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
         
@@ -68,4 +98,4 @@ public class CustomUserDetailsService implements UserDetailsService {
                 authorities
         );
     }
-} 
+}

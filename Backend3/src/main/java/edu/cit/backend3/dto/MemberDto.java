@@ -11,9 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MemberDto {
     private Long id;
-    private String name;
+    private String username;
     private String email;
     private String firstName;
     private String lastName;
-    private boolean admin;
-} 
+    private String role;
+    private String status;
+    private String createdAt;
+}

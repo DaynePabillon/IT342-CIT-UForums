@@ -44,9 +44,6 @@ interface User {
 const AdminDashboard: React.FC = () => {
     const { logout, isAdmin } = useAuth();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('dashboard');
-    const [forums, setForums] = useState<Forum[]>([]);
-    const [threads, setThreads] = useState<AdminThread[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [users, setUsers] = useState<User[]>([]);
@@ -70,8 +67,8 @@ const AdminDashboard: React.FC = () => {
     const [selectedReport, setSelectedReport] = useState<ReportedContent | null>(null);
     const [selectedThread, setSelectedThread] = useState<AdminThread | null>(null);
     const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
+    const [reportedThreadInfo, setReportedThreadInfo] = useState<any>(null);
     const [backToReportFunction, setBackToReportFunction] = useState<(() => void) | null>(null);
-    const [reportedThreadInfo, setReportedThreadInfo] = useState<{id: number, title: string} | null>(null);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -167,27 +164,6 @@ const AdminDashboard: React.FC = () => {
                 setUserLoading(false);
             }
 
-            // Load threads
-            try {
-                const threadsData = await getThreads();
-                if (threadsData && threadsData.content) {
-                    setThreads(threadsData.content.map((thread: any) => ({
-                        id: thread.id,
-                        title: thread.title,
-                        content: thread.content,
-                        createdAt: thread.createdAt,
-                        author: thread.author || { username: thread.username || 'Unknown' },
-                        username: thread.username || 'Unknown',
-                        forumTitle: thread.forum?.title
-                    })));
-                } else {
-                    setThreads([]);
-                }
-            } catch (threadErr) {
-                console.error('Error loading threads:', threadErr);
-                setThreads([]);
-            }
-
             // Load reports
             setModerationLoading(true);
             try {
@@ -206,7 +182,7 @@ const AdminDashboard: React.FC = () => {
             }
 
             // Load analytics - only if needed
-            if (activeTab === 'analytics') {
+            if (true) {
                 setAnalyticsLoading(true);
                 try {
                     const forumStatsData = await getForumStats();
@@ -248,12 +224,6 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (activeTab === 'users') {
-            loadUsers();
-        }
-    }, [activeTab]);
-
     const handleUpdateRole = async (userId: number, newRole: string) => {
         try {
             await updateUserRole(userId, newRole);
@@ -291,12 +261,6 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (activeTab === 'moderation') {
-            loadReportedContent();
-        }
-    }, [activeTab]);
-
     const handleResolveReport = async (reportId: number, action: 'resolve' | 'dismiss') => {
         try {
             await resolveReport(reportId, action);
@@ -322,12 +286,6 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (activeTab === 'reports') {
-            loadAnalytics();
-        }
-    }, [activeTab]);
-
     const handleLogout = () => {
         logout();
         navigate('/admin/login');
@@ -349,7 +307,6 @@ const AdminDashboard: React.FC = () => {
         try {
             setSelectedReport(report);
             setViewMode('detail');
-            setActiveTab('reports');
             
             // If this is a thread report, fetch the thread title
             if (report.contentType === 'THREAD') {
@@ -415,13 +372,11 @@ const AdminDashboard: React.FC = () => {
                     
                     // Switch to thread detail view
                     setViewMode('detail');
-                    setActiveTab('threads');
                     
                     // Add a back button function to return to the report
                     if (currentReport) {
                         setBackToReportFunction(() => {
                             setSelectedReport(currentReport);
-                            setActiveTab('reports');
                             setViewMode('detail');
                             setSelectedThread(null);
                         });
@@ -559,389 +514,32 @@ const AdminDashboard: React.FC = () => {
         );
     };
 
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'dashboard':
-                return renderDashboard();
-            case 'users':
-                return (
-                    <div className="admin-section">
-                        <h2 className="admin-section-title">User Management</h2>
-                        {userLoading ? (
-                            <div className="flex justify-center items-center h-64">
-                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold"></div>
-                            </div>
-                        ) : userError ? (
-                            <div className="text-red-500 text-center">{userError}</div>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <table className="admin-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Username</th>
-                                            <th>Email</th>
-                                            <th>Role</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {users.map((user) => (
-                                            <tr key={user.id}>
-                                                <td>{user.username}</td>
-                                                <td>{user.email}</td>
-                                                <td>
-                                                    <select 
-                                                        value={user.role}
-                                                        onChange={(e) => handleUpdateRole(user.id, e.target.value)}
-                                                        className="admin-select"
-                                                    >
-                                                        <option value="USER">User</option>
-                                                        <option value="MODERATOR">Moderator</option>
-                                                        <option value="ADMIN">Admin</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <span className={user.active ? 'admin-badge-active' : 'admin-badge-inactive'}>
-                                                        {user.active ? 'Active' : 'Inactive'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <button 
-                                                        onClick={() => handleUpdateStatus(user.id, !user.active)}
-                                                        className="admin-btn-secondary"
-                                                    >
-                                                        {user.active ? 'Deactivate' : 'Activate'}
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-                );
-            case 'reports':
-                return viewMode === 'detail' && selectedReport ? (
-                    <div className="space-y-4">
-                        <div className="flex items-center mb-4">
-                            <button 
-                                onClick={backToList}
-                                className="admin-btn-secondary mr-4"
-                            >
-                                ← Back to Reports
-                            </button>
-                            <h2 className="admin-section-title">Report Details</h2>
-                        </div>
-                        
-                        <div className="admin-card">
-                            <div className="mb-4">
-                                <h3 className="text-lg font-semibold text-highlight mb-2">Report Information</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <p className="text-secondary"><span className="font-semibold">ID:</span> {selectedReport?.id}</p>
-                                        <p className="text-secondary"><span className="font-semibold">Type:</span> {selectedReport?.contentType}</p>
-                                        <p className="text-secondary"><span className="font-semibold">Content ID:</span> {selectedReport?.contentId}</p>
-                                        <p className="text-secondary"><span className="font-semibold">Status:</span> 
-                                            <span className={selectedReport?.status === 'PENDING' ? 'admin-badge-pending' : 'admin-badge-resolved'}>
-                                                {selectedReport?.status}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-secondary"><span className="font-semibold">Reported By:</span> {selectedReport?.reporter?.username || 'Anonymous'}</p>
-                                        <p className="text-secondary"><span className="font-semibold">Date:</span> {new Date(selectedReport?.createdAt).toLocaleString()}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="mb-4">
-                                <h3 className="text-lg font-semibold text-highlight mb-2">Reason for Report</h3>
-                                <p className="text-secondary p-3 bg-maroon-700 rounded">{selectedReport?.reason}</p>
-                            </div>
-                            
-                            <div className="mb-4">
-                                <h3 className="text-lg font-semibold text-highlight mb-2">Content Information</h3>
-                                {selectedReport?.contentType === 'THREAD' && (
-                                    <div className="space-y-3">
-                                        <div className="p-3 bg-maroon-700 rounded mb-3">
-                                            <h4 className="text-md font-semibold text-gold mb-1">Thread Title:</h4>
-                                            <p className="text-secondary">{reportedThreadInfo?.title || 'Loading thread information...'}</p>
-                                            <p className="text-xs text-gray-400 mt-1">Thread ID: {selectedReport?.contentId}</p>
-                                        </div>
-                                        <div className="flex space-x-3 mb-4">
-                                            <button 
-                                                onClick={() => {
-                                                    if (selectedReport?.contentId) {
-                                                        const threadId = Number(selectedReport.contentId);
-                                                        if (!isNaN(threadId)) {
-                                                            viewThreadDetails(threadId);
-                                                        } else {
-                                                            alert('Invalid thread ID');
-                                                        }
-                                                    }
-                                                }}
-                                                className="admin-btn-primary"
-                                            >
-                                                View Thread
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    if (selectedReport?.contentId) {
-                                                        const threadId = Number(selectedReport.contentId);
-                                                        if (!isNaN(threadId)) {
-                                                            if (window.confirm('Are you sure you want to delete this thread? This action cannot be undone.')) {
-                                                                deleteThread(threadId);
-                                                                if (selectedReport?.id) {
-                                                                    handleResolveReport(selectedReport.id, 'resolve');
-                                                                }
-                                                                backToList();
-                                                            }
-                                                        } else {
-                                                            alert('Invalid thread ID');
-                                                        }
-                                                    }
-                                                }}
-                                                className="admin-btn-danger"
-                                            >
-                                                Delete Thread
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                                {selectedReport?.contentType === 'COMMENT' && (
-                                    <p className="text-secondary">Comment ID: {selectedReport?.contentId}</p>
-                                )}
-                            </div>
-                            
-                            <div className="flex space-x-4 mt-6">
-                                <button
-                                    onClick={() => {
-                                        handleResolveReport(selectedReport?.id, 'resolve');
-                                        backToList();
-                                    }}
-                                    className="admin-btn-primary"
-                                >
-                                    Resolve Report
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        handleResolveReport(selectedReport?.id, 'dismiss');
-                                        backToList();
-                                    }}
-                                    className="admin-btn-secondary"
-                                >
-                                    Dismiss Report
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        <h2 className="admin-section-title">Reports</h2>
-                        <div className="bg-white p-4 rounded-lg shadow">
-                            {reportedContent.length === 0 ? (
-                                <p className="text-center text-gray-500 py-4">No reports found</p>
-                            ) : (
-                                <table className="min-w-full">
-                                    <thead>
-                                        <tr>
-                                            <th className="px-4 py-2">Type</th>
-                                            <th className="px-4 py-2">Content ID</th>
-                                            <th className="px-4 py-2">Reason</th>
-                                            <th className="px-4 py-2">Reported By</th>
-                                            <th className="px-4 py-2">Status</th>
-                                            <th className="px-4 py-2">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {reportedContent.map(report => (
-                                            <tr key={report.id}>
-                                                <td className="px-4 py-2">{report.contentType}</td>
-                                                <td className="px-4 py-2">{report.contentId}</td>
-                                                <td className="px-4 py-2 truncate max-w-xs">{report.reason}</td>
-                                                <td className="px-4 py-2">{report.reporter?.username || 'Anonymous'}</td>
-                                                <td className="px-4 py-2">{report.status}</td>
-                                                <td className="px-4 py-2 flex space-x-2">
-                                                    <button
-                                                        onClick={() => viewReportDetails(report)}
-                                                        className="text-blue-600 hover:text-blue-900 mr-4"
-                                                    >
-                                                        View
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleResolveReport(report.id, 'resolve')}
-                                                        className="text-green-600 hover:text-green-900 mr-4"
-                                                    >
-                                                        Resolve
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleResolveReport(report.id, 'dismiss')}
-                                                        className="text-gray-600 hover:text-gray-900"
-                                                    >
-                                                        Dismiss
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
-                    </div>
-                );
-            case 'threads':
-                return viewMode === 'detail' && selectedThread ? (
-                    <div className="space-y-4">
-                        <div className="flex items-center mb-4">
-                            {backToReportFunction ? (
-                                <button 
-                                    onClick={backToReportFunction}
-                                    className="admin-btn-secondary mr-4 flex items-center"
-                                >
-                                    <span className="mr-1">←</span> Back to Report
-                                </button>
-                            ) : (
-                                <button 
-                                    onClick={backToList}
-                                    className="admin-btn-secondary mr-4"
-                                >
-                                    Back to List
-                                </button>
-                            )}
-                            <h2 className="admin-section-title">Thread Details</h2>
-                        </div>
-                        
-                        <div className="admin-card">
-                            <div className="mb-4">
-                                <h3 className="text-xl font-bold text-highlight">{selectedThread?.title}</h3>
-                                <p className="text-xs text-gray-400 mt-1">
-                                    Posted by {selectedThread?.author?.username || selectedThread?.username} on {new Date(selectedThread?.createdAt).toLocaleString()}
-                                </p>
-                            </div>
-                            
-                            <div className="mb-4 p-4 bg-maroon-700 rounded">
-                                <p className="text-secondary whitespace-pre-wrap">{selectedThread?.content}</p>
-                            </div>
-                            
-                            <div className="flex space-x-4 mt-6">
-                                <button
-                                    onClick={() => {
-                                        // Redirect to the thread page on the main site
-                                        window.open(`/forums/thread/${selectedThread?.id}`, '_blank');
-                                    }}
-                                    className="admin-btn-primary"
-                                >
-                                    View on Site
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (window.confirm('Are you sure you want to delete this thread?')) {
-                                            deleteThread(selectedThread?.id);
-                                            backToList();
-                                        }
-                                    }}
-                                    className="admin-btn-danger"
-                                >
-                                    Delete Thread
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        <h2 className="admin-section-title">Threads</h2>
-                        <div className="bg-white p-4 rounded-lg shadow">
-                            {threads.length === 0 ? (
-                                <p className="text-center text-gray-500 py-4">No threads found</p>
-                            ) : (
-                                <table className="min-w-full">
-                                    <thead>
-                                        <tr>
-                                            <th className="px-4 py-2">Title</th>
-                                            <th className="px-4 py-2">Author</th>
-                                            <th className="px-4 py-2">Date</th>
-                                            <th className="px-4 py-2">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {threads.map(thread => (
-                                            <tr key={thread.id}>
-                                                <td className="px-4 py-2">{thread.title}</td>
-                                                <td className="px-4 py-2">{thread.author?.username || thread.username}</td>
-                                                <td className="px-4 py-2">{new Date(thread.createdAt).toLocaleString()}</td>
-                                                <td className="px-4 py-2 flex space-x-2">
-                                                    <button
-                                                        onClick={() => viewThreadDetails(thread.id)}
-                                                        className="text-blue-600 hover:text-blue-900 mr-4"
-                                                    >
-                                                        View
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            if (window.confirm('Are you sure you want to delete this thread?')) {
-                                                                deleteThread(thread.id);
-                                                            }
-                                                        }}
-                                                        className="text-red-600 hover:text-red-900"
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
-                    </div>
-                );
-            default:
-                return <div>Invalid tab</div>;
-        }
-    };
-
     return (
         <div className="admin-dashboard">
             <div className="admin-header">
                 <h1 className="admin-title">Admin Dashboard</h1>
-                <button 
-                    onClick={handleLogout}
-                    className="admin-btn-secondary"
-                >
-                    Logout
-                </button>
+                <div className="admin-header-actions">
+                    <button 
+                        onClick={() => navigate('/admin/users')}
+                        className="admin-btn-primary mr-2"
+                    >
+                        Manage Users
+                    </button>
+                    <button 
+                        onClick={() => navigate('/admin/reports')}
+                        className="admin-btn-primary mr-2"
+                    >
+                        View Reports
+                    </button>
+                    <button 
+                        onClick={handleLogout}
+                        className="admin-btn-secondary"
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
-            <div className="admin-tabs">
-                <button 
-                    onClick={() => setActiveTab('dashboard')}
-                    className={`admin-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
-                >
-                    Dashboard
-                </button>
-                <button 
-                    onClick={() => setActiveTab('users')}
-                    className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`}
-                >
-                    Users
-                </button>
-                <button 
-                    onClick={() => setActiveTab('reports')}
-                    className={`admin-tab ${activeTab === 'reports' ? 'active' : ''}`}
-                >
-                    Reports
-                </button>
-                <button 
-                    onClick={() => setActiveTab('threads')}
-                    className={`admin-tab ${activeTab === 'threads' ? 'active' : ''}`}
-                >
-                    Threads
-                </button>
-            </div>
-            <div className="admin-content">
-                {renderContent()}
-            </div>
+            {renderDashboard()}
         </div>
     );
 };

@@ -6,12 +6,16 @@
   --cit-maroon-dark: #600000;
   --cit-gold-light: #FFE44D;
   --cit-gold-dark: #CCB000;
+  --cit-bg-light: #f8f9fa;
+  --cit-text-dark: #333333;
+  --cit-border: #e0e0e0;
 }
 
 /* Global Styles */
 body {
-  background-color: #f8f9fa;
-  background-image: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background-color: var(--cit-bg-light);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: var(--cit-text-dark);
   min-height: 100vh;
 }
 
@@ -150,6 +154,37 @@ body {
   color: white !important;
 }
 
+.badge-announcements {
+  background-color: #dc3545;
+  color: white;
+}
+
+.badge-events {
+  background-color: #007bff;
+  color: white;
+}
+
+.badge-academic {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Additional category badge styles */
+.badge-technology {
+  background-color: #0077cc;
+  color: white;
+}
+
+.badge-sports {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.badge-entertainment {
+  background-color: #9b59b6;
+  color: white;
+}
+
 /* Alerts */
 .alert-danger {
   background-color: #fff3f3 !important;
@@ -194,6 +229,53 @@ body {
 .thread-title:hover {
   color: var(--cit-maroon-light);
   text-decoration: none;
+}
+
+/* Thread specific styles */
+.thread-card {
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+
+.thread-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--cit-maroon);
+}
+
+.thread-title a:hover {
+  color: var(--cit-maroon-light);
+  text-decoration: none;
+}
+
+.thread-content {
+  margin-bottom: 16px;
+  color: var(--cit-text-dark);
+}
+
+.thread-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #666;
+  border-top: 1px solid var(--cit-border);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.thread-author {
+  display: flex;
+  align-items: center;
+}
+
+.thread-author small {
+  margin-left: 4px;
+}
+
+.forum-header-card {
+  margin-bottom: 24px;
 }
 
 /* Comments */
@@ -244,4 +326,232 @@ body {
 
 .bg-gold {
   background-color: var(--cit-gold) !important;
-} 
+}
+
+/* Reddit-like Styling */
+.forum-card {
+  border-radius: 8px;
+  border: 1px solid var(--cit-border);
+  transition: all 0.2s ease;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.forum-card:hover {
+  border-color: var(--cit-gold);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.forum-card-header {
+  background-color: var(--cit-maroon);
+  color: white;
+  padding: 12px 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.forum-card-header .category-badge {
+  background-color: var(--cit-gold);
+  color: var(--cit-maroon);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.forum-card-body {
+  padding: 16px;
+}
+
+.forum-card-footer {
+  padding: 12px 16px;
+  background-color: #f9f9f9;
+  border-top: 1px solid var(--cit-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, var(--cit-maroon) 0%, var(--cit-maroon-dark) 100%);
+  color: white;
+  padding: 48px 24px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://via.placeholder.com/1200x400');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  z-index: 0;
+}
+
+.hero-section .content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-section h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--cit-gold);
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto 24px;
+  opacity: 0.9;
+}
+
+.hero-section .btn {
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Section Headers */
+.section-header {
+  border-left: 5px solid var(--cit-gold);
+  padding-left: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--cit-maroon);
+  margin: 0;
+}
+
+/* Thread Stats */
+.thread-stats {
+  display: flex;
+  align-items: center;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.thread-stats .stat {
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.thread-stats .stat svg {
+  margin-right: 6px;
+}
+
+/* Call to Action */
+.cta-section {
+  background: linear-gradient(135deg, var(--cit-gold-light) 0%, var(--cit-gold) 100%);
+  border-radius: 8px;
+  padding: 32px;
+  text-align: center;
+  margin-top: 32px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.cta-section h3 {
+  color: var(--cit-maroon);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.cta-section .btn {
+  margin: 0 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid var(--cit-maroon);
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Category filter styling */
+.category-filter {
+  margin-bottom: 24px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 8px;
+}
+
+.category-filter .btn-group {
+  display: inline-flex;
+  flex-wrap: nowrap;
+}
+
+.category-filter .btn {
+  border-radius: 20px;
+  margin-right: 4px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.category-filter .btn-primary {
+  background-color: var(--cit-maroon);
+  border-color: var(--cit-maroon);
+}
+
+.category-filter .btn-outline-primary {
+  color: var(--cit-maroon);
+  border-color: var(--cit-maroon);
+}
+
+.category-filter .btn-outline-primary:hover {
+  background-color: var(--cit-maroon);
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-section p {
+    font-size: 1rem;
+  }
+}

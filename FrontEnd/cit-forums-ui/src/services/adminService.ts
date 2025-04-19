@@ -203,13 +203,13 @@ export const getThreads = async (page: number = 0, size: number = 10): Promise<P
     }
 };
 
-// Admin thread operations
+// Get thread by ID (admin specific endpoint)
 export const getThreadById = async (threadId: number): Promise<any> => {
     try {
         const response = await axiosInstance.get(`/api/admin/thread/${threadId}`);
         return response.data;
     } catch (error) {
-        console.error('Error fetching thread by ID:', error);
+        console.error('Error fetching thread:', error);
         throw error;
     }
 };

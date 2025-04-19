@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getAuthToken, setAuthToken, removeAuthToken } from '../services/authService';
+import { getAuthToken, setAuthToken, removeAuthToken, getUserProfile } from '../services/authService';
 import axiosInstance from '../services/axiosInstance';
 
 interface AuthContextType {
@@ -7,6 +7,7 @@ interface AuthContextType {
   isAdmin: boolean;
   login: (token: string, isAdmin: boolean) => void;
   logout: () => void;
+  checkAdminStatus: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,6 +26,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAdmin(true);
         // Ensure axios is using the admin token
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${adminToken}`;
+      } else {
+        // Check if the user has admin role
+        const userProfile = getUserProfile();
+        if (userProfile?.roles?.includes('ROLE_ADMIN')) {
+          setIsAdmin(true);
+          localStorage.setItem('adminToken', token);
+        }
       }
     }
   }, []);
@@ -55,8 +63,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     delete axiosInstance.defaults.headers.common['Authorization'];
   };
 
+  const checkAdminStatus = (): boolean => {
+    const userProfile = getUserProfile();
+    const hasAdminRole = userProfile?.roles?.includes('ROLE_ADMIN') || false;
+    const adminToken = localStorage.getItem('adminToken');
+    
+    return hasAdminRole || !!adminToken;
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isAdmin, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isAdmin, login, logout, checkAdminStatus }}>
       {children}
     </AuthContext.Provider>
   );
@@ -70,4 +86,4 @@ export const useAuth = () => {
   return context;
 };
 
-export default AuthContext; 
+export default AuthContext;

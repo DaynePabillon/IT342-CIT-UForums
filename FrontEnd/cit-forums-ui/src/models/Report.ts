@@ -11,10 +11,14 @@ export interface Report {
   resolvedBy?: number;
   resolvedByUsername?: string;
   actionTaken?: string;
+  reporter?: {
+    id: number;
+    username: string;
+  };
 }
 
 export interface CreateReportRequest {
   reportedContentType: 'THREAD' | 'COMMENT';
   reportedContentId: number;
   reason: string;
-} 
+}

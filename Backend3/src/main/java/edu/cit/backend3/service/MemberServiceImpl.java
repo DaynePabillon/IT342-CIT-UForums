@@ -264,11 +264,13 @@ public class MemberServiceImpl implements MemberService {
     private MemberDto convertToDto(Member member) {
         MemberDto dto = new MemberDto();
         dto.setId(member.getId());
-        dto.setName(member.getName());
+        dto.setUsername(member.getName());
         dto.setEmail(member.getEmail());
         dto.setFirstName(member.getFirstName());
         dto.setLastName(member.getLastName());
-        dto.setAdmin(member.isAdmin());
+        dto.setRole(member.getRole());
+        dto.setStatus(member.getStatus());
+        dto.setCreatedAt(member.getCreatedAt() != null ? member.getCreatedAt().toString() : null);
         return dto;
     }
 } 

@@ -14,11 +14,13 @@ public class MemberMapper {
         
         MemberDto dto = new MemberDto();
         dto.setId(member.getId());
-        dto.setName(member.getName());
+        dto.setUsername(member.getName());
         dto.setEmail(member.getEmail());
         dto.setFirstName(member.getFirstName());
         dto.setLastName(member.getLastName());
-        dto.setAdmin(member.isAdmin());
+        dto.setRole(member.getRole());
+        dto.setStatus(member.getStatus());
+        dto.setCreatedAt(member.getCreatedAt() != null ? member.getCreatedAt().toString() : null);
         return dto;
     }
     
@@ -29,11 +31,12 @@ public class MemberMapper {
         
         Member member = new Member();
         member.setId(dto.getId());
-        member.setName(dto.getName());
+        member.setName(dto.getUsername());
         member.setEmail(dto.getEmail());
         member.setFirstName(dto.getFirstName());
         member.setLastName(dto.getLastName());
-        member.setAdmin(dto.isAdmin());
+        member.setStatus(dto.getStatus());
+        // Note: We don't set the role directly as it's managed by roles collection
         return member;
     }
-} 
+}

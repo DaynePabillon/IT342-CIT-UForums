@@ -151,6 +151,8 @@ const ThreadList: React.FC = () => {
         return 'badge-academic';
       case ForumCategory.EVENTS:
         return 'badge-events';
+      case ForumCategory.ANNOUNCEMENTS:
+        return 'badge-announcements';
       default:
         return 'badge-general';
     }
@@ -166,6 +168,8 @@ const ThreadList: React.FC = () => {
         return 'Academic';
       case ForumCategory.EVENTS:
         return 'Events';
+      case ForumCategory.ANNOUNCEMENTS:
+        return 'Announcements';
       default:
         return 'General';
     }
@@ -173,10 +177,8 @@ const ThreadList: React.FC = () => {
 
   if (loading && !forum) {
     return (
-      <div className="text-center">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div className="loading-indicator">
+        <div className="loading-spinner"></div>
       </div>
     );
   }
@@ -228,40 +230,32 @@ const ThreadList: React.FC = () => {
         </div>
       )}
       
-      <div className="row mb-4">
-        <div className="col">
-          <div className="card">
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-center">
-                <h2 className="mb-0">{forum.title}</h2>
-                <span className={`badge ${getCategoryBadgeClass(forum.categoryName as ForumCategory)}`}>
-                  {getCategoryDisplayName(forum.categoryName as ForumCategory)}
-                </span>
-              </div>
-              <p className="text-muted mb-0">{forum.description}</p>
-            </div>
+      <div className="forum-header-card mb-4">
+        <div className="forum-card">
+          <div className="forum-card-header">
+            <h2 className="mb-0">{forum.title}</h2>
+            <span className={`category-badge ${getCategoryBadgeClass(forum.categoryName as ForumCategory)}`}>
+              {getCategoryDisplayName(forum.categoryName as ForumCategory)}
+            </span>
+          </div>
+          <div className="forum-card-body">
+            <p className="mb-0">{forum.description}</p>
           </div>
         </div>
       </div>
 
-      <div className="row mb-4">
-        <div className="col">
-          <div className="d-flex justify-content-between align-items-center">
-            <h3>Threads</h3>
-            {isAuthenticated() && (
-              <button onClick={handleCreateThread} className="btn btn-primary">
-                Create Thread
-              </button>
-            )}
-          </div>
-        </div>
+      <div className="section-header mb-4">
+        <h3>Threads</h3>
+        {isAuthenticated() && (
+          <button onClick={handleCreateThread} className="btn btn-primary">
+            Create Thread
+          </button>
+        )}
       </div>
 
       {loading ? (
-        <div className="text-center">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
+        <div className="loading-indicator">
+          <div className="loading-spinner"></div>
         </div>
       ) : threads.length === 0 ? (
         <div className="alert alert-info">
@@ -275,12 +269,12 @@ const ThreadList: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="row">
+        <div className="thread-list">
           {threads.map((thread) => (
-            <div key={thread.id} className="col-12 mb-4">
-              <div className="card h-100">
-                <div className="card-body">
-                  <h5 className="card-title">
+            <div key={thread.id} className="thread-card mb-3">
+              <div className="forum-card">
+                <div className="forum-card-body">
+                  <h5 className="thread-title">
                     <Link 
                       to={`/forums/${validForumId}/threads/${thread.id}`}
                       className="text-decoration-none"
@@ -288,24 +282,29 @@ const ThreadList: React.FC = () => {
                       {thread.title}
                     </Link>
                   </h5>
-                  <p className="card-text">
+                  <p className="thread-content">
                     {thread.content.length > 150 
                       ? `${thread.content.substring(0, 150)}...` 
                       : thread.content}
                   </p>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <small className="text-muted">
-                        Created by {thread.createdBy?.name || 'Unknown User'}
+                  <div className="thread-meta">
+                    <div className="thread-author">
+                      <small>
+                        Posted by {thread.createdBy?.name || 'Unknown User'}
                       </small>
                     </div>
-                    <div>
-                      <span className="badge bg-secondary me-2">
+                    <div className="thread-stats">
+                      <div className="stat">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chat" viewBox="0 0 16 16">
+                          <path d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
+                        </svg>
                         {thread.commentCount} {thread.commentCount === 1 ? 'comment' : 'comments'}
-                      </span>
-                      <small className="text-muted">
-                        {new Date(thread.createdAt).toLocaleDateString()}
-                      </small>
+                      </div>
+                      <div className="stat">
+                        <small className="text-muted">
+                          {new Date(thread.createdAt).toLocaleDateString()}
+                        </small>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -358,5 +357,3 @@ const ThreadList: React.FC = () => {
 };
 
 export default ThreadList;
-
- 

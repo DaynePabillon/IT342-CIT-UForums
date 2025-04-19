@@ -4,6 +4,8 @@ import edu.cit.backend3.models.Member;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -18,6 +20,7 @@ public class JwtTokenProvider {
 
     private final SecretKey secretKey;
     private final long expiration;
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     @Autowired
     public JwtTokenProvider(JwtConfig jwtConfig) {
@@ -27,11 +30,17 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
-        return createToken(principal.getUsername());
+        String username = principal.getUsername();
+        
+        logger.info("Generating token for user: {}", username);
+        return createToken(username);
     }
 
     public String generateTokenFromMember(Member member) {
-        return createToken(member.getEmail());
+        String identifier = member.getName(); // Use name instead of email
+        logger.info("Generating token from member: id={}, name={}, email={}", 
+                   member.getId(), member.getName(), member.getEmail());
+        return createToken(identifier);
     }
 
     private String createToken(String subject) {

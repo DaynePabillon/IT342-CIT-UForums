@@ -91,16 +91,14 @@ public class ApiForumController {
         return ResponseEntity.ok(forumService.getAllForums(page, size));
     }
     
-    @Operation(summary = "Get all active forums", description = "Returns a paginated list of all active forums")
+    @Operation(summary = "Get all active forums", description = "Returns a list of all active forums")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Active forums retrieved successfully",
-                    content = @Content(schema = @Schema(implementation = Page.class)))
+                    content = @Content(schema = @Schema(implementation = ForumDto.class)))
     })
     @GetMapping("/active")
-    public ResponseEntity<Page<ForumDto>> getAllActiveForums(
-            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(forumService.getAllForums(page, size));
+    public ResponseEntity<List<ForumDto>> getActiveForums() {
+        return ResponseEntity.ok(forumService.getAllActiveForums());
     }
     
     @Operation(summary = "Get forum by ID", description = "Returns a forum by its ID")

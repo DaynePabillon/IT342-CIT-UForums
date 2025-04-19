@@ -34,13 +34,12 @@ export const getReports = async (): Promise<Report[]> => {
 };
 
 export const resolveReport = async (reportId: number, action: string): Promise<Report> => {
-  const response = await fetch(`${API_BASE_URL}/reports/${reportId}/resolve`, {
+  const response = await fetch(`${API_BASE_URL}/reports/${reportId}/resolve?action=${encodeURIComponent(action)}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${getAuthToken()}`
-    },
-    body: JSON.stringify({ action })
+    }
   });
 
   if (!response.ok) {

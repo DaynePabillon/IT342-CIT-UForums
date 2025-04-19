@@ -19,6 +19,10 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
+    public List<Report> getAllReports() {
+        return reportRepository.findAll();
+    }
+
     public List<Report> getReportsByStatus(String status) {
         return reportRepository.findByStatus(status);
     }
@@ -27,11 +31,33 @@ public class ReportService {
         return reportRepository.findByReporter(reporter);
     }
 
+    // New method that doesn't require a resolver
+    public Report resolveReport(Long reportId, String action) {
+        Optional<Report> optionalReport = reportRepository.findById(reportId);
+        if (optionalReport.isPresent()) {
+            Report report = optionalReport.get();
+            report.setResolver(null); // Explicitly set resolver to null
+            report.setStatus("RESOLVED");
+            report.setAction(action);
+            report.setResolvedAt(LocalDateTime.now());
+            return reportRepository.save(report);
+        }
+        throw new RuntimeException("Report not found with id: " + reportId);
+    }
+    
+    // Keep the original method for backward compatibility
     public Report resolveReport(Long reportId, Member resolver, String action) {
         Optional<Report> optionalReport = reportRepository.findById(reportId);
         if (optionalReport.isPresent()) {
             Report report = optionalReport.get();
-            report.setResolver(resolver);
+            
+            // Only set resolver if it's valid (not null and has a valid ID)
+            if (resolver != null && resolver.getId() != null) {
+                report.setResolver(resolver);
+            } else {
+                report.setResolver(null); // Explicitly set resolver to null
+            }
+            
             report.setStatus("RESOLVED");
             report.setAction(action);
             report.setResolvedAt(LocalDateTime.now());
@@ -43,4 +69,36 @@ public class ReportService {
     public List<Report> getReportsByContent(String contentType, Long contentId) {
         return reportRepository.findByContentTypeAndContentId(contentType, contentId);
     }
-} 
+
+    public Report dismissReport(Long reportId) {
+        Optional<Report> optionalReport = reportRepository.findById(reportId);
+        if (optionalReport.isPresent()) {
+            Report report = optionalReport.get();
+            report.setResolver(null); // Explicitly set resolver to null
+            report.setStatus("DISMISSED");
+            report.setResolvedAt(LocalDateTime.now());
+            return reportRepository.save(report);
+        }
+        throw new RuntimeException("Report not found with id: " + reportId);
+    }
+    
+    // Keep the original method for backward compatibility
+    public Report dismissReport(Long reportId, Member resolver) {
+        Optional<Report> optionalReport = reportRepository.findById(reportId);
+        if (optionalReport.isPresent()) {
+            Report report = optionalReport.get();
+            
+            // Only set resolver if it's valid (not null and has a valid ID)
+            if (resolver != null && resolver.getId() != null) {
+                report.setResolver(resolver);
+            } else {
+                report.setResolver(null); // Explicitly set resolver to null
+            }
+            
+            report.setStatus("DISMISSED");
+            report.setResolvedAt(LocalDateTime.now());
+            return reportRepository.save(report);
+        }
+        throw new RuntimeException("Report not found with id: " + reportId);
+    }
+}

@@ -82,7 +82,7 @@ public class ApiAuthController {
 
             // Check if the user is an admin
             MemberDto member = memberService.getMemberByUsernameOrEmail(loginRequest.getUsernameOrEmail());
-            if (!member.isAdmin()) {
+            if (member.getRole() == null || !member.getRole().equals("ROLE_ADMIN")) {
                 logger.error("Admin login failed - User is not an admin: {}", loginRequest.getUsernameOrEmail());
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
@@ -131,7 +131,7 @@ public class ApiAuthController {
             Member member = memberRepository.findByName(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            if (!member.isAdmin()) {
+            if (member.getRole() == null || !member.getRole().equals("ROLE_ADMIN")) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(new ApiResponse(false, "User is not an admin"));
             }

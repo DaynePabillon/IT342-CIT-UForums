@@ -68,6 +68,9 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
     removeAuthToken();
     removeUserProfile();
     
+    // Clear browser session storage and any other cached data
+    sessionStorage.clear();
+    
     const response = await axiosInstance.post(`${API_URL}/login`, credentials);
     const token = response.data.token;
     console.log('Login successful, received token:', token ? 'Present' : 'Missing');
@@ -130,8 +133,18 @@ export const register = async (userData: RegisterRequest): Promise<boolean> => {
 };
 
 export const logout = (): void => {
+  // Clear auth token and user profile
   removeAuthToken();
   removeUserProfile();
+  
+  // Clear any session storage data
+  sessionStorage.clear();
+  
+  // Clear any axios cached headers
+  delete axiosInstance.defaults.headers.common['Authorization'];
+  
+  // Force a reload of the page to clear any in-memory state
+  window.location.href = '/';
 };
 
 export const isAuthenticated = (): boolean => {

@@ -26,8 +26,25 @@ public class OpenApiController {
      */
     @GetMapping(value = "/openapi.yaml", produces = "application/yaml")
     @ResponseBody
-    public byte[] getOpenApiSpec() throws IOException {
+    public byte[] getOpenApiYaml() throws IOException {
         Resource resource = new ClassPathResource("openapi/openapi.yaml");
         return Files.readAllBytes(resource.getFile().toPath());
     }
-} 
+    
+    /**
+     * Serves the OpenAPI JSON file for the standalone Swagger UI
+     * @return OpenAPI specification as JSON
+     * @throws IOException if file cannot be read
+     */
+    @GetMapping(value = "/openapi.json", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public byte[] getOpenApiJson() throws IOException {
+        // Using the springdoc generated JSON file
+        Resource resource = new ClassPathResource("static/v3/api-docs/swagger-config.json");
+        if (!resource.exists()) {
+            // Fallback to the standard api-docs endpoint output
+            resource = new ClassPathResource("static/v3/api-docs.json");
+        }
+        return Files.readAllBytes(resource.getFile().toPath());
+    }
+}
