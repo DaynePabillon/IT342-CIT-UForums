@@ -19,17 +19,19 @@ export const getCurrentUser = async (): Promise<UserProfile> => {
   try {
     const response = await axiosInstance.get(`${API_URL}/me`);
     const user = response.data;
+    console.log('Fetched current user data:', user);
     
     // Always update the stored profile with fresh data from the server
     const userProfile: UserProfile = {
       id: user.id,
-      name: user.name || '',
+      name: user.username || user.name || '',
       email: user.email || '',
       firstName: user.firstName || '',
       lastName: user.lastName || '',
       roles: user.roles || []
     };
     
+    console.log('Updating stored user profile with server data:', userProfile);
     setUserProfile(userProfile);
     return userProfile;
   } catch (error) {
@@ -42,19 +44,22 @@ export const getCurrentUser = async (): Promise<UserProfile> => {
 
 export const updateProfile = async (data: UpdateProfileRequest): Promise<UserProfile> => {
   try {
+    console.log('Sending profile update request with data:', data);
     const response = await axiosInstance.put(`${API_URL}/profile`, data);
+    console.log('Profile update response:', response.data);
     const updatedUser = response.data;
     
     // Update the stored profile with the new data
     const userProfile: UserProfile = {
       id: updatedUser.id,
-      name: updatedUser.name || '',
+      name: updatedUser.username || updatedUser.name || '',
       email: updatedUser.email || '',
       firstName: updatedUser.firstName || '',
       lastName: updatedUser.lastName || '',
       roles: updatedUser.roles || []
     };
     
+    console.log('Saving updated user profile to local storage:', userProfile);
     setUserProfile(userProfile);
     return userProfile;
   } catch (error) {

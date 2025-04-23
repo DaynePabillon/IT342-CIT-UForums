@@ -45,9 +45,29 @@ public class ApiCommentController {
     public ResponseEntity<CommentDto> createComment(
             @Parameter(description = "Comment details") @Valid @RequestBody CommentRequest commentRequest,
             @Parameter(description = "Post ID") @PathVariable Long postId,
+            @Parameter(description = "Thread ID (optional)") @RequestParam(required = false) Long threadId,
             Principal principal) {
         Long currentUserId = memberService.getMemberByUsernameOrEmail(principal.getName()).getId();
-        CommentDto createdComment = commentService.createComment(commentRequest, postId, currentUserId);
+        CommentDto createdComment = commentService.createComment(commentRequest, postId, threadId, currentUserId);
+        return new ResponseEntity<>(createdComment, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Create a new comment directly on a thread", description = "Creates a new comment on a thread")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Comment created successfully",
+                    content = @Content(schema = @Schema(implementation = CommentDto.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "404", description = "Thread not found")
+    })
+    @PostMapping("/thread/{threadId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<CommentDto> createCommentOnThread(
+            @Parameter(description = "Comment details") @Valid @RequestBody CommentRequest commentRequest,
+            @Parameter(description = "Thread ID") @PathVariable Long threadId,
+            Principal principal) {
+        Long currentUserId = memberService.getMemberByUsernameOrEmail(principal.getName()).getId();
+        CommentDto createdComment = commentService.createCommentOnThread(commentRequest, threadId, currentUserId);
         return new ResponseEntity<>(createdComment, HttpStatus.CREATED);
     }
 

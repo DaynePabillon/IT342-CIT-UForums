@@ -3,6 +3,7 @@ package edu.cit.backend3.repository;
 import edu.cit.backend3.models.Comment;
 import edu.cit.backend3.models.Member;
 import edu.cit.backend3.models.Post;
+import edu.cit.backend3.models.Thread;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -42,5 +43,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             @Param("dateFormat") String dateFormat);
 
     Page<Comment> findByParentPost(Post post, Pageable pageable);
+    
+    Page<Comment> findByThread(Thread thread, Pageable pageable);
+    
     Page<Comment> findByAuthorId(Long authorId, Pageable pageable);
-} 
+}

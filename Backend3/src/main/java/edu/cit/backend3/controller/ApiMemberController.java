@@ -14,12 +14,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -29,6 +33,8 @@ import java.util.List;
 @RequestMapping("/api/members")
 @Tag(name = "Users", description = "Operations for user management and profile operations")
 public class ApiMemberController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ApiMemberController.class);
 
     @Autowired
     private MemberService memberService;
@@ -48,9 +54,30 @@ public class ApiMemberController {
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<MemberDto> getCurrentMember(Principal principal) {
-        MemberDto member = memberService.getMemberByUsernameOrEmail(principal.getName());
-        return ResponseEntity.ok(member);
+    public ResponseEntity<?> getCurrentMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            logger.warn("User is not authenticated");
+            return ResponseEntity.status(401).body("User is not authenticated");
+        }
+        
+        String username = authentication.getName();
+        logger.info("Getting current member info for: {}", username);
+        
+        try {
+            MemberDto memberDto = memberService.getMemberByUsernameOrEmail(username);
+            if (memberDto == null) {
+                logger.error("Member not found for authenticated user: {}", username);
+                return ResponseEntity.status(404).body("Member not found");
+            }
+            
+            logger.info("Successfully retrieved member: id={}, username={}", memberDto.getId(), memberDto.getUsername());
+            return ResponseEntity.ok(memberDto);
+        } catch (Exception e) {
+            logger.error("Error getting current member", e);
+            return ResponseEntity.status(500).body("Error getting current member: " + e.getMessage());
+        }
     }
     
     @PutMapping("/profile")

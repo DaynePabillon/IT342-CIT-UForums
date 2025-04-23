@@ -14,11 +14,15 @@ const axiosInstance = axios.create({
 // Request interceptor
 axiosInstance.interceptors.request.use(
     (config) => {
-        // Get the admin token first, if not found, get the regular token
-        const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+        // Clear any previous token first to avoid mixing tokens
+        delete config.headers.Authorization;
+        
+        // Get the token from localStorage
+        const token = localStorage.getItem('auth_token');
         
         // If token exists, add it to headers
         if (token) {
+            console.log('Adding auth token to request');
             config.headers.Authorization = `Bearer ${token}`;
         }
         
@@ -38,32 +42,25 @@ axiosInstance.interceptors.response.use(
         if (error.response) {
             // Handle 401 Unauthorized
             if (error.response.status === 401) {
+                console.log('Received 401 Unauthorized response, clearing auth data');
                 // Clear tokens
-                localStorage.removeItem('adminToken');
-                localStorage.removeItem('token');
+                localStorage.removeItem('auth_token');
                 
                 // Remove Authorization header
                 delete axiosInstance.defaults.headers.common['Authorization'];
                 
                 // Dispatch unauthorized event
-                window.dispatchEvent(unauthorizedEvent);
+                window.dispatchEvent(new Event('unauthorized'));
                 
-                // Redirect to appropriate login page
-                const isAdminPath = window.location.pathname.startsWith('/admin');
-                if (isAdminPath && !window.location.pathname.includes('/admin/login')) {
-                    window.location.href = '/admin/login';
-                } else if (!isAdminPath && !window.location.pathname.includes('/login')) {
+                // Redirect to login page if not already there
+                if (!window.location.pathname.includes('/login')) {
+                    console.log('Redirecting to login page');
                     window.location.href = '/login';
                 }
             }
             // Handle 403 Forbidden
             else if (error.response.status === 403) {
-                // Only redirect if trying to access admin routes without admin privileges
-                const isAdminPath = window.location.pathname.startsWith('/admin');
-                if (isAdminPath) {
-                    console.error('Access forbidden: User does not have admin privileges');
-                    window.location.href = '/admin/login';
-                }
+                console.error('Access forbidden: Insufficient privileges');
             }
         }
         return Promise.reject(error);

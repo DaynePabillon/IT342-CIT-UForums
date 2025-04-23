@@ -61,6 +61,22 @@ public class CustomUserDetailsService implements UserDetailsService {
             return buildUserDetails(member);
         }
         
+        // Try to find by ID (in case username is a numeric ID)
+        try {
+            Long id = Long.parseLong(username);
+            logger.debug("Attempting to find user by ID: {}", id);
+            Optional<Member> memberById = memberRepository.findById(id);
+            
+            if (memberById.isPresent()) {
+                logger.info("User found by ID: {}", id);
+                Member member = memberById.get();
+                return buildUserDetails(member);
+            }
+        } catch (NumberFormatException e) {
+            // Not a numeric ID, ignore
+            logger.debug("Username is not a numeric ID: {}", username);
+        }
+        
         // No user found with any method
         logger.error("User not found with any search method: {}", username);
         throw new UsernameNotFoundException("User not found");
@@ -79,23 +95,48 @@ public class CustomUserDetailsService implements UserDetailsService {
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         
         // Check roles collection or admin flag
-        if (member.getRoles() != null && !member.getRoles().isEmpty()) {
-            // Add all roles from the roles collection
-            for (Role role : member.getRoles()) {
-                String roleName = "ROLE_" + role.getName().name();
-                logger.info("Adding role {} for user {}", roleName, member.getName());
-                authorities.add(new SimpleGrantedAuthority(roleName));
+        try {
+            if (member.getRoles() != null && !member.getRoles().isEmpty()) {
+                // Add all roles from the roles collection
+                for (Role role : member.getRoles()) {
+                    String roleName = "ROLE_" + role.getName().name();
+                    logger.info("Adding role {} for user {}", roleName, member.getName());
+                    authorities.add(new SimpleGrantedAuthority(roleName));
+                }
             }
-        } else if (member.isAdmin()) { // Fallback to the admin flag if roles collection is empty
+        } catch (Exception e) {
+            logger.warn("Error accessing roles collection for user {}: {}", member.getName(), e.getMessage());
+            // Continue with the admin flag check
+        }
+        
+        // Fallback to the admin flag if roles collection is empty or couldn't be accessed
+        if (member.isAdmin()) { 
             logger.info("User {} is an admin (from admin flag), adding ROLE_ADMIN", member.getName());
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
         
+        // Use member ID as the username for UserDetails to ensure stability across username changes
         return new org.springframework.security.core.userdetails.User(
-                member.getName(),
+                String.valueOf(member.getId()),
                 member.getPassword(),
                 true, true, true, true,
                 authorities
         );
+    }
+    
+    @Transactional
+    public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
+        logger.info("Loading user by ID: {}", id);
+        Optional<Member> memberById = memberRepository.findById(id);
+        
+        if (memberById.isPresent()) {
+            logger.info("User found by ID: {}", id);
+            Member member = memberById.get();
+            return buildUserDetails(member);
+        }
+        
+        // No user found with the given ID
+        logger.error("User not found with ID: {}", id);
+        throw new UsernameNotFoundException("User not found");
     }
 }

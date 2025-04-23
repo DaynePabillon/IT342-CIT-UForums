@@ -76,6 +76,10 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                // Member endpoints
+                .requestMatchers("/api/members/me").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/threads/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
                 // Swagger UI and API docs
                 .requestMatchers("/swagger-ui.html").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()

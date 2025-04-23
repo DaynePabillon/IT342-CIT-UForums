@@ -1,0 +1,111 @@
+/* CIT-U Forums Custom Theme Styles */
+
+/* Thread Card Styles */
+.thread-card {
+  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.thread-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.thread-card .card-header {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  border-bottom: none;
+  padding: 1rem 1.25rem;
+}
+
+.thread-content {
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* Comment Card Styles */
+.comment-card {
+  transition: all 0.2s ease;
+  border-left: 3px solid #e9ecef;
+  border-radius: 0.5rem;
+  margin-left: 1rem;
+  background-color: #f8f9fa;
+}
+
+.comment-card:hover {
+  border-left-color: #0d6efd;
+  background-color: #fff;
+}
+
+/* Comment Form Styles */
+.comment-form-card textarea:focus {
+  box-shadow: none;
+  border-color: #0d6efd;
+  background-color: #fff !important;
+}
+
+/* Avatar Styles */
+.avatar {
+  transition: all 0.2s ease;
+}
+
+.thread-card:hover .avatar {
+  background-color: #e7f1ff !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.thread-card, .comment-card {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Thread Status Badges */
+.badge.bg-warning {
+  color: #212529;
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+}
+
+/* Thread and Comment Actions */
+.thread-actions button, .comment-header button {
+  transition: all 0.2s ease;
+}
+
+.thread-actions button:hover, .comment-header button:hover {
+  background-color: #e9ecef;
+  color: #0d6efd;
+}
+
+/* Comment Indentation for Replies (if implemented) */
+.comment-replies {
+  margin-left: 2.5rem;
+}
+
+/* CIT-U Specific Theme Elements */
+.cit-u-accent {
+  color: #0d6efd;
+}
+
+.cit-u-bg-accent {
+  background-color: #0d6efd;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .thread-card .card-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .comment-card {
+    margin-left: 0.5rem;
+  }
+  
+  .avatar {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}

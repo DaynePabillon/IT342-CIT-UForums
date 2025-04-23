@@ -64,6 +64,9 @@ public class Thread {
     @Column(nullable = false)
     private int viewCount = 0;
     
+    @Column(nullable = false)
+    private int commentCount = 0;
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

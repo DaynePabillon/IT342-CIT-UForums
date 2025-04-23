@@ -28,31 +28,67 @@ const Thread: React.FC<ThreadProps> = ({ thread, onDelete }) => {
     }
   };
 
+  // Format date in a more readable way
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   return (
-    <div className="card mb-4">
-      <div className="card-header">
+    <div className="thread-card card mb-4 shadow-sm border-0">
+      <div className="card-header bg-gradient" style={{ backgroundColor: '#0d6efd', color: 'white' }}>
         <div className="d-flex justify-content-between align-items-center">
-          <h5 className="mb-0">{thread.title}</h5>
+          <h5 className="mb-0 fw-bold">{thread.title}</h5>
+          {thread.isPinned && (
+            <span className="badge bg-warning text-dark ms-2">
+              <i className="bi bi-pin-angle-fill me-1"></i>Pinned
+            </span>
+          )}
         </div>
       </div>
       <div className="card-body">
-        <p className="card-text">{thread.content}</p>
-        <div className="d-flex justify-content-between align-items-center">
-          <div className="d-flex align-items-center">
-            <small className="text-muted me-3">
-              Posted by {thread.createdBy.name} on {new Date(thread.createdAt).toLocaleDateString()}
-            </small>
+        <div className="thread-content mb-3">
+          <p className="card-text" style={{ whiteSpace: 'pre-line' }}>{thread.content}</p>
+        </div>
+        <div className="thread-footer d-flex justify-content-between align-items-center">
+          <div className="author-info d-flex align-items-center">
+            <div className="avatar me-2 bg-light rounded-circle d-flex justify-content-center align-items-center" 
+                 style={{ width: '40px', height: '40px' }}>
+              <span className="fw-bold text-primary">
+                {thread.createdBy.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <div className="author-name fw-bold">{thread.createdBy.name}</div>
+              <small className="text-muted">
+                Posted on {formatDate(thread.createdAt)}
+              </small>
+            </div>
+          </div>
+          
+          <div className="thread-actions d-flex align-items-center">
+            <span className="me-3 text-muted">
+              <i className="bi bi-chat-left-text me-1"></i>
+              {thread.commentCount} {thread.commentCount === 1 ? 'comment' : 'comments'}
+            </span>
+            
             {isAuthenticated() && (
               <div className="dropdown">
                 <button
-                  className="btn btn-link text-muted p-0"
+                  className="btn btn-sm btn-outline-secondary rounded-pill"
                   type="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
                   <i className="bi bi-three-dots"></i>
                 </button>
-                <ul className="dropdown-menu">
+                <ul className="dropdown-menu dropdown-menu-end">
                   <li>
                     <button
                       className="dropdown-item text-danger"
@@ -74,7 +110,7 @@ const Thread: React.FC<ThreadProps> = ({ thread, onDelete }) => {
         <div className="modal show d-block" tabIndex={-1}>
           <div className="modal-dialog">
             <div className="modal-content">
-              <div className="modal-header">
+              <div className="modal-header bg-light">
                 <h5 className="modal-title">Report Thread</h5>
                 <button
                   type="button"
@@ -121,4 +157,4 @@ const Thread: React.FC<ThreadProps> = ({ thread, onDelete }) => {
   );
 };
 
-export default Thread; 
+export default Thread;

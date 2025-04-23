@@ -1,0 +1,150 @@
+.guidelines-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.guidelines-modal {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  animation: modal-appear 0.3s ease-out;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.guidelines-modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #333; /* Changed from #8b0000 (maroon) to #333 (dark gray) */
+  color: #FFD700; /* Changed text color to yellow */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.guidelines-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.guidelines-modal-content {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 60vh;
+  line-height: 1.6;
+}
+
+.guidelines-modal-content h3 {
+  color: #FFD700; /* Changed from #8b0000 (maroon) to #FFD700 (yellow) */
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.guidelines-modal-content h4 {
+  color: #333;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.guidelines-modal-content p {
+  margin-bottom: 16px;
+  color: #444;
+}
+
+.guidelines-modal-footer {
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-top: 4px;
+}
+
+.checkbox-container label {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.scroll-notice {
+  color: #FFD700; /* Changed from #8b0000 (maroon) to #FFD700 (yellow) */
+  font-style: italic;
+  font-size: 0.85rem;
+  margin-left: 5px;
+}
+
+.accept-button {
+  padding: 10px 20px;
+  background-color: #333; /* Changed from #8b0000 (maroon) to #333 (dark gray) */
+  color: #FFD700; /* Changed text color to yellow */
+  border: 1px solid #FFD700; /* Added yellow border */
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  align-self: flex-end;
+}
+
+.accept-button:hover:not(:disabled) {
+  background-color: #444; /* Changed hover color */
+}
+
+.accept-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .guidelines-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .guidelines-modal-content {
+    max-height: 50vh;
+  }
+  
+  .guidelines-modal-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .guidelines-modal-footer {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .accept-button {
+    align-self: center;
+    width: 100%;
+  }
+}

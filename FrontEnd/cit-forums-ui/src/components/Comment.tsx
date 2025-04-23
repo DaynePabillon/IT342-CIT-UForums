@@ -29,29 +29,52 @@ const Comment: React.FC<CommentProps> = ({ comment, onDelete }) => {
     }
   };
 
+  // Format date in a more readable way
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   return (
-    <div className="card mb-3">
-      <div className="card-body">
-        <div className="d-flex justify-content-between align-items-start">
+    <div className="comment-card card mb-3 shadow-sm border-0">
+      <div className="card-body py-3">
+        <div className="d-flex">
+          {/* Avatar */}
+          <div className="comment-avatar me-3">
+            <div className="avatar bg-light rounded-circle d-flex justify-content-center align-items-center" 
+                 style={{ width: '36px', height: '36px' }}>
+              <span className="fw-bold text-secondary">
+                {comment.authorName.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          </div>
+          
+          {/* Comment content */}
           <div className="flex-grow-1">
-            <h6 className="card-subtitle mb-2 text-muted">
-              Posted by {comment.authorName}
-            </h6>
-            <p className="card-text">{comment.content}</p>
-            <div className="d-flex align-items-center mt-2">
-              <small className="text-muted">
-                {new Date(comment.createdAt).toLocaleDateString()}
-              </small>
+            <div className="comment-header d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <h6 className="mb-0 fw-bold">{comment.authorName}</h6>
+                <small className="text-muted">{formatDate(comment.createdAt)}</small>
+              </div>
+              
               {isAuthenticated() && (
-                <div className="dropdown ms-2">
+                <div className="dropdown">
                   <button
-                    className="btn btn-link text-muted p-0"
+                    className="btn btn-sm btn-outline-light text-muted rounded-pill"
                     onClick={() => setShowDropdown(!showDropdown)}
+                    onBlur={() => setTimeout(() => setShowDropdown(false), 100)}
                   >
                     <i className="bi bi-three-dots"></i>
                   </button>
                   {showDropdown && (
-                    <div className="dropdown-menu show" style={{ position: 'absolute', transform: 'translate3d(0px, 30px, 0px)' }}>
+                    <div className="dropdown-menu dropdown-menu-end show" 
+                         style={{ position: 'absolute', transform: 'translate3d(0px, 30px, 0px)' }}>
                       <button
                         className="dropdown-item text-danger"
                         onClick={() => {
@@ -67,6 +90,10 @@ const Comment: React.FC<CommentProps> = ({ comment, onDelete }) => {
                 </div>
               )}
             </div>
+            
+            <div className="comment-content mb-2">
+              <p className="card-text" style={{ whiteSpace: 'pre-line' }}>{comment.content}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -76,7 +103,7 @@ const Comment: React.FC<CommentProps> = ({ comment, onDelete }) => {
         <div className="modal show" style={{ display: 'block' }}>
           <div className="modal-dialog">
             <div className="modal-content">
-              <div className="modal-header">
+              <div className="modal-header bg-light">
                 <h5 className="modal-title">Report Comment</h5>
                 <button
                   type="button"
@@ -116,10 +143,11 @@ const Comment: React.FC<CommentProps> = ({ comment, onDelete }) => {
               </div>
             </div>
           </div>
+          <div className="modal-backdrop show"></div>
         </div>
       )}
     </div>
   );
 };
 
-export default Comment; 
+export default Comment;

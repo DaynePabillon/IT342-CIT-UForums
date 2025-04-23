@@ -27,8 +27,9 @@ const Navbar: React.FC = () => {
       if (authed) {
         // Always fetch fresh user data from the server
         const currentUser = await getCurrentUser();
+        console.log('Current user data:', currentUser);
         if (currentUser) {
-          setUsername(currentUser.name);
+          setUsername(currentUser.name || 'User');
           setAdmin(currentUser.roles?.includes('ROLE_ADMIN') || false);
         } else {
           setUsername('User');

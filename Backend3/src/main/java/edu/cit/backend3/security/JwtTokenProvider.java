@@ -30,14 +30,14 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
-        String username = principal.getUsername();
+        String userId = principal.getUsername(); // This is now the user ID from CustomUserDetailsService
         
-        logger.info("Generating token for user: {}", username);
-        return createToken(username);
+        logger.info("Generating token for user ID: {}", userId);
+        return createToken(userId);
     }
 
     public String generateTokenFromMember(Member member) {
-        String identifier = member.getName(); // Use name instead of email
+        String identifier = String.valueOf(member.getId()); // Use ID instead of name
         logger.info("Generating token from member: id={}, name={}, email={}", 
                    member.getId(), member.getName(), member.getEmail());
         return createToken(identifier);
@@ -58,7 +58,8 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
+    // Renamed for clarity, but still returns the same value (now a user ID)
+    public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()

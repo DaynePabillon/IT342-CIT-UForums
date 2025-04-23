@@ -88,7 +88,7 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
       
       const userProfile: UserProfile = {
         id: response.data.user.id,
-        name: response.data.user.name || credentials.usernameOrEmail,
+        name: response.data.user.name || response.data.user.username || credentials.usernameOrEmail,
         email: response.data.user.email || credentials.usernameOrEmail,
         firstName: response.data.user.firstName || '',
         lastName: response.data.user.lastName || '',
@@ -97,18 +97,12 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
       
       console.log('Setting user profile:', userProfile);
       setUserProfile(userProfile);
+      
+      // Force reload of the page to ensure clean state
+      window.location.reload();
     } else {
       console.warn('No user data in login response');
-      
-      const minimalProfile: UserProfile = {
-        id: 0,
-        name: credentials.usernameOrEmail,
-        email: credentials.usernameOrEmail,
-        firstName: '',
-        lastName: '',
-        roles: []
-      };
-      setUserProfile(minimalProfile);
+      return false;
     }
     
     return true;
@@ -133,9 +127,14 @@ export const register = async (userData: RegisterRequest): Promise<boolean> => {
 };
 
 export const logout = (): void => {
-  // Clear auth token and user profile
+  console.log('Logging out user');
+  
+  // Clear all authentication tokens
   removeAuthToken();
   removeUserProfile();
+  localStorage.removeItem('token');
+  localStorage.removeItem('adminToken');
+  localStorage.removeItem('user_profile');
   
   // Clear any session storage data
   sessionStorage.clear();
@@ -143,7 +142,9 @@ export const logout = (): void => {
   // Clear any axios cached headers
   delete axiosInstance.defaults.headers.common['Authorization'];
   
-  // Force a reload of the page to clear any in-memory state
+  console.log('All authentication data cleared');
+  
+  // Force a complete reload of the application to clear any in-memory state
   window.location.href = '/';
 };
 

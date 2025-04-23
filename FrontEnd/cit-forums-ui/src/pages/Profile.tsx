@@ -111,20 +111,60 @@ const Profile: React.FC = () => {
     setSuccess(null);
     
     try {
-      const updatedUser = await updateProfile(profileData);
-      setSuccess('Profile updated successfully!');
-      setIsEditing(false);
+      // Get current user profile to compare changes
+      const currentUser = await getCurrentUser();
+      console.log('Current user before update:', currentUser);
       
-      // Update local state with the fresh data
-      setProfileData({
-        name: updatedUser.name || 'User',
-        email: updatedUser.email || '',
-        firstName: updatedUser.firstName || '',
-        lastName: updatedUser.lastName || '',
-      });
+      // Only include fields that have changed
+      const updatedFields: any = {};
+      let hasChanges = false;
       
-      // Refresh content
-      await loadUserContent();
+      if (profileData.name !== currentUser.name) {
+        updatedFields.name = profileData.name;
+        hasChanges = true;
+      }
+      
+      if (profileData.email !== currentUser.email) {
+        updatedFields.email = profileData.email;
+        hasChanges = true;
+      }
+      
+      if (profileData.firstName !== currentUser.firstName) {
+        updatedFields.firstName = profileData.firstName;
+        hasChanges = true;
+      }
+      
+      if (profileData.lastName !== currentUser.lastName) {
+        updatedFields.lastName = profileData.lastName;
+        hasChanges = true;
+      }
+      
+      console.log('Fields to update:', updatedFields, 'Has changes:', hasChanges);
+      
+      // Only proceed with update if there are changes
+      if (hasChanges) {
+        const updatedUser = await updateProfile(updatedFields);
+        console.log('Updated user after API call:', updatedUser);
+        setSuccess('Profile updated successfully!');
+        setIsEditing(false);
+        
+        // Update local state with the fresh data
+        setProfileData({
+          name: updatedUser.name || 'User',
+          email: updatedUser.email || '',
+          firstName: updatedUser.firstName || '',
+          lastName: updatedUser.lastName || '',
+        });
+        
+        // Force a refresh of the user data in localStorage and session
+        await getCurrentUser(); // This will update the stored profile
+        
+        // Force a page reload to update the header and all components
+        window.location.reload();
+      } else {
+        setSuccess('No changes were made to your profile.');
+        setIsEditing(false);
+      }
     } catch (err: any) {
       console.error('Error updating profile:', err);
       setError(err.response?.data?.message || 'Failed to update profile');
@@ -312,4 +352,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile; 
+export default Profile;

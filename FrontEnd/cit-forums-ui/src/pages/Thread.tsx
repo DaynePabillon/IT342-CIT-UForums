@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getThreadById, Thread } from '../services/threadService';
-import { getCommentsByThreadId, Comment as CommentType } from '../services/commentService';
+import { getCommentsByThreadId, Comment as CommentType, createComment } from '../services/commentService';
 import { isAuthenticated } from '../services/authService';
 import CommentForm from '../components/CommentForm';
 import ThreadComponent from '../components/Thread';
@@ -9,6 +9,7 @@ import CommentComponent from '../components/Comment';
 
 const ThreadPage: React.FC = () => {
   const { forumId, threadId } = useParams<{ forumId: string; threadId: string }>();
+  const navigate = useNavigate();
   const [thread, setThread] = useState<Thread | null>(null);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,6 +31,7 @@ const ThreadPage: React.FC = () => {
       // Get comments for this thread
       try {
         const threadComments = await getCommentsByThreadId(parseInt(threadId));
+        console.log('Fetched comments:', threadComments);
         setComments(threadComments);
       } catch (commentError: any) {
         console.error('Error fetching comments:', commentError);
@@ -50,8 +52,21 @@ const ThreadPage: React.FC = () => {
     fetchThread();
   }, [fetchThread]);
 
-  const handleCommentAdded = (newComment: CommentType) => {
+  const handleCommentAdded = async (newComment: CommentType) => {
+    console.log('Comment added:', newComment);
+    // Add the new comment to the comments array
     setComments(prevComments => [...prevComments, newComment]);
+    
+    // Refresh the thread data to get the updated comment count
+    try {
+      if (threadId) {
+        const updatedThread = await getThreadById(parseInt(threadId));
+        setThread(updatedThread);
+        console.log('Thread data refreshed with updated comment count:', updatedThread.commentCount);
+      }
+    } catch (err) {
+      console.error('Error refreshing thread data:', err);
+    }
   };
 
   const handleThreadDelete = async (threadId: number) => {
@@ -62,6 +77,21 @@ const ThreadPage: React.FC = () => {
   const handleCommentDelete = async (commentId: number) => {
     // Implement comment deletion if needed
     console.log('Comment deletion not implemented yet');
+  };
+
+  // Function to navigate back with updated comment count
+  const handleBackToForum = () => {
+    if (thread && forumId) {
+      navigate(`/forums/${forumId}/threads`, { 
+        state: { 
+          refresh: true,
+          updatedThreadId: thread.id,
+          updatedCommentCount: thread.commentCount
+        } 
+      });
+    } else {
+      navigate(`/forums/${forumId}/threads`);
+    }
   };
 
   if (loading) {
@@ -79,9 +109,9 @@ const ThreadPage: React.FC = () => {
   return (
     <div className="container">
       <div className="mb-3">
-        <Link to={`/forums/${forumId}/threads`} className="btn btn-outline-secondary">
+        <button onClick={handleBackToForum} className="btn btn-outline-secondary">
           ← Back to Forum
-        </Link>
+        </button>
       </div>
 
       {/* Use the Thread component */}
@@ -103,30 +133,39 @@ const ThreadPage: React.FC = () => {
 
       {/* Comments Section */}
       <div className="comments-section mt-4">
-        <h3>Comments</h3>
-        {comments.map((comment) => (
-          <CommentComponent
-            key={comment.id}
-            comment={{
-              id: comment.id,
-              content: comment.content,
-              authorId: comment.author?.id || 0,
-              authorName: comment.author?.name || 'Anonymous',
-              threadId: threadId ? parseInt(threadId) : 0,
-              createdAt: comment.createdAt,
-              updatedAt: comment.updatedAt || comment.createdAt,
-            }}
-            onDelete={handleCommentDelete}
-          />
-        ))}
+        <h3>Comments ({thread.commentCount})</h3>
+        {comments.length > 0 ? (
+          comments.map((comment) => (
+            <CommentComponent
+              key={comment.id}
+              comment={{
+                id: comment.id,
+                content: comment.content,
+                authorId: comment.author?.id || 0,
+                authorName: comment.author?.name || 'Anonymous',
+                threadId: threadId ? parseInt(threadId) : 0,
+                createdAt: comment.createdAt,
+                updatedAt: comment.updatedAt || comment.createdAt,
+              }}
+              onDelete={handleCommentDelete}
+            />
+          ))
+        ) : (
+          <p className="text-muted">No comments yet. Be the first to comment!</p>
+        )}
 
         {/* Comment Form - Only render if user is authenticated */}
         {userAuthenticated && (
-          <CommentForm postId={thread.id} onCommentAdded={handleCommentAdded} />
+          <CommentForm 
+            threadId={parseInt(threadId!)} 
+            // Don't pass postId when commenting directly on a thread
+            // This will use the thread's direct comment endpoint
+            onCommentAdded={handleCommentAdded} 
+          />
         )}
       </div>
     </div>
   );
 };
 
-export default ThreadPage; 
+export default ThreadPage;

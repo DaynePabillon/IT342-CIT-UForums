@@ -35,16 +35,22 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Initialize users
-        initializeUsers();
-        
-        // Initialize forums
-        initializeForums();
+        try {
+            // Initialize users
+            initializeUsers();
+            
+            // Initialize forums
+            initializeForums();
+        } catch (Exception e) {
+            logger.error("Error during data initialization: {}", e.getMessage());
+            logger.debug("Initialization error details", e);
+            // Continue application startup even if initialization fails
+        }
     }
     
     private void initializeUsers() {
-        // Check if admin user exists
-        if (!memberRepository.existsByName("admin")) {
+        // Check if admin user exists by username or email
+        if (!memberRepository.existsByName("admin") && !memberRepository.existsByEmail("admin@cituforums.com")) {
             logger.info("Creating default admin user");
             
             Member admin = new Member();
@@ -60,11 +66,30 @@ public class DataInitializer implements CommandLineRunner {
             memberRepository.save(admin);
             logger.info("Default admin user created successfully");
         } else {
-            logger.info("Admin user already exists");
+            // If admin exists but we're having login issues, update the admin user
+            try {
+                List<Member> admins = memberRepository.findByNameOrEmail("admin", "admin@cituforums.com");
+                if (!admins.isEmpty()) {
+                    Member admin = admins.get(0);
+                    // Ensure the admin has the correct credentials
+                    admin.setName("admin");
+                    admin.setEmail("admin@cituforums.com");
+                    admin.setPassword(passwordEncoder.encode("admin123"));
+                    admin.setAdmin(true);
+                    admin.setActive(true);
+                    
+                    memberRepository.save(admin);
+                    logger.info("Updated existing admin user");
+                } else {
+                    logger.info("Admin user exists but could not be found for update");
+                }
+            } catch (Exception e) {
+                logger.error("Error updating admin user: {}", e.getMessage());
+            }
         }
         
-        // Check if test user exists
-        if (!memberRepository.existsByName("user")) {
+        // Check if test user exists by username or email
+        if (!memberRepository.existsByName("user") && !memberRepository.existsByEmail("user@cituforums.com")) {
             logger.info("Creating default test user");
             
             Member user = new Member();
@@ -80,14 +105,40 @@ public class DataInitializer implements CommandLineRunner {
             memberRepository.save(user);
             logger.info("Default test user created successfully");
         } else {
-            logger.info("Test user already exists");
+            // If user exists but we're having login issues, update the test user
+            try {
+                List<Member> users = memberRepository.findByNameOrEmail("user", "user@cituforums.com");
+                if (!users.isEmpty()) {
+                    Member user = users.get(0);
+                    // Ensure the user has the correct credentials
+                    user.setName("user");
+                    user.setEmail("user@cituforums.com");
+                    user.setPassword(passwordEncoder.encode("user123"));
+                    user.setAdmin(false);
+                    user.setActive(true);
+                    
+                    memberRepository.save(user);
+                    logger.info("Updated existing test user");
+                } else {
+                    logger.info("Test user exists but could not be found for update");
+                }
+            } catch (Exception e) {
+                logger.error("Error updating test user: {}", e.getMessage());
+            }
         }
     }
     
     private void initializeForums() {
-        // Get admin user for forum creation
-        Member admin = memberRepository.findByName("admin")
-                .orElseThrow(() -> new RuntimeException("Admin user not found"));
+        // Get admin user for forum creation - first try to find by name or email
+        List<Member> admins = memberRepository.findByNameOrEmail("admin", "admin@cituforums.com");
+        
+        if (admins.isEmpty()) {
+            logger.warn("Admin user not found, skipping forum initialization");
+            return;
+        }
+        
+        Member admin = admins.get(0);
+        logger.info("Found admin user for forum creation: id={}, name={}", admin.getId(), admin.getName());
         
         // Create example forums for each category if they don't exist
         createForumIfNotExists("Announcements", "Important announcements from CIT-U administration", "ANNOUNCEMENTS", admin);

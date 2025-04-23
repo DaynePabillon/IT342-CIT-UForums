@@ -3,11 +3,12 @@ import { createComment } from '../services/commentService';
 import { getUserProfile } from '../services/authService';
 
 interface CommentFormProps {
-  postId: number;
+  postId?: number;
+  threadId: number;
   onCommentAdded: (newComment: any) => void;
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => {
+const CommentForm: React.FC<CommentFormProps> = ({ postId, threadId, onCommentAdded }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,10 +21,11 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => 
     setError(null);
 
     try {
-      console.log('Creating comment with postId:', postId);
+      console.log('Creating comment with threadId:', threadId, 'and postId:', postId);
       const newComment = await createComment({
         content,
-        postId,
+        threadId,
+        postId
       });
       console.log('Comment created successfully:', newComment);
       
@@ -43,33 +45,56 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => 
   };
 
   return (
-    <div className="card mt-4">
-      <div className="card-header">Add a Comment</div>
+    <div className="comment-form-card card mt-4 shadow-sm border-0">
+      <div className="card-header bg-light">
+        <h5 className="mb-0 fs-5">
+          <i className="bi bi-chat-left-text me-2"></i>
+          Add a Comment
+        </h5>
+      </div>
       <div className="card-body">
-        {error && <div className="alert alert-danger">{error}</div>}
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-3">
             <textarea
-              className="form-control"
-              rows={3}
+              className="form-control border-0 bg-light"
+              style={{ resize: 'none', borderRadius: '0.5rem' }}
+              rows={4}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Write your comment..."
+              placeholder="Share your thoughts..."
               required
               disabled={loading}
             ></textarea>
           </div>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={loading || !content.trim()}
-          >
-            {loading ? 'Posting...' : 'Post Comment'}
-          </button>
+          <div className="d-flex justify-content-end">
+            <button
+              type="submit"
+              className="btn btn-primary px-4 rounded-pill"
+              disabled={loading || !content.trim()}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Posting...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-send me-2"></i>
+                  Post Comment
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
 };
 
-export default CommentForm; 
+export default CommentForm;

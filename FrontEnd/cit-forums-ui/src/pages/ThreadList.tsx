@@ -60,10 +60,27 @@ const ThreadList: React.FC = () => {
 
   useEffect(() => {
     if (location.state) {
-      const state = location.state as { refresh?: boolean; message?: string };
+      const state = location.state as { 
+        refresh?: boolean; 
+        message?: string; 
+        updatedThreadId?: number;
+        updatedCommentCount?: number;
+      };
       
       if (state.refresh) {
-        fetchThreads();
+        // If we have specific thread update info, update just that thread
+        if (state.updatedThreadId && typeof state.updatedCommentCount === 'number') {
+          setThreads(prevThreads => 
+            prevThreads.map(thread => 
+              thread.id === state.updatedThreadId 
+                ? { ...thread, commentCount: state.updatedCommentCount as number } 
+                : thread
+            )
+          );
+        } else {
+          // Otherwise do a full refresh
+          fetchThreads();
+        }
       }
       
       if (state.message) {
@@ -74,6 +91,7 @@ const ThreadList: React.FC = () => {
         return () => clearTimeout(timer);
       }
       
+      // Clear the location state after processing
       window.history.replaceState({}, document.title);
     }
   }, [location, fetchThreads]);

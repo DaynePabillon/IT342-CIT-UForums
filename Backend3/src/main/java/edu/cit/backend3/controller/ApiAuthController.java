@@ -16,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -46,9 +48,12 @@ public class ApiAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> authenticateMember(@Valid @RequestBody LoginRequest loginRequest) {
-        logger.info("Login attempt for user: {}", loginRequest.getUsernameOrEmail());
+    public ResponseEntity<?> authenticateMember(@RequestBody LoginRequest loginRequest) {
         try {
+            // Clear any existing authentication
+            SecurityContextHolder.clearContext();
+            
+            // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsernameOrEmail(),
@@ -56,23 +61,63 @@ public class ApiAuthController {
                     )
             );
 
+            // Set the authentication in the security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Get token from token provider
-            String token = tokenProvider.generateToken(authentication);
-            logger.info("Login successful for user: {}", loginRequest.getUsernameOrEmail());
-
-            return ResponseEntity.ok(new JwtAuthResponse(token));
+            // Get the user details
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String username = userDetails.getUsername();
+            
+            // In CustomUserDetailsService, we use the user ID as the username in UserDetails
+            // We need to load the actual Member entity by ID
+            Long userId;
+            try {
+                userId = Long.parseLong(username);
+                logger.info("Parsed user ID from authentication: {}", userId);
+            } catch (NumberFormatException e) {
+                logger.error("Failed to parse user ID from authentication: {}", username);
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid user ID"));
+            }
+            
+            // Get the Member entity using the ID
+            Member member = memberService.getMemberEntity(userId);
+            if (member == null) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "User not found"));
+            }
+            
+            // Get the MemberDto
+            MemberDto memberDto = memberService.getMember(userId);
+            if (memberDto == null) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "User not found"));
+            }
+            
+            // Generate JWT token
+            String jwt = tokenProvider.generateToken(authentication);
+            
+            // Log the user information
+            logger.info("User authenticated: id={}, username={}, email={}", 
+                       member.getId(), member.getName(), member.getEmail());
+            
+            // Return JWT token and user information
+            return ResponseEntity.ok(new JwtAuthResponse(jwt, memberDto));
+        } catch (BadCredentialsException e) {
+            logger.error("Authentication failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse(false, "Invalid username/email or password"));
         } catch (Exception e) {
-            logger.error("Login failed for user: {} - Error: {}", loginRequest.getUsernameOrEmail(), e.getMessage());
-            throw e;
+            logger.error("Authentication error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An error occurred during authentication"));
         }
     }
 
     @PostMapping("/admin/login")
-    public ResponseEntity<JwtAuthResponse> authenticateAdmin(@Valid @RequestBody LoginRequest loginRequest) {
-        logger.info("Admin login attempt for user: {}", loginRequest.getUsernameOrEmail());
+    public ResponseEntity<?> authenticateAdmin(@RequestBody LoginRequest loginRequest) {
         try {
+            // Clear any existing authentication
+            SecurityContextHolder.clearContext();
+            
+            // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsernameOrEmail(),
@@ -80,21 +125,60 @@ public class ApiAuthController {
                     )
             );
 
-            // Check if the user is an admin
-            MemberDto member = memberService.getMemberByUsernameOrEmail(loginRequest.getUsernameOrEmail());
-            if (member.getRole() == null || !member.getRole().equals("ROLE_ADMIN")) {
-                logger.error("Admin login failed - User is not an admin: {}", loginRequest.getUsernameOrEmail());
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-
+            // Set the authentication in the security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = tokenProvider.generateToken(authentication);
-            logger.info("Admin login successful for user: {}", loginRequest.getUsernameOrEmail());
 
-            return ResponseEntity.ok(new JwtAuthResponse(token));
+            // Get the user details
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String username = userDetails.getUsername();
+            
+            // In CustomUserDetailsService, we use the user ID as the username in UserDetails
+            // We need to load the actual Member entity by ID
+            Long userId;
+            try {
+                userId = Long.parseLong(username);
+                logger.info("Parsed user ID from authentication: {}", userId);
+            } catch (NumberFormatException e) {
+                logger.error("Failed to parse user ID from authentication: {}", username);
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid user ID"));
+            }
+            
+            // Get the Member entity using the ID
+            Member member = memberService.getMemberEntity(userId);
+            if (member == null) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "User not found"));
+            }
+            
+            // Check if the user is an admin
+            if (!member.isAdmin()) {
+                logger.warn("Non-admin user attempted to login as admin: {}", member.getName());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new ApiResponse(false, "Access denied: User is not an admin"));
+            }
+            
+            // Get the MemberDto
+            MemberDto memberDto = memberService.getMember(userId);
+            if (memberDto == null) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "User not found"));
+            }
+            
+            // Generate JWT token
+            String jwt = tokenProvider.generateToken(authentication);
+            
+            // Log the admin login
+            logger.info("Admin authenticated: id={}, username={}, email={}", 
+                       member.getId(), member.getName(), member.getEmail());
+            
+            // Return JWT token and user information
+            return ResponseEntity.ok(new JwtAuthResponse(jwt, memberDto));
+        } catch (BadCredentialsException e) {
+            logger.error("Admin authentication failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse(false, "Invalid username/email or password"));
         } catch (Exception e) {
-            logger.error("Admin login failed for user: {} - Error: {}", loginRequest.getUsernameOrEmail(), e.getMessage());
-            throw e;
+            logger.error("Admin authentication error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An error occurred during authentication"));
         }
     }
 
@@ -131,7 +215,7 @@ public class ApiAuthController {
             Member member = memberRepository.findByName(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            if (member.getRole() == null || !member.getRole().equals("ROLE_ADMIN")) {
+            if (!member.isAdmin()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(new ApiResponse(false, "User is not an admin"));
             }
@@ -143,4 +227,4 @@ public class ApiAuthController {
                     .body(new ApiResponse(false, "Failed to check admin status"));
         }
     }
-} 
+}

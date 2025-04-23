@@ -18,6 +18,8 @@ public class CommentRequest {
     @Size(min = 1, max = 1000, message = "Content must be between 1 and 1000 characters")
     private String content;
     
-    @NotNull(message = "Post ID cannot be null")
     private Long postId;
-} 
+    
+    @NotNull(message = "Thread ID cannot be null")
+    private Long threadId;
+}

@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -189,10 +190,25 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDto getMemberByUsernameOrEmail(String usernameOrEmail) {
+        // First try to find by name or email
         List<Member> members = memberRepository.findByNameOrEmail(usernameOrEmail, usernameOrEmail);
+        
+        // If not found, try to parse as ID
         if (members.isEmpty()) {
+            try {
+                Long id = Long.parseLong(usernameOrEmail);
+                Optional<Member> memberById = memberRepository.findById(id);
+                if (memberById.isPresent()) {
+                    return convertToDto(memberById.get());
+                }
+            } catch (NumberFormatException e) {
+                // Not a numeric ID, ignore
+                logger.debug("Username is not a numeric ID: {}", usernameOrEmail);
+            }
+            
             throw new RuntimeException("User not found");
         }
+        
         Member member = members.get(0);
         return convertToDto(member);
     }
@@ -217,28 +233,56 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public MemberDto updateProfile(Long memberId, ProfileUpdateRequest updateRequest) {
-        logger.info("Updating profile for member ID: {}", memberId);
+        logger.info("Updating profile for member ID: {} with request: {}", memberId, updateRequest);
         
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("Member not found"));
+        logger.info("Found member to update: {}", member);
 
-        if (!member.getName().equals(updateRequest.getName()) && existsByName(updateRequest.getName())) {
-            logger.error("Username is already taken: {}", updateRequest.getName());
-            throw new RuntimeException("Username is already taken!");
+        boolean updated = false;
+        
+        // Only update fields that are provided in the request and not null/empty
+        if (updateRequest.getName() != null && !updateRequest.getName().isEmpty()) {
+            if (!member.getName().equals(updateRequest.getName()) && existsByName(updateRequest.getName())) {
+                logger.error("Username is already taken: {}", updateRequest.getName());
+                throw new RuntimeException("Username is already taken!");
+            }
+            logger.info("Updating name from '{}' to '{}'", member.getName(), updateRequest.getName());
+            member.setName(updateRequest.getName());
+            updated = true;
         }
 
-        if (!member.getEmail().equals(updateRequest.getEmail()) && existsByEmail(updateRequest.getEmail())) {
-            logger.error("Email is already in use: {}", updateRequest.getEmail());
-            throw new RuntimeException("Email is already in use!");
+        if (updateRequest.getEmail() != null && !updateRequest.getEmail().isEmpty()) {
+            if (!member.getEmail().equals(updateRequest.getEmail()) && existsByEmail(updateRequest.getEmail())) {
+                logger.error("Email is already in use: {}", updateRequest.getEmail());
+                throw new RuntimeException("Email is already in use!");
+            }
+            logger.info("Updating email from '{}' to '{}'", member.getEmail(), updateRequest.getEmail());
+            member.setEmail(updateRequest.getEmail());
+            updated = true;
         }
 
-        member.setName(updateRequest.getName());
-        member.setEmail(updateRequest.getEmail());
-        member.setFirstName(updateRequest.getFirstName());
-        member.setLastName(updateRequest.getLastName());
+        if (updateRequest.getFirstName() != null) {
+            logger.info("Updating firstName from '{}' to '{}'", member.getFirstName(), updateRequest.getFirstName());
+            member.setFirstName(updateRequest.getFirstName());
+            updated = true;
+        }
 
-        Member updatedMember = memberRepository.save(member);
-        logger.info("Profile updated successfully for member ID: {}", memberId);
+        if (updateRequest.getLastName() != null) {
+            logger.info("Updating lastName from '{}' to '{}'", member.getLastName(), updateRequest.getLastName());
+            member.setLastName(updateRequest.getLastName());
+            updated = true;
+        }
+
+        Member updatedMember;
+        if (updated) {
+            logger.info("Saving updated member: {}", member);
+            updatedMember = memberRepository.save(member);
+            logger.info("Profile updated successfully for member ID: {}, updated entity: {}", memberId, updatedMember);
+        } else {
+            logger.info("No changes detected, skipping database update");
+            updatedMember = member;
+        }
         
         return convertToDto(updatedMember);
     }

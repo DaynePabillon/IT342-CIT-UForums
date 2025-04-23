@@ -54,11 +54,19 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
+      // Clear any existing authentication data from localStorage first
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_profile');
+      sessionStorage.clear();
+      
+      console.log('Attempting login with:', formData.usernameOrEmail);
       const success = await login(formData);
+      
       if (success) {
-        // Redirect to original intended destination or home
-        const state = location.state as LocationState;
-        navigate(state?.from || '/', { replace: true });
+        console.log('Login successful, redirecting...');
+        // Force a full page reload to ensure clean state
+        window.location.href = (location.state as LocationState)?.from || '/';
+        return; // Stop execution after redirect
       } else {
         setError('Invalid credentials. Please try again.');
       }

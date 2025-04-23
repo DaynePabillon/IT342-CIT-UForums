@@ -7,7 +7,9 @@ import org.springframework.data.domain.Page;
 
 public interface CommentService {
     
-    CommentDto createComment(CommentRequest commentRequest, Long postId, Long authorId);
+    CommentDto createComment(CommentRequest commentRequest, Long postId, Long threadId, Long authorId);
+    
+    CommentDto createCommentOnThread(CommentRequest commentRequest, Long threadId, Long authorId);
     
     CommentDto updateComment(Long commentId, CommentRequest commentRequest);
     
@@ -22,4 +24,4 @@ public interface CommentService {
     Page<CommentDto> getCommentsByAuthor(Long authorId, int page, int size);
     
     Comment getCommentEntity(Long commentId);
-} 
+}
