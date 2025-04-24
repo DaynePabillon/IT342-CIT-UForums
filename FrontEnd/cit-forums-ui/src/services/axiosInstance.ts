@@ -5,7 +5,7 @@ const unauthorizedEvent = new Event('unauthorized');
 
 // Create axios instance with default config
 const axiosInstance = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080',
+    baseURL: 'https://it342-cit-uforums.onrender.com',
     headers: {
         'Content-Type': 'application/json',
     },
