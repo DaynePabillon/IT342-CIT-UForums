@@ -5,7 +5,7 @@ const TOKEN_KEY = 'auth_token';
 
 // Create an axios instance with default configuration
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080', // Adjust to your backend URL
+  baseURL: process.env.REACT_APP_API_URL || 'https://it342-cit-uforums-backend.onrender.com', // Production backend URL
   timeout: 10000, // Set a 10-second timeout for all requests
   headers: {
     'Content-Type': 'application/json',
