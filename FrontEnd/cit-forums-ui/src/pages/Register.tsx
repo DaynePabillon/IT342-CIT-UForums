@@ -21,10 +21,35 @@ const Register: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    
+    // Format phone number to match ###-###-#### pattern
+    if (name === 'phoneNumber') {
+      // Remove all non-digit characters
+      const digitsOnly = value.replace(/\D/g, '');
+      
+      // Format as ###-###-####
+      if (digitsOnly.length <= 3) {
+        setFormData({
+          ...formData,
+          [name]: digitsOnly
+        });
+      } else if (digitsOnly.length <= 6) {
+        setFormData({
+          ...formData,
+          [name]: `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`
+        });
+      } else {
+        setFormData({
+          ...formData,
+          [name]: `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,10 +58,12 @@ const Register: React.FC = () => {
     setError(null);
 
     try {
+      console.log('Registering with data:', formData);
       // Register the user
       const success = await register(formData);
       
       if (success) {
+        console.log('Registration successful, redirecting to login with:', formData.name);
         // After successful registration, redirect to login
         navigate('/login', { 
           state: { 

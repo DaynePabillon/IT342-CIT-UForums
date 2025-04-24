@@ -59,7 +59,7 @@ const Login: React.FC = () => {
       localStorage.removeItem('user_profile');
       sessionStorage.clear();
       
-      console.log('Attempting login with:', formData.usernameOrEmail);
+      console.log('Attempting login with:', formData);
       const success = await login(formData);
       
       if (success) {
