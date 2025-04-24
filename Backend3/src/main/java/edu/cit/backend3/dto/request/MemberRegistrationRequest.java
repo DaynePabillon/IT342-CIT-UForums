@@ -31,4 +31,16 @@ public class MemberRegistrationRequest {
     private String firstName;
     
     private String lastName;
-} 
+    
+    @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$", message = "Phone number must be in format ###-###-####")
+    private String phoneNumber;
+    
+    private String city;
+    
+    private String province;
+    
+    private String address;
+    
+    @Size(max = 500, message = "Bio cannot exceed 500 characters")
+    private String bio;
+}

@@ -9,12 +9,17 @@ const Register: React.FC = () => {
     password: '',
     firstName: '',
     lastName: '',
+    phoneNumber: '',
+    city: '',
+    province: '',
+    address: '',
+    bio: ''
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -116,6 +121,59 @@ const Register: React.FC = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
+                />
+              </div>
+              <div className="form-group mb-3">
+                <label htmlFor="phoneNumber">Phone Number</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group mb-3">
+                <label htmlFor="city">City</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group mb-3">
+                <label htmlFor="province">Province</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="province"
+                  name="province"
+                  value={formData.province}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group mb-3">
+                <label htmlFor="address">Address</label>
+                <textarea
+                  className="form-control"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group mb-3">
+                <label htmlFor="bio">Bio</label>
+                <textarea
+                  className="form-control"
+                  id="bio"
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleChange}
                 />
               </div>
               <div className="d-grid">

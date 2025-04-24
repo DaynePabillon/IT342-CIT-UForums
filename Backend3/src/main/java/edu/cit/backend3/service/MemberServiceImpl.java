@@ -82,6 +82,11 @@ public class MemberServiceImpl implements MemberService {
             member.setPassword(registrationRequest.getPassword());
             member.setFirstName(registrationRequest.getFirstName());
             member.setLastName(registrationRequest.getLastName());
+            member.setPhoneNumber(registrationRequest.getPhoneNumber());
+            member.setCity(registrationRequest.getCity());
+            member.setProvince(registrationRequest.getProvince());
+            member.setAddress(registrationRequest.getAddress());
+            member.setBio(registrationRequest.getBio());
             member.setAdmin(false);
 
             logger.info("Saving member to database...");
@@ -274,6 +279,36 @@ public class MemberServiceImpl implements MemberService {
             updated = true;
         }
 
+        if (updateRequest.getPhoneNumber() != null) {
+            logger.info("Updating phoneNumber from '{}' to '{}'", member.getPhoneNumber(), updateRequest.getPhoneNumber());
+            member.setPhoneNumber(updateRequest.getPhoneNumber());
+            updated = true;
+        }
+
+        if (updateRequest.getCity() != null) {
+            logger.info("Updating city from '{}' to '{}'", member.getCity(), updateRequest.getCity());
+            member.setCity(updateRequest.getCity());
+            updated = true;
+        }
+
+        if (updateRequest.getProvince() != null) {
+            logger.info("Updating province from '{}' to '{}'", member.getProvince(), updateRequest.getProvince());
+            member.setProvince(updateRequest.getProvince());
+            updated = true;
+        }
+
+        if (updateRequest.getAddress() != null) {
+            logger.info("Updating address from '{}' to '{}'", member.getAddress(), updateRequest.getAddress());
+            member.setAddress(updateRequest.getAddress());
+            updated = true;
+        }
+
+        if (updateRequest.getBio() != null) {
+            logger.info("Updating bio from '{}' to '{}'", member.getBio(), updateRequest.getBio());
+            member.setBio(updateRequest.getBio());
+            updated = true;
+        }
+
         Member updatedMember;
         if (updated) {
             logger.info("Saving updated member: {}", member);
@@ -315,6 +350,11 @@ public class MemberServiceImpl implements MemberService {
         dto.setRole(member.getRole());
         dto.setStatus(member.getStatus());
         dto.setCreatedAt(member.getCreatedAt() != null ? member.getCreatedAt().toString() : null);
+        dto.setPhoneNumber(member.getPhoneNumber());
+        dto.setCity(member.getCity());
+        dto.setProvince(member.getProvince());
+        dto.setAddress(member.getAddress());
+        dto.setBio(member.getBio());
         return dto;
     }
 } 

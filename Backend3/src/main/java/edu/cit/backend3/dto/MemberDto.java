@@ -18,4 +18,9 @@ public class MemberDto {
     private String role;
     private String status;
     private String createdAt;
+    private String phoneNumber;
+    private String city;
+    private String province;
+    private String address;
+    private String bio;
 }

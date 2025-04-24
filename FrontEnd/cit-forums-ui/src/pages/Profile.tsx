@@ -27,6 +27,11 @@ interface ProfileData {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string;
+  city: string;
+  province: string;
+  address: string;
+  bio: string;
 }
 
 const Profile: React.FC = () => {
@@ -36,6 +41,11 @@ const Profile: React.FC = () => {
     email: '',
     firstName: '',
     lastName: '',
+    phoneNumber: '',
+    city: '',
+    province: '',
+    address: '',
+    bio: '',
   });
   const [threads, setThreads] = useState<UserThreadData[]>([]);
   const [comments, setComments] = useState<UserCommentData[]>([]);
@@ -77,6 +87,11 @@ const Profile: React.FC = () => {
             email: currentUser.email || '',
             firstName: currentUser.firstName || '',
             lastName: currentUser.lastName || '',
+            phoneNumber: currentUser.phoneNumber || '',
+            city: currentUser.city || '',
+            province: currentUser.province || '',
+            address: currentUser.address || '',
+            bio: currentUser.bio || '',
           });
           
           // Also update the stored profile to ensure consistency
@@ -97,7 +112,7 @@ const Profile: React.FC = () => {
     loadUserData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setProfileData(prev => ({
       ...prev,
@@ -139,6 +154,31 @@ const Profile: React.FC = () => {
         hasChanges = true;
       }
       
+      if (profileData.phoneNumber !== currentUser.phoneNumber) {
+        updatedFields.phoneNumber = profileData.phoneNumber;
+        hasChanges = true;
+      }
+      
+      if (profileData.city !== currentUser.city) {
+        updatedFields.city = profileData.city;
+        hasChanges = true;
+      }
+      
+      if (profileData.province !== currentUser.province) {
+        updatedFields.province = profileData.province;
+        hasChanges = true;
+      }
+      
+      if (profileData.address !== currentUser.address) {
+        updatedFields.address = profileData.address;
+        hasChanges = true;
+      }
+      
+      if (profileData.bio !== currentUser.bio) {
+        updatedFields.bio = profileData.bio;
+        hasChanges = true;
+      }
+      
       console.log('Fields to update:', updatedFields, 'Has changes:', hasChanges);
       
       // Only proceed with update if there are changes
@@ -154,6 +194,11 @@ const Profile: React.FC = () => {
           email: updatedUser.email || '',
           firstName: updatedUser.firstName || '',
           lastName: updatedUser.lastName || '',
+          phoneNumber: updatedUser.phoneNumber || '',
+          city: updatedUser.city || '',
+          province: updatedUser.province || '',
+          address: updatedUser.address || '',
+          bio: updatedUser.bio || '',
         });
         
         // Force a refresh of the user data in localStorage and session
@@ -263,6 +308,55 @@ const Profile: React.FC = () => {
                         onChange={handleChange}
                       />
                     </div>
+                    <div className="mb-3">
+                      <label className="form-label">Phone Number</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="phoneNumber"
+                        value={profileData.phoneNumber}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">City</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="city"
+                        value={profileData.city}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Province</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="province"
+                        value={profileData.province}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Address</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="address"
+                        value={profileData.address}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Bio</label>
+                      <textarea
+                        className="form-control"
+                        name="bio"
+                        value={profileData.bio}
+                        onChange={handleChange}
+                      />
+                    </div>
                     <button type="submit" className="btn btn-success">
                       Save Changes
                     </button>
@@ -273,6 +367,11 @@ const Profile: React.FC = () => {
                     <p><strong>Email:</strong> {profileData.email}</p>
                     <p><strong>First Name:</strong> {profileData.firstName}</p>
                     <p><strong>Last Name:</strong> {profileData.lastName}</p>
+                    <p><strong>Phone Number:</strong> {profileData.phoneNumber}</p>
+                    <p><strong>City:</strong> {profileData.city}</p>
+                    <p><strong>Province:</strong> {profileData.province}</p>
+                    <p><strong>Address:</strong> {profileData.address}</p>
+                    <p><strong>Bio:</strong> {profileData.bio}</p>
                   </div>
                 )}
               </div>

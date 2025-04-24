@@ -26,6 +26,18 @@ public class ProfileUpdateRequest {
     private String firstName;
     
     private String lastName;
+    
+    @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$", message = "Phone number must be in format ###-###-####")
+    private String phoneNumber;
+    
+    private String city;
+    
+    private String province;
+    
+    private String address;
+    
+    @Size(max = 500, message = "Bio cannot exceed 500 characters")
+    private String bio;
 
     @Override
     public String toString() {
@@ -34,6 +46,11 @@ public class ProfileUpdateRequest {
                 ", email='" + email + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", city='" + city + '\'' +
+                ", province='" + province + '\'' +
+                ", address='" + address + '\'' +
+                ", bio='" + bio + '\'' +
                 '}';
     }
 } 

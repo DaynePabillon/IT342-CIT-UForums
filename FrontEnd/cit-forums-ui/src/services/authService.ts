@@ -14,6 +14,11 @@ export interface RegisterRequest {
   password: string;
   firstName: string;
   lastName: string;
+  phoneNumber?: string;
+  city?: string;
+  province?: string;
+  address?: string;
+  bio?: string;
 }
 
 export interface UserProfile {
@@ -22,6 +27,11 @@ export interface UserProfile {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber?: string;
+  city?: string;
+  province?: string;
+  address?: string;
+  bio?: string;
   roles: string[];
 }
 
@@ -92,6 +102,11 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
         email: response.data.user.email || credentials.usernameOrEmail,
         firstName: response.data.user.firstName || '',
         lastName: response.data.user.lastName || '',
+        phoneNumber: response.data.user.phoneNumber || '',
+        city: response.data.user.city || '',
+        province: response.data.user.province || '',
+        address: response.data.user.address || '',
+        bio: response.data.user.bio || '',
         roles: response.data.user.roles || []
       };
       

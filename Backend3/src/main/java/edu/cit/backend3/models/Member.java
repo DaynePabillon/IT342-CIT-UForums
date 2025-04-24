@@ -59,6 +59,21 @@ public class Member {
     @Builder.Default
     private boolean admin = false;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+    
+    @Column(name = "city")
+    private String city;
+    
+    @Column(name = "province")
+    private String province;
+    
+    @Column(name = "address")
+    private String address;
+    
+    @Column(name = "bio", length = 500)
+    private String bio;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "member_roles",
