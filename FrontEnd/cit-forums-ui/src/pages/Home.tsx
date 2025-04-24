@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getActiveForums, Forum, ForumCategory } from '../services/forumService';
-import { isAuthenticated } from '../services/authService';
+import { isAuthenticated, isAdmin } from '../services/authService';
 
 const Home: React.FC = () => {
   const [forums, setForums] = useState<Forum[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [isAdminUser, setIsAdminUser] = useState<boolean>(false);
 
   useEffect(() => {
     fetchActiveForums();
     setAuthenticated(isAuthenticated());
+    setIsAdminUser(isAdmin());
   }, []);
 
   const fetchActiveForums = async () => {
@@ -120,6 +122,18 @@ const Home: React.FC = () => {
             <Link to="/login" className="btn btn-outline-primary mx-2">
               Login
             </Link>
+          </div>
+        </div>
+      )}
+
+      {isAdminUser && (
+        <div className="admin-access-section mt-4 p-3 bg-light rounded">
+          <h4>Admin Quick Access</h4>
+          <p>Access admin functions directly:</p>
+          <div className="d-flex gap-2">
+            <Link to="/admin/dashboard" className="btn btn-warning">Admin Dashboard</Link>
+            <Link to="/admin/reports" className="btn btn-info">Reports</Link>
+            <Link to="/admin/users" className="btn btn-secondary">Users</Link>
           </div>
         </div>
       )}
