@@ -83,6 +83,7 @@ public class MemberServiceImpl implements MemberService {
             member.setFirstName(registrationRequest.getFirstName());
             member.setLastName(registrationRequest.getLastName());
             member.setPhoneNumber(registrationRequest.getPhoneNumber());
+            member.setStudentNumber(registrationRequest.getStudentNumber());
             member.setCity(registrationRequest.getCity());
             member.setProvince(registrationRequest.getProvince());
             member.setAddress(registrationRequest.getAddress());
@@ -285,6 +286,12 @@ public class MemberServiceImpl implements MemberService {
             updated = true;
         }
 
+        if (updateRequest.getStudentNumber() != null) {
+            logger.info("Updating studentNumber from '{}' to '{}'", member.getStudentNumber(), updateRequest.getStudentNumber());
+            member.setStudentNumber(updateRequest.getStudentNumber());
+            updated = true;
+        }
+
         if (updateRequest.getCity() != null) {
             logger.info("Updating city from '{}' to '{}'", member.getCity(), updateRequest.getCity());
             member.setCity(updateRequest.getCity());
@@ -351,6 +358,7 @@ public class MemberServiceImpl implements MemberService {
         dto.setStatus(member.getStatus());
         dto.setCreatedAt(member.getCreatedAt() != null ? member.getCreatedAt().toString() : null);
         dto.setPhoneNumber(member.getPhoneNumber());
+        dto.setStudentNumber(member.getStudentNumber());
         dto.setCity(member.getCity());
         dto.setProvince(member.getProvince());
         dto.setAddress(member.getAddress());

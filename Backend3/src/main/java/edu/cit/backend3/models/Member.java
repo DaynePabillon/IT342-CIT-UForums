@@ -62,6 +62,9 @@ public class Member {
     @Column(name = "phone_number")
     private String phoneNumber;
     
+    @Column(name = "student_number")
+    private String studentNumber;
+    
     @Column(name = "city")
     private String city;
     

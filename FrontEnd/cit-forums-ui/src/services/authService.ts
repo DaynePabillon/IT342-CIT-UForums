@@ -15,6 +15,7 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   phoneNumber?: string;
+  studentNumber?: string;
   city?: string;
   province?: string;
   address?: string;
@@ -28,6 +29,7 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   phoneNumber?: string;
+  studentNumber?: string;
   city?: string;
   province?: string;
   address?: string;
@@ -103,6 +105,7 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
         firstName: response.data.user.firstName || '',
         lastName: response.data.user.lastName || '',
         phoneNumber: response.data.user.phoneNumber || '',
+        studentNumber: response.data.user.studentNumber || '',
         city: response.data.user.city || '',
         province: response.data.user.province || '',
         address: response.data.user.address || '',

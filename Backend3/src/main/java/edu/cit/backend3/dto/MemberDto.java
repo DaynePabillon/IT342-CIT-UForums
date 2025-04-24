@@ -19,6 +19,7 @@ public class MemberDto {
     private String status;
     private String createdAt;
     private String phoneNumber;
+    private String studentNumber;
     private String city;
     private String province;
     private String address;

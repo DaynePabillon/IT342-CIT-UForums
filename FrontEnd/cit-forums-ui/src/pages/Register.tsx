@@ -10,6 +10,7 @@ const Register: React.FC = () => {
     firstName: '',
     lastName: '',
     phoneNumber: '',
+    studentNumber: '',
     city: '',
     province: '',
     address: '',
@@ -22,8 +23,21 @@ const Register: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
-    // Format phone number to match ###-###-#### pattern
+    // Format phone number (11 digits without dashes)
     if (name === 'phoneNumber') {
+      // Remove all non-digit characters
+      const digitsOnly = value.replace(/\D/g, '');
+      
+      // Limit to 11 digits
+      const limitedDigits = digitsOnly.slice(0, 11);
+      
+      setFormData({
+        ...formData,
+        [name]: limitedDigits
+      });
+    } 
+    // Format student number (###-###-####)
+    else if (name === 'studentNumber') {
       // Remove all non-digit characters
       const digitsOnly = value.replace(/\D/g, '');
       
@@ -101,6 +115,9 @@ const Register: React.FC = () => {
                   onChange={handleChange}
                   required
                 />
+                <small className="form-text text-muted">
+                  Username can only contain letters, numbers, dots, underscores, and hyphens. <strong>No spaces allowed.</strong>
+                </small>
               </div>
               <div className="form-group mb-3">
                 <label htmlFor="email">Email</label>
@@ -151,7 +168,7 @@ const Register: React.FC = () => {
                 />
               </div>
               <div className="form-group mb-3">
-                <label htmlFor="phoneNumber">Phone Number</label>
+                <label htmlFor="phoneNumber">Mobile Number</label>
                 <input
                   type="text"
                   className="form-control"
@@ -159,7 +176,26 @@ const Register: React.FC = () => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
+                  placeholder="09123456789"
                 />
+                <small className="form-text text-muted">
+                  Mobile number must be 11 digits without dashes or spaces. <strong>Numbers only, no letters.</strong>
+                </small>
+              </div>
+              <div className="form-group mb-3">
+                <label htmlFor="studentNumber">Student ID</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="studentNumber"
+                  name="studentNumber"
+                  value={formData.studentNumber}
+                  onChange={handleChange}
+                  placeholder="123-456-7890"
+                />
+                <small className="form-text text-muted">
+                  Student ID must be in format ###-###-####. <strong>Numbers only, no letters.</strong>
+                </small>
               </div>
               <div className="form-group mb-3">
                 <label htmlFor="city">City</label>
@@ -222,4 +258,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register; 
+export default Register;

@@ -17,7 +17,7 @@ public class MemberRegistrationRequest {
     
     @NotBlank(message = "Username cannot be empty")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    @Pattern(regexp = "^[a-zA-Z0-9._-]+$", message = "Username can only contain letters, numbers, dots, underscores, and hyphens")
+    @Pattern(regexp = "^[a-zA-Z0-9._-]+$", message = "Username can only contain letters, numbers, dots, underscores, and hyphens (no spaces)")
     private String name;
     
     @NotBlank(message = "Email cannot be empty")
@@ -32,8 +32,11 @@ public class MemberRegistrationRequest {
     
     private String lastName;
     
-    @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$", message = "Phone number must be in format ###-###-####")
+    @Pattern(regexp = "^\\d{11}$", message = "Phone number must be 11 digits without dashes or spaces")
     private String phoneNumber;
+    
+    @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$", message = "Student ID must be in format ###-###-####")
+    private String studentNumber;
     
     private String city;
     
