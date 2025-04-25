@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${spring.mvc.cors.allowed-origins:http://localhost:3000,http://localhost:3003}")
+    @Value("${spring.mvc.cors.allowed-origins:http://localhost:3000,http://localhost:3003,https://it342-cit-uforums.onrender.com}")
     private String[] allowedOrigins;
 
     @Override
@@ -53,7 +53,7 @@ public class WebConfig implements WebMvcConfigurer {
     
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // Add simple view controllers for common pages if needed
+        registry.addViewController("/").setViewName("forward:/index.html");
         registry.addViewController("/static-login").setViewName("redirect:/basic-login.html");
     }
 
