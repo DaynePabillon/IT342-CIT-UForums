@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
+@CrossOrigin(origins = {"http://localhost:3000", "https://it342-cit-uforums.onrender.com"})
 @Tag(name = "Admin Dashboard", description = "Admin dashboard for system monitoring, user management, and content moderation")
 @SecurityRequirement(name = "bearerAuth")
 public class AdminDashboardController {

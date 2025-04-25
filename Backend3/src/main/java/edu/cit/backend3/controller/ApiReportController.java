@@ -23,6 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reports/new")
+@CrossOrigin(origins = {"http://localhost:3000", "https://it342-cit-uforums.onrender.com"})
 @Tag(name = "Reports", description = "Operations for creating and managing reports")
 @SecurityRequirement(name = "bearerAuth")
 public class ApiReportController {

@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://it342-cit-uforums.onrender.com"})
 @Tag(name = "Reports", description = "API for managing content reports")
 public class ReportController {
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
@@ -133,11 +133,26 @@ public class ReportController {
         Member reporter;
         try {
             reporter = memberService.findByNameOrEmail(authentication.getName(), authentication.getName());
-            return ResponseEntity.ok(reportService.getReportsByReporter(reporter));
         } catch (Exception e) {
             logger.error("Failed to find reporter: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Failed to find user: " + e.getMessage());
+        }
+        
+        if (reporter == null) {
+            logger.error("Reporter is null for user: {}", authentication.getName());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("User not found");
+        }
+        
+        logger.info("Found reporter: {}, ID: {}", reporter.getName(), reporter.getId());
+        
+        try {
+            return ResponseEntity.ok(reportService.getReportsByReporter(reporter));
+        } catch (Exception e) {
+            logger.error("Error getting user's reports: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error getting user's reports: " + e.getMessage());
         }
     }
 
