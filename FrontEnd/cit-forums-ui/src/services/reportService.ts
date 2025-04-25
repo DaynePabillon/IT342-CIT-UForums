@@ -3,7 +3,7 @@ import { getAuthToken } from './authService';
 import { API_BASE_URL } from '../config';
 
 export const createReport = async (report: CreateReportRequest): Promise<Report> => {
-  const response = await fetch(`${API_BASE_URL}/reports`, {
+  const response = await fetch(`${API_BASE_URL}/api/reports`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ export const createReport = async (report: CreateReportRequest): Promise<Report>
 };
 
 export const getReports = async (): Promise<Report[]> => {
-  const response = await fetch(`${API_BASE_URL}/reports`, {
+  const response = await fetch(`${API_BASE_URL}/api/admin/dashboard-reports`, {
     headers: {
       'Authorization': `Bearer ${getAuthToken()}`
     }
@@ -34,7 +34,7 @@ export const getReports = async (): Promise<Report[]> => {
 };
 
 export const resolveReport = async (reportId: number, action: string): Promise<Report> => {
-  const response = await fetch(`${API_BASE_URL}/reports/${reportId}/resolve?action=${encodeURIComponent(action)}`, {
+  const response = await fetch(`${API_BASE_URL}/api/admin/reports/${reportId}/resolve?action=${encodeURIComponent(action)}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const resolveReport = async (reportId: number, action: string): Promise<R
 };
 
 export const dismissReport = async (reportId: number): Promise<Report> => {
-  const response = await fetch(`${API_BASE_URL}/reports/${reportId}/dismiss`, {
+  const response = await fetch(`${API_BASE_URL}/api/admin/reports/${reportId}/dismiss`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${getAuthToken()}`
