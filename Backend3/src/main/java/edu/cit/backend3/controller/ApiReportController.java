@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/api/reports/new")
 @Tag(name = "Reports", description = "Operations for creating and managing reports")
 @SecurityRequirement(name = "bearerAuth")
 public class ApiReportController {
