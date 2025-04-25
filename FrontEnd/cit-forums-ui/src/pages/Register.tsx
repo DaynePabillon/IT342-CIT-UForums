@@ -36,13 +36,13 @@ const Register: React.FC = () => {
         [name]: limitedDigits
       });
     } 
-    // Format student number (###-###-####)
+    // Format student number (##-####-###)
     else if (name === 'studentNumber') {
       // Remove all non-digit characters
       const digitsOnly = value.replace(/\D/g, '');
       
-      // Format as ###-###-####
-      if (digitsOnly.length <= 3) {
+      // Format as ##-####-###
+      if (digitsOnly.length <= 2) {
         setFormData({
           ...formData,
           [name]: digitsOnly
@@ -50,12 +50,12 @@ const Register: React.FC = () => {
       } else if (digitsOnly.length <= 6) {
         setFormData({
           ...formData,
-          [name]: `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`
+          [name]: `${digitsOnly.slice(0, 2)}-${digitsOnly.slice(2)}`
         });
       } else {
         setFormData({
           ...formData,
-          [name]: `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`
+          [name]: `${digitsOnly.slice(0, 2)}-${digitsOnly.slice(2, 6)}-${digitsOnly.slice(6, 9)}`
         });
       }
     } else {
@@ -251,12 +251,12 @@ const Register: React.FC = () => {
                               name="studentNumber"
                               value={formData.studentNumber}
                               onChange={handleChange}
-                              placeholder="123-456-7890"
+                              placeholder="12-3456-789"
                             />
                           </div>
                           <small className="form-text text-muted">
                             <i className="bi bi-info-circle me-1"></i>
-                            Student ID must be in format ###-###-####. <strong>Numbers only, no letters.</strong>
+                            Student ID must be in format ##-####-###. <strong>Numbers only, no letters.</strong>
                           </small>
                         </div>
                         
