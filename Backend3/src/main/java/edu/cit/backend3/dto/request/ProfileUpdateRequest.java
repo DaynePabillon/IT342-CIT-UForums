@@ -30,7 +30,7 @@ public class ProfileUpdateRequest {
     @Pattern(regexp = "^\\d{11}$", message = "Phone number must be 11 digits without dashes or spaces")
     private String phoneNumber;
     
-    @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$", message = "Student ID must be in format ###-###-####")
+    @Pattern(regexp = "^\\d{2}-\\d{4}-\\d{3}$", message = "Student ID must be in format ##-####-###")
     private String studentNumber;
     
     private String city;
