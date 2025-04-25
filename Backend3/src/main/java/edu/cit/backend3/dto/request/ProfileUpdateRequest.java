@@ -1,6 +1,7 @@
 package edu.cit.backend3.dto.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,8 @@ public class ProfileUpdateRequest {
     @Pattern(regexp = "^\\d{11}$", message = "Phone number must be 11 digits without dashes or spaces")
     private String phoneNumber;
     
-    @Pattern(regexp = "^(\\d{2}-\\d{4}-\\d{3})?$", message = "Student ID must be in format ##-####-### or can be empty")
+    @NotBlank(message = "Student ID cannot be empty")
+    @Pattern(regexp = "^\\d{2}-\\d{4}-\\d{3}$", message = "Student ID must be in format ##-####-###")
     private String studentNumber;
     
     private String city;
