@@ -50,7 +50,7 @@ public class ApiReportController {
         
         try {
             // Find the current user
-            Member reporter = memberService.getMemberByUsernameOrEmail(principal.getName());
+            Member reporter = memberService.findByNameOrEmail(principal.getName(), principal.getName());
             if (reporter == null) {
                 return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, "Reporter not found"));
