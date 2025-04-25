@@ -3,7 +3,7 @@ import { getAuthToken } from './authService';
 import { API_BASE_URL } from '../config';
 
 export const createReport = async (report: CreateReportRequest): Promise<Report> => {
-  const response = await fetch(`${API_BASE_URL}/api/reports`, {
+  const response = await fetch(`${API_BASE_URL}/api/reports/new`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -62,4 +62,4 @@ export const dismissReport = async (reportId: number): Promise<Report> => {
   }
 
   return response.json();
-}; 
+};
