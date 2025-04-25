@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'https://it342-cit-uforums-backend.onrender.com/api';
+export const API_BASE_URL = 'https://it342-cit-uforums-backend.onrender.com';
