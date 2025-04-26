@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
-@CrossOrigin(origins = {"http://localhost:3000", "https://it342-cit-uforums.onrender.com"})
+@CrossOrigin(origins = {"http://localhost:3000", "https://it342-cit-uforums.onrender.com", "https://it342-cit-uforums-site.onrender.com"})
 @Tag(name = "Reports", description = "API for managing content reports")
 public class ReportController {
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
