@@ -79,7 +79,7 @@ const Login: React.FC = () => {
       <div className="container-fluid">
         <div className="row vh-100">
           {/* Left side - Image */}
-          <div className="col-md-7 d-none d-md-flex bg-primary p-0">
+          <div className="col-md-7 d-none d-md-flex p-0" style={{ background: 'linear-gradient(135deg, #8B0000 0%, #A52A2A 100%)' }}>
             <div className="login-image-container w-100 h-100 d-flex align-items-center justify-content-center">
               <div className="text-white text-center p-5">
                 <h1 className="display-4 fw-bold mb-4">Welcome to CIT-U Forums</h1>
@@ -189,7 +189,8 @@ const Login: React.FC = () => {
                       <div className="d-grid gap-2">
                         <button 
                           type="submit" 
-                          className="btn btn-primary btn-lg py-3"
+                          className="btn py-3"
+                          style={{ backgroundColor: '#8B0000', color: 'white' }}
                           disabled={loading}
                         >
                           {loading ? (

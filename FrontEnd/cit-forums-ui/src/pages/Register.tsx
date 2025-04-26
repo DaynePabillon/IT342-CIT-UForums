@@ -132,37 +132,37 @@ const Register: React.FC = () => {
             <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
               <div className="row g-0">
                 {/* Left side - Image and welcome message */}
-                <div className="col-md-5 d-none d-md-block bg-primary text-white p-0">
+                <div className="col-md-5 d-none d-md-block p-0">
                   <div className="h-100 d-flex flex-column justify-content-center p-4" 
                        style={{
-                         background: 'linear-gradient(135deg, #3a8eff 0%, #1e5bb0 100%)',
+                         background: 'linear-gradient(135deg, #8B0000 0%, #A52A2A 100%)',
                          position: 'relative'
                        }}>
                     <div className="position-relative z-1">
-                      <h2 className="display-6 fw-bold mb-4">Join Our Community</h2>
-                      <p className="lead">Connect with peers, share knowledge, and participate in discussions at CIT-U Forums.</p>
+                      <h2 className="display-6 fw-bold mb-4 text-white">Join Our Community</h2>
+                      <p className="lead text-white">Connect with peers, share knowledge, and participate in discussions at CIT-U Forums.</p>
                       <div className="mt-5">
                         <div className="d-flex align-items-center mb-3">
-                          <i className="bi bi-check-circle-fill me-3 fs-5"></i>
-                          <span>Access to all forums and discussions</span>
+                          <i className="bi bi-check-circle-fill me-3 fs-5 text-warning"></i>
+                          <span className="text-white">Access to all forums and discussions</span>
                         </div>
                         <div className="d-flex align-items-center mb-3">
-                          <i className="bi bi-check-circle-fill me-3 fs-5"></i>
-                          <span>Create threads and share your thoughts</span>
+                          <i className="bi bi-check-circle-fill me-3 fs-5 text-warning"></i>
+                          <span className="text-white">Create threads and share your thoughts</span>
                         </div>
                         <div className="d-flex align-items-center mb-3">
-                          <i className="bi bi-check-circle-fill me-3 fs-5"></i>
-                          <span>Connect with fellow students and faculty</span>
+                          <i className="bi bi-check-circle-fill me-3 fs-5 text-warning"></i>
+                          <span className="text-white">Connect with fellow students and faculty</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Decorative background elements */}
                     <div className="position-absolute top-0 end-0 p-5 opacity-10">
-                      <i className="bi bi-chat-square-text-fill" style={{ fontSize: '8rem' }}></i>
+                      <i className="bi bi-chat-square-text-fill text-white" style={{ fontSize: '8rem' }}></i>
                     </div>
                     <div className="position-absolute bottom-0 start-0 p-5 opacity-10">
-                      <i className="bi bi-people-fill" style={{ fontSize: '8rem' }}></i>
+                      <i className="bi bi-people-fill text-white" style={{ fontSize: '8rem' }}></i>
                     </div>
                   </div>
                 </div>
@@ -431,7 +431,8 @@ const Register: React.FC = () => {
                       <div className="d-grid gap-2 mt-4">
                         <button 
                           type="submit" 
-                          className="btn btn-primary btn-lg py-3"
+                          className="btn py-3"
+                          style={{ backgroundColor: '#8B0000', color: 'white' }}
                           disabled={loading || !passwordsMatch}
                         >
                           {loading ? (
