@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 
@@ -17,8 +18,25 @@ public class ReportDto {
     private Long reporterId;
     private String reporterUsername;
     private String reason;
+    
+    // Support both field names for content type
+    @JsonProperty(value = "contentType", access = JsonProperty.Access.READ_WRITE)
     private String contentType;
+    
+    @JsonProperty(value = "reportedContentType", access = JsonProperty.Access.WRITE_ONLY)
+    public void setReportedContentType(String reportedContentType) {
+        this.contentType = reportedContentType;
+    }
+    
+    // Support both field names for content id
+    @JsonProperty(value = "contentId", access = JsonProperty.Access.READ_WRITE)
     private Long contentId;
+    
+    @JsonProperty(value = "reportedContentId", access = JsonProperty.Access.WRITE_ONLY)
+    public void setReportedContentId(Long reportedContentId) {
+        this.contentId = reportedContentId;
+    }
+    
     private String status;
     private Long resolverId;
     private String resolverUsername;
