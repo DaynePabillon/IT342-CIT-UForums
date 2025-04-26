@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/custom.css';
 import '../styles/adminTheme.css';
+import WarningModal from '../components/WarningModal';
 
 const AdminReports: React.FC = () => {
   // State Variables
@@ -18,6 +19,8 @@ const AdminReports: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showBanConfirmation, setShowBanConfirmation] = useState(false);
   const [userToBan, setUserToBan] = useState<{id: number, username: string} | null>(null);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [userToWarn, setUserToWarn] = useState<{id: number, username: string, contentType?: string, contentId?: number} | null>(null);
   const navigate = useNavigate();
   const { checkAdminStatus } = useAuth();
 
@@ -102,7 +105,8 @@ const AdminReports: React.FC = () => {
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error resolving report:', err);
-      setError('Failed to resolve report. Please check the console for details.');
+      setError('Failed to resolve report. Please try again.');
+      setTimeout(() => setError(null), 3000);
     }
   };
 
@@ -121,7 +125,21 @@ const AdminReports: React.FC = () => {
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error dismissing report:', err);
-      setError('Failed to dismiss report. Please check the console for details.');
+      setError('Failed to dismiss report. Please try again.');
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  // Handle Warning User
+  const handleWarnUser = (report: Report) => {
+    if (report && report.reporterId) {
+      setUserToWarn({
+        id: report.reporterId,
+        username: report.reporterUsername,
+        contentType: report.reportedContentType,
+        contentId: report.reportedContentId
+      });
+      setShowWarningModal(true);
     }
   };
 
@@ -136,278 +154,233 @@ const AdminReports: React.FC = () => {
     if (!userToBan) return;
     
     try {
-      console.log('Banning user:', userToBan);
+      console.log('Banning user:', userToBan.id);
       await updateUserStatus(userToBan.id, 'BANNED');
       setSuccessMessage(`User ${userToBan.username} has been banned`);
+      setShowBanConfirmation(false);
+      setUserToBan(null);
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error banning user:', err);
-      setError('Failed to ban user. Please check the console for details.');
-    } finally {
-      setShowBanConfirmation(false);
-      setUserToBan(null);
+      setError('Failed to ban user. Please try again.');
+      setTimeout(() => setError(null), 3000);
     }
   };
 
-  // Cancel Ban User
-  const cancelBanUser = () => {
-    setShowBanConfirmation(false);
-    setUserToBan(null);
-  };
-
-  // Navigate to Users
-  const navigateToUsers = () => {
-    navigate('/admin/users');
-  };
-
-  // Navigate to Dashboard
-  const navigateToDashboard = () => {
-    navigate('/admin/dashboard');
-  };
-
-  // Loading Indicator
+  // Render loading state
   if (loading) {
     return (
-      <div className="loading-indicator">
-        <div className="loading-spinner"></div>
-        <p>Loading reports...</p>
+      <div className="container mt-4">
+        <h2>Reports Management</h2>
+        <div className="d-flex justify-content-center mt-5">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render error state
+  if (error && !reports.length) {
+    return (
+      <div className="container mt-4">
+        <h2>Reports Management</h2>
+        <div className="alert alert-danger mt-3">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="admin-dashboard">
-      {/* Header */}
-      <div className="admin-header">
-        <h1 className="admin-title">Reports Management</h1>
-        <div className="admin-header-actions">
-          <button 
-            onClick={navigateToDashboard}
-            className="admin-btn-primary mr-2"
-          >
-            Dashboard
-          </button>
-          <button 
-            onClick={navigateToUsers}
-            className="admin-btn-primary"
-          >
-            Manage Users
-          </button>
-        </div>
-      </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="admin-alert-error">
-          <span>{error}</span>
-          <button 
-            onClick={() => setError(null)}
-            className="admin-alert-close"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      {/* Success Message */}
+    <div className="container-fluid mt-4">
       {successMessage && (
-        <div className="admin-alert-success">
-          <span>{successMessage}</span>
-          <button 
-            onClick={() => setSuccessMessage(null)}
-            className="admin-alert-close"
-          >
-            ×
-          </button>
+        <div className="alert alert-success alert-dismissible fade show" role="alert">
+          {successMessage}
+          <button type="button" className="btn-close" onClick={() => setSuccessMessage(null)} aria-label="Close"></button>
         </div>
       )}
-
-      {/* Main Content */}
-      <div className="admin-content-grid">
-        {/* Reports List */}
-        <div className="admin-card admin-reports-list">
-          <h2 className="admin-section-title">Reports</h2>
-          
-          {reports.length === 0 ? (
-            <div className="admin-alert-info">No reports found.</div>
-          ) : (
-            <div className="admin-table-container">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>Reporter</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reports.map((report) => (
-                    <tr 
-                      key={report.id} 
-                      className={selectedReport?.id === report.id ? 'active' : ''}
-                      onClick={() => handleViewReport(report)}
-                    >
-                      <td>
-                        <span className={`admin-badge admin-badge-${report.reportedContentType.toLowerCase()}`}>
-                          {report.reportedContentType}
-                        </span>
-                      </td>
-                      <td>{report.reporter?.username || 'Anonymous'}</td>
-                      <td>{new Date(report.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        <span className={`admin-badge admin-badge-${report.status.toLowerCase()}`}>
-                          {report.status}
-                        </span>
-                      </td>
-                      <td>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewReport(report);
-                          }}
-                          className="admin-btn-secondary admin-btn-sm"
-                        >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+      
+      {error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          {error}
+          <button type="button" className="btn-close" onClick={() => setError(null)} aria-label="Close"></button>
         </div>
-        
-        {/* Report Details */}
-        <div className="admin-card admin-report-details">
-          {!selectedReport ? (
-            <div className="admin-placeholder">
-              <p>Select a report to view details</p>
-            </div>
-          ) : (
-            <div className="admin-detail-container">
-              <h2 className="admin-detail-header">Report Details</h2>
-              
-              {/* Report Info Section */}
-              <div className="admin-detail-section">
-                <h3 className="admin-detail-title">Report Information</h3>
-                <div className="admin-detail-grid">
-                  <div className="admin-detail-item">
-                    <span className="admin-detail-label">Type:</span>
-                    <span className={`admin-badge admin-badge-${selectedReport.reportedContentType.toLowerCase()}`}>
-                      {selectedReport.reportedContentType}
-                    </span>
-                  </div>
-                  <div className="admin-detail-item">
-                    <span className="admin-detail-label">Status:</span>
-                    <span className={`admin-badge admin-badge-${selectedReport.status.toLowerCase()}`}>
-                      {selectedReport.status}
-                    </span>
-                  </div>
-                  <div className="admin-detail-item">
-                    <span className="admin-detail-label">Reporter:</span>
-                    <span>
-                      {selectedReport.reporter?.username || 'Anonymous'}
-                      {selectedReport.reporter && (
-                        <button 
-                          onClick={() => selectedReport.reporter && handleBanUser(selectedReport.reporter.id, selectedReport.reporter.username)}
-                          className="admin-btn-danger admin-btn-sm ml-2"
-                        >
-                          Ban User
-                        </button>
-                      )}
-                    </span>
-                  </div>
-                  <div className="admin-detail-item">
-                    <span className="admin-detail-label">Date:</span>
-                    <span>{new Date(selectedReport.createdAt).toLocaleString()}</span>
-                  </div>
-                </div>
+      )}
+      
+      <h2>Reports Management</h2>
+      
+      {reports.length === 0 ? (
+        <div className="alert alert-info mt-3">
+          <i className="bi bi-info-circle me-2"></i>
+          No reports to display. All clear!
+        </div>
+      ) : (
+        <div className="row mt-3">
+          <div className="col-md-5">
+            <div className="card">
+              <div className="card-header bg-primary text-white">
+                <h5 className="mb-0">Reported Items</h5>
               </div>
-              
-              {/* Report Reason Section */}
-              <div className="admin-detail-section">
-                <h3 className="admin-detail-title">Reason for Report</h3>
-                <div className="admin-detail-reason">
-                  {selectedReport.reason}
-                </div>
-              </div>
-              
-              {/* Reported Content Section */}
-              {contentLoading ? (
-                <div className="admin-content-loading">
-                  <div className="loading-spinner"></div>
-                  <p>Loading content...</p>
-                </div>
-              ) : reportedContent ? (
-                <div className="admin-detail-section">
-                  <h3 className="admin-detail-title">Reported Content</h3>
-                  {reportedContent.error ? (
-                    <div className="admin-alert-error">{reportedContent.message}</div>
-                  ) : (
-                    <div className="admin-reported-content">
-                      {reportedContent.title && (
-                        <h4 className="admin-content-title">{reportedContent.title}</h4>
-                      )}
-                      <div className="admin-content-body">
-                        {reportedContent.content}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : null}
-              
-              {/* Action Buttons */}
-              <div className="admin-detail-actions">
-                <button 
-                  onClick={() => handleResolveReport(selectedReport.id)}
-                  className="admin-btn-success"
-                >
-                  Resolve Report
-                </button>
-                <button 
-                  onClick={() => handleDismissReport(selectedReport.id)}
-                  className="admin-btn-secondary"
-                >
-                  Dismiss Report
-                </button>
-                {selectedReport.reporter && (
-                  <button 
-                    onClick={() => selectedReport.reporter && handleBanUser(selectedReport.reporter.id, selectedReport.reporter.username)}
-                    className="admin-btn-danger"
+              <div className="list-group list-group-flush">
+                {reports.map(report => (
+                  <button
+                    key={report.id}
+                    className={`list-group-item list-group-item-action ${selectedReport?.id === report.id ? 'active' : ''}`}
+                    onClick={() => handleViewReport(report)}
                   >
-                    Ban Reporter
+                    <div className="d-flex w-100 justify-content-between">
+                      <h6 className="mb-1">
+                        {report.reportedContentType === 'THREAD' ? 'Thread' : 'Comment'} #{report.reportedContentId}
+                      </h6>
+                      <small>{new Date(report.createdAt).toLocaleString()}</small>
+                    </div>
+                    <p className="mb-1 text-truncate">{report.reason}</p>
+                    <small>Reported by: {report.reporterUsername}</small>
                   </button>
-                )}
+                ))}
               </div>
             </div>
-          )}
+          </div>
+          
+          <div className="col-md-7">
+            {selectedReport ? (
+              <div className="card">
+                <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                  <h5 className="mb-0">Report Details</h5>
+                  <div>
+                    <button 
+                      className="btn btn-sm btn-warning me-2" 
+                      onClick={() => handleWarnUser(selectedReport)}
+                    >
+                      <i className="bi bi-exclamation-triangle me-1"></i> Warn User
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-danger me-2" 
+                      onClick={() => handleBanUser(selectedReport.reporterId, selectedReport.reporterUsername)}
+                    >
+                      <i className="bi bi-slash-circle me-1"></i> Ban User
+                    </button>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <h5 className="card-title">
+                    {selectedReport.reportedContentType === 'THREAD' ? 'Thread' : 'Comment'} #{selectedReport.reportedContentId}
+                  </h5>
+                  
+                  <div className="mb-3">
+                    <strong>Reason:</strong> {selectedReport.reason}
+                  </div>
+                  
+                  <div className="mb-3">
+                    <strong>Reported By:</strong> {selectedReport.reporterUsername}
+                  </div>
+                  
+                  <div className="mb-3">
+                    <strong>Date:</strong> {new Date(selectedReport.createdAt).toLocaleString()}
+                  </div>
+                  
+                  <div className="card mb-3">
+                    <div className="card-header bg-light">
+                      <h6 className="mb-0">Reported Content</h6>
+                    </div>
+                    <div className="card-body">
+                      {contentLoading ? (
+                        <div className="d-flex justify-content-center">
+                          <div className="spinner-border spinner-border-sm" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      ) : reportedContent ? (
+                        <div>
+                          {reportedContent.title && (
+                            <h6 className="card-subtitle mb-2 text-muted">{reportedContent.title}</h6>
+                          )}
+                          <p className="card-text">{reportedContent.content}</p>
+                        </div>
+                      ) : (
+                        <p className="text-muted">Content not available</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="d-flex justify-content-end">
+                    <button 
+                      className="btn btn-secondary me-2" 
+                      onClick={() => handleDismissReport(selectedReport.id)}
+                    >
+                      Dismiss Report
+                    </button>
+                    <button 
+                      className="btn btn-success" 
+                      onClick={() => handleResolveReport(selectedReport.id)}
+                    >
+                      Resolve Report
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="card">
+                <div className="card-body text-center py-5">
+                  <i className="bi bi-arrow-left-circle fs-1 text-muted"></i>
+                  <p className="mt-3 text-muted">Select a report to view details</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-
-      {/* Ban User Confirmation Modal */}
+      )}
+      
+      {/* Warning Modal */}
+      {userToWarn && (
+        <WarningModal
+          show={showWarningModal}
+          onClose={() => setShowWarningModal(false)}
+          memberId={userToWarn.id}
+          memberUsername={userToWarn.username}
+          contentType={userToWarn.contentType}
+          contentId={userToWarn.contentId}
+          onSuccess={() => {
+            setSuccessMessage(`Warning issued to ${userToWarn.username}`);
+            setTimeout(() => setSuccessMessage(null), 3000);
+          }}
+        />
+      )}
+      
+      {/* Ban Confirmation Modal */}
       {showBanConfirmation && userToBan && (
-        <div className="admin-modal-overlay">
-          <div className="admin-modal">
-            <h3 className="admin-modal-title">Confirm Ban</h3>
-            <p className="admin-modal-content">
-              Are you sure you want to ban user {userToBan.username}? This will prevent them from logging in.
-            </p>
-            <div className="admin-modal-actions">
-              <button 
-                onClick={confirmBanUser}
-                className="admin-btn-danger"
-              >
-                Ban User
-              </button>
-              <button 
-                onClick={cancelBanUser}
-                className="admin-btn-secondary"
-              >
-                Cancel
-              </button>
+        <div className="modal show d-block" tabIndex={-1}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header bg-danger text-white">
+                <h5 className="modal-title">Ban User Confirmation</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowBanConfirmation(false)}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to ban user <strong>{userToBan.username}</strong>?</p>
+                <p>This will prevent them from posting or interacting with the forum.</p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowBanConfirmation(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={confirmBanUser}
+                >
+                  Ban User
+                </button>
+              </div>
             </div>
           </div>
         </div>

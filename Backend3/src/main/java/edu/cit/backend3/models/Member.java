@@ -50,7 +50,21 @@ public class Member {
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;
-    
+
+    @Column(name = "warning_count", nullable = false)
+    @Builder.Default
+    private int warningCount = 0;
+
+    @Column(name = "is_banned", nullable = false)
+    @Builder.Default
+    private boolean banned = false;
+
+    @Column(name = "ban_reason")
+    private String banReason;
+
+    @Column(name = "banned_until")
+    private LocalDateTime bannedUntil;
+
     @Column(name = "status")
     @Builder.Default
     private String status = "ACTIVE";
