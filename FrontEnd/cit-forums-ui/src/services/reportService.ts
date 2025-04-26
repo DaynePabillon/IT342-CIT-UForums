@@ -34,7 +34,34 @@ export const createReport = async (report: CreateReportRequest): Promise<Report>
 
 export const getReports = async (): Promise<Report[]> => {
   try {
+    console.log('Fetching reports from dashboard endpoint');
     const response = await axiosInstance.get('/api/admin/dashboard-reports');
+    console.log('Raw reports response:', response.data);
+    
+    // Check if the response is paginated (Spring Data format)
+    if (response.data && response.data.content && Array.isArray(response.data.content)) {
+      console.log('Detected paginated response, mapping content');
+      
+      // Map the backend field names to frontend field names
+      return response.data.content.map((item: any) => ({
+        id: item.id,
+        reporterId: item.reporterId || (item.reporter ? item.reporter.id : null),
+        reporterUsername: item.reporterUsername || (item.reporter ? item.reporter.name : 'Unknown'),
+        reportedContentType: item.contentType, // Map contentType to reportedContentType
+        reportedContentId: item.contentId,     // Map contentId to reportedContentId
+        reason: item.reason,
+        status: item.status,
+        createdAt: item.createdAt,
+        resolvedAt: item.resolvedAt,
+        resolvedBy: item.resolverId,
+        resolvedByUsername: item.resolverUsername,
+        actionTaken: item.action,
+        // Include the original data for debugging
+        _originalData: item
+      }));
+    }
+    
+    // If not paginated, assume it's already in the right format
     return response.data;
   } catch (error) {
     console.error('Error in getReports:', error);
