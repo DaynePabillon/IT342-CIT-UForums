@@ -51,13 +51,13 @@ public class Member {
     @Builder.Default
     private boolean active = true;
 
-    @Column(name = "warning_count", nullable = false)
+    @Column(name = "warning_count")
     @Builder.Default
-    private int warningCount = 0;
+    private Integer warningCount = 0;
 
-    @Column(name = "is_banned", nullable = false)
+    @Column(name = "is_banned")
     @Builder.Default
-    private boolean banned = false;
+    private Boolean banned = false;
 
     @Column(name = "ban_reason")
     private String banReason;
