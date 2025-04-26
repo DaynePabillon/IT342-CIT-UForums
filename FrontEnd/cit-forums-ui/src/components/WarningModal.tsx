@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { issueWarning } from '../services/warningService';
-import { IssueWarningRequest } from '../models/Warning';
+import { createWarning } from '../services/warningService';
+import { CreateWarningRequest } from '../models/Warning';
 
 interface WarningModalProps {
   show: boolean;
   onClose: () => void;
   memberId: number;
   memberUsername: string;
-  contentType?: string;
-  contentId?: number;
   onSuccess?: () => void;
 }
 
@@ -17,11 +15,10 @@ const WarningModal: React.FC<WarningModalProps> = ({
   onClose,
   memberId,
   memberUsername,
-  contentType,
-  contentId,
   onSuccess
 }) => {
   const [reason, setReason] = useState('');
+  const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,25 +28,30 @@ const WarningModal: React.FC<WarningModalProps> = ({
       return;
     }
 
+    if (!message.trim()) {
+      setError('Please provide a message for the user');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      const request: IssueWarningRequest = {
+      const request: CreateWarningRequest = {
         memberId,
         reason,
-        contentType,
-        contentId
+        message
       };
 
-      await issueWarning(request);
+      await createWarning(request);
       setReason('');
+      setMessage('');
       setError(null);
       if (onSuccess) {
         onSuccess();
       }
       onClose();
     } catch (err) {
-      console.error('Failed to issue warning:', err);
-      setError('Failed to issue warning. Please try again.');
+      console.error('Failed to submit warning:', err);
+      setError('Failed to submit warning. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -73,26 +75,44 @@ const WarningModal: React.FC<WarningModalProps> = ({
           </div>
           <div className="modal-body">
             {error && <div className="alert alert-danger">{error}</div>}
+            <p className="mb-3">
+              This user will receive a warning. After 3 warnings, the user will be automatically banned.
+            </p>
+            <p className="mb-3">
+              <strong>Current Warning Count:</strong> <span className="badge bg-warning text-dark">Loading...</span>
+            </p>
             <div className="mb-3">
               <label htmlFor="warningReason" className="form-label">
-                Warning Reason
+                Reason for Warning
               </label>
-              <textarea
+              <select
                 id="warningReason"
-                className="form-control"
-                rows={4}
+                className="form-select"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="Explain why you are issuing this warning..."
                 disabled={isSubmitting}
-              />
-              <small className="text-muted">
-                This message will be sent to the user. Be clear about which rule was violated.
-              </small>
+              >
+                <option value="">Select a reason...</option>
+                <option value="Inappropriate Content">Inappropriate Content</option>
+                <option value="Harassment">Harassment</option>
+                <option value="Spam">Spam</option>
+                <option value="Misinformation">Misinformation</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
-            <div className="alert alert-info">
-              <i className="bi bi-info-circle me-2"></i>
-              User will be automatically banned after receiving 3 warnings.
+            <div className="mb-3">
+              <label htmlFor="warningMessage" className="form-label">
+                Message to User
+              </label>
+              <textarea
+                id="warningMessage"
+                className="form-control"
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Explain to the user why they are receiving this warning and what they should do differently..."
+                disabled={isSubmitting}
+              ></textarea>
             </div>
           </div>
           <div className="modal-footer">
@@ -113,7 +133,7 @@ const WarningModal: React.FC<WarningModalProps> = ({
               {isSubmitting ? (
                 <>
                   <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Issuing Warning...
+                  Submitting...
                 </>
               ) : (
                 'Issue Warning'

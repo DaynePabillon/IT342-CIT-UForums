@@ -2,19 +2,15 @@ export interface Warning {
   id: number;
   memberId: number;
   memberUsername: string;
-  adminId: number;
-  adminUsername: string;
+  warnedById: number;
+  warnedByUsername: string;
   reason: string;
-  contentType?: string;
-  contentId?: number;
+  message: string;
   createdAt: string;
-  acknowledged: boolean;
-  acknowledgedAt?: string;
 }
 
-export interface IssueWarningRequest {
+export interface CreateWarningRequest {
   memberId: number;
   reason: string;
-  contentType?: string;
-  contentId?: number;
+  message: string;
 }

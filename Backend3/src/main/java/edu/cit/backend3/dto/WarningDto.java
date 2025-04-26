@@ -16,36 +16,22 @@ public class WarningDto {
     private Long id;
     private Long memberId;
     private String memberUsername;
-    private Long adminId;
-    private String adminUsername;
+    private Long warnedById;
+    private String warnedByUsername;
     private String reason;
-    private String contentType;
-    private Long contentId;
+    private String message;
     private LocalDateTime createdAt;
-    private boolean acknowledged;
-    private LocalDateTime acknowledgedAt;
     
     public static WarningDto fromEntity(Warning warning) {
-        WarningDto dto = new WarningDto();
-        dto.setId(warning.getId());
-        
-        if (warning.getMember() != null) {
-            dto.setMemberId(warning.getMember().getId());
-            dto.setMemberUsername(warning.getMember().getName());
-        }
-        
-        if (warning.getAdmin() != null) {
-            dto.setAdminId(warning.getAdmin().getId());
-            dto.setAdminUsername(warning.getAdmin().getName());
-        }
-        
-        dto.setReason(warning.getReason());
-        dto.setContentType(warning.getContentType());
-        dto.setContentId(warning.getContentId());
-        dto.setCreatedAt(warning.getCreatedAt());
-        dto.setAcknowledged(warning.isAcknowledged());
-        dto.setAcknowledgedAt(warning.getAcknowledgedAt());
-        
-        return dto;
+        return WarningDto.builder()
+                .id(warning.getId())
+                .memberId(warning.getMember().getId())
+                .memberUsername(warning.getMember().getName())
+                .warnedById(warning.getWarnedBy().getId())
+                .warnedByUsername(warning.getWarnedBy().getName())
+                .reason(warning.getReason())
+                .message(warning.getMessage())
+                .createdAt(warning.getCreatedAt())
+                .build();
     }
 }

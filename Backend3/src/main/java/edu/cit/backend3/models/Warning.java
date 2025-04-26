@@ -21,23 +21,15 @@ public class Warning {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "admin_id", nullable = false)
-    private Member admin;
+    @JoinColumn(name = "warned_by_id", nullable = false)
+    private Member warnedBy;
 
     @Column(nullable = false)
     private String reason;
 
-    @Column(nullable = true)
-    private String contentType; // "thread", "comment", etc.
-
-    @Column(nullable = true)
-    private Long contentId;
-
     @Column(nullable = false)
+    private String message;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(nullable = false)
-    private boolean acknowledged = false;
-
-    private LocalDateTime acknowledgedAt;
 }

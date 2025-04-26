@@ -50,21 +50,7 @@ public class Member {
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;
-
-    @Column(name = "warning_count")
-    @Builder.Default
-    private Integer warningCount = 0;
-
-    @Column(name = "is_banned")
-    @Builder.Default
-    private Boolean banned = false;
-
-    @Column(name = "ban_reason")
-    private String banReason;
-
-    @Column(name = "banned_until")
-    private LocalDateTime bannedUntil;
-
+    
     @Column(name = "status")
     @Builder.Default
     private String status = "ACTIVE";
@@ -93,6 +79,34 @@ public class Member {
     
     @Column(name = "bio", length = 500)
     private String bio;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean enabled = true;
+
+    @Column(name = "warning_count", nullable = false)
+    @Builder.Default
+    private int warningCount = 0;
+
+    @Column(name = "is_banned", nullable = false)
+    @Builder.Default
+    private boolean isBanned = false;
+
+    @Column(name = "ban_reason")
+    private String banReason;
+
+    @Column(name = "banned_at")
+    private LocalDateTime bannedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "banned_by_id")
+    private Member bannedBy;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Warning> receivedWarnings = new HashSet<>();
+
+    @OneToMany(mappedBy = "warnedBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Warning> issuedWarnings = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
