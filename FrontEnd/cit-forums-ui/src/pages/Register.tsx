@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register, RegisterRequest } from '../services/authService';
-import { BiShowAlt, BiHide } from 'react-icons/bi';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState<RegisterRequest & { confirmPassword: string }>({
@@ -236,7 +235,7 @@ const Register: React.FC = () => {
                                 type="button"
                                 onClick={togglePasswordVisibility}
                               >
-                                {showPassword ? <BiHide /> : <BiShowAlt />}
+                                <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
                               </button>
                             </div>
                           </div>
@@ -259,7 +258,7 @@ const Register: React.FC = () => {
                                 type="button"
                                 onClick={toggleConfirmPasswordVisibility}
                               >
-                                {showConfirmPassword ? <BiHide /> : <BiShowAlt />}
+                                <i className={showConfirmPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
                               </button>
                               {!passwordsMatch && (
                                 <div className="invalid-feedback">

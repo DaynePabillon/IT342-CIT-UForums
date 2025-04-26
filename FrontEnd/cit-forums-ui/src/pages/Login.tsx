@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { login, LoginRequest, isAuthenticated } from '../services/authService';
-import { BiShowAlt, BiHide } from 'react-icons/bi';
 
 interface LocationState {
   message?: string;
@@ -168,7 +167,7 @@ const Login: React.FC = () => {
                             type="button"
                             onClick={togglePasswordVisibility}
                           >
-                            {showPassword ? <BiHide /> : <BiShowAlt />}
+                            <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
                           </button>
                         </div>
                       </div>
