@@ -97,7 +97,7 @@ export const updateUserStatus = async (userId: number, status: string): Promise<
 // Get reported content
 export const getReportedContent = async (page: number = 0, size: number = 10): Promise<PagedResponse<ReportedContent>> => {
     try {
-        const response = await axiosInstance.get('/api/admin/reports', {
+        const response = await axiosInstance.get('/api/admin/dashboard-reports', {
             params: { page, size }
         });
         return response.data;

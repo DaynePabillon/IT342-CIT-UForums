@@ -30,11 +30,14 @@ const AdminReports: React.FC = () => {
           navigate('/admin/login');
           return;
         }
+        setLoading(true);
+        console.log('Fetching reports...');
         const data = await getReports();
+        console.log('Reports fetched:', data);
         setReports(data);
       } catch (err) {
-        setError('Failed to fetch reports');
-        console.error(err);
+        console.error('Error in fetchReports:', err);
+        setError('Failed to fetch reports. Please check the console for details.');
       } finally {
         setLoading(false);
       }
@@ -50,9 +53,12 @@ const AdminReports: React.FC = () => {
     setReportedContent(null);
     
     try {
+      console.log('Viewing report:', report);
       if (report.reportedContentType === 'THREAD') {
         // Use the admin-specific endpoint to get thread details
+        console.log('Fetching thread details for ID:', report.reportedContentId);
         const threadData = await getThreadById(report.reportedContentId);
+        console.log('Thread data fetched:', threadData);
         if (threadData) {
           setReportedContent(threadData);
         } else {
@@ -84,7 +90,8 @@ const AdminReports: React.FC = () => {
   // Handle Resolve Report
   const handleResolveReport = async (reportId: number) => {
     try {
-      await resolveReport(reportId, 'RESOLVED');
+      console.log('Resolving report:', reportId);
+      await resolveReport(reportId, 'resolve');
       setReports(reports.filter(report => report.id !== reportId));
       
       if (selectedReport?.id === reportId) {
@@ -94,14 +101,15 @@ const AdminReports: React.FC = () => {
       setSuccessMessage('Report has been resolved');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setError('Failed to resolve report');
-      console.error(err);
+      console.error('Error resolving report:', err);
+      setError('Failed to resolve report. Please check the console for details.');
     }
   };
 
   // Handle Dismiss Report
   const handleDismissReport = async (reportId: number) => {
     try {
+      console.log('Dismissing report:', reportId);
       await dismissReport(reportId);
       setReports(reports.filter(report => report.id !== reportId));
       
@@ -112,8 +120,8 @@ const AdminReports: React.FC = () => {
       setSuccessMessage('Report has been dismissed');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setError('Failed to dismiss report');
-      console.error(err);
+      console.error('Error dismissing report:', err);
+      setError('Failed to dismiss report. Please check the console for details.');
     }
   };
 
@@ -128,12 +136,13 @@ const AdminReports: React.FC = () => {
     if (!userToBan) return;
     
     try {
+      console.log('Banning user:', userToBan);
       await updateUserStatus(userToBan.id, 'BANNED');
       setSuccessMessage(`User ${userToBan.username} has been banned`);
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setError('Failed to ban user');
-      console.error(err);
+      console.error('Error banning user:', err);
+      setError('Failed to ban user. Please check the console for details.');
     } finally {
       setShowBanConfirmation(false);
       setUserToBan(null);
@@ -166,16 +175,11 @@ const AdminReports: React.FC = () => {
     );
   }
 
-  // Error Message
-  if (error) {
-    return <div className="alert alert-danger">{error}</div>;
-  }
-
   return (
     <div className="admin-dashboard">
       {/* Header */}
       <div className="admin-header">
-        <h1 className="admin-title">Report Management</h1>
+        <h1 className="admin-title">Reports Management</h1>
         <div className="admin-header-actions">
           <button 
             onClick={navigateToDashboard}
@@ -185,12 +189,25 @@ const AdminReports: React.FC = () => {
           </button>
           <button 
             onClick={navigateToUsers}
-            className="admin-btn-primary mr-2"
+            className="admin-btn-primary"
           >
             Manage Users
           </button>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="admin-alert-error">
+          <span>{error}</span>
+          <button 
+            onClick={() => setError(null)}
+            className="admin-alert-close"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Success Message */}
       {successMessage && (
@@ -204,12 +221,12 @@ const AdminReports: React.FC = () => {
           </button>
         </div>
       )}
-      
+
       {/* Main Content */}
-      <div className="admin-content-layout">
+      <div className="admin-content-grid">
         {/* Reports List */}
-        <div className={`admin-card ${selectedReport ? 'admin-card-list' : ''}`}>
-          <h2 className="admin-section-title">Reported Content</h2>
+        <div className="admin-card admin-reports-list">
+          <h2 className="admin-section-title">Reports</h2>
           
           {reports.length === 0 ? (
             <div className="admin-alert-info">No reports found.</div>
@@ -218,51 +235,42 @@ const AdminReports: React.FC = () => {
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Type</th>
-                    <th>Reported By</th>
-                    <th>Reason</th>
-                    <th>Status</th>
+                    <th>Reporter</th>
                     <th>Date</th>
+                    <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {reports.map(report => (
-                    <tr key={report.id} className={selectedReport?.id === report.id ? 'admin-row-selected' : ''}>
-                      <td>{report.id}</td>
+                  {reports.map((report) => (
+                    <tr 
+                      key={report.id} 
+                      className={selectedReport?.id === report.id ? 'active' : ''}
+                      onClick={() => handleViewReport(report)}
+                    >
                       <td>
-                        <span className="admin-badge">{report.reportedContentType}</span>
+                        <span className={`admin-badge admin-badge-${report.reportedContentType.toLowerCase()}`}>
+                          {report.reportedContentType}
+                        </span>
                       </td>
                       <td>{report.reporter?.username || 'Anonymous'}</td>
-                      <td className="admin-cell-truncate">{report.reason}</td>
+                      <td>{new Date(report.createdAt).toLocaleDateString()}</td>
                       <td>
-                        <span className={`admin-badge-${report.status.toLowerCase()}`}>
+                        <span className={`admin-badge admin-badge-${report.status.toLowerCase()}`}>
                           {report.status}
                         </span>
                       </td>
-                      <td>{new Date(report.createdAt).toLocaleDateString()}</td>
                       <td>
-                        <div className="admin-action-buttons">
-                          <button 
-                            onClick={() => handleViewReport(report)}
-                            className="admin-btn-primary admin-btn-sm"
-                          >
-                            View
-                          </button>
-                          <button 
-                            onClick={() => handleResolveReport(report.id)}
-                            className="admin-btn-success admin-btn-sm"
-                          >
-                            Resolve
-                          </button>
-                          <button 
-                            onClick={() => handleDismissReport(report.id)}
-                            className="admin-btn-secondary admin-btn-sm"
-                          >
-                            Dismiss
-                          </button>
-                        </div>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewReport(report);
+                          }}
+                          className="admin-btn-secondary admin-btn-sm"
+                        >
+                          View
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -271,112 +279,112 @@ const AdminReports: React.FC = () => {
             </div>
           )}
         </div>
-
+        
         {/* Report Details */}
-        {selectedReport && (
-          <div className="admin-card admin-card-detail">
-            <h2 className="admin-section-title">Report Details</h2>
-            
-            {contentLoading ? (
-              <div className="admin-loading">
-                <div className="admin-spinner"></div>
-                <p>Loading content...</p>
+        <div className="admin-card admin-report-details">
+          {!selectedReport ? (
+            <div className="admin-placeholder">
+              <p>Select a report to view details</p>
+            </div>
+          ) : (
+            <div className="admin-detail-container">
+              <h2 className="admin-detail-header">Report Details</h2>
+              
+              {/* Report Info Section */}
+              <div className="admin-detail-section">
+                <h3 className="admin-detail-title">Report Information</h3>
+                <div className="admin-detail-grid">
+                  <div className="admin-detail-item">
+                    <span className="admin-detail-label">Type:</span>
+                    <span className={`admin-badge admin-badge-${selectedReport.reportedContentType.toLowerCase()}`}>
+                      {selectedReport.reportedContentType}
+                    </span>
+                  </div>
+                  <div className="admin-detail-item">
+                    <span className="admin-detail-label">Status:</span>
+                    <span className={`admin-badge admin-badge-${selectedReport.status.toLowerCase()}`}>
+                      {selectedReport.status}
+                    </span>
+                  </div>
+                  <div className="admin-detail-item">
+                    <span className="admin-detail-label">Reporter:</span>
+                    <span>
+                      {selectedReport.reporter?.username || 'Anonymous'}
+                      {selectedReport.reporter && (
+                        <button 
+                          onClick={() => selectedReport.reporter && handleBanUser(selectedReport.reporter.id, selectedReport.reporter.username)}
+                          className="admin-btn-danger admin-btn-sm ml-2"
+                        >
+                          Ban User
+                        </button>
+                      )}
+                    </span>
+                  </div>
+                  <div className="admin-detail-item">
+                    <span className="admin-detail-label">Date:</span>
+                    <span>{new Date(selectedReport.createdAt).toLocaleString()}</span>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="admin-detail-content">
-                {/* Report Information Section */}
-                <div className="admin-detail-section">
-                  <h3 className="admin-detail-title">Report Information</h3>
-                  <div className="admin-detail-grid">
-                    <div className="admin-detail-item">
-                      <span className="admin-detail-label">ID:</span>
-                      <span>{selectedReport.id}</span>
-                    </div>
-                    <div className="admin-detail-item">
-                      <span className="admin-detail-label">Type:</span>
-                      <span>{selectedReport.reportedContentType}</span>
-                    </div>
-                    <div className="admin-detail-item">
-                      <span className="admin-detail-label">Status:</span>
-                      <span className={`admin-badge-${selectedReport.status.toLowerCase()}`}>
-                        {selectedReport.status}
-                      </span>
-                    </div>
-                    <div className="admin-detail-item">
-                      <span className="admin-detail-label">Reported By:</span>
-                      <span>
-                        {selectedReport.reporter?.username || 'Anonymous'}
-                        {selectedReport.reporter && (
-                          <button 
-                            onClick={() => selectedReport.reporter && handleBanUser(selectedReport.reporter.id, selectedReport.reporter.username)}
-                            className="admin-btn-danger admin-btn-sm ml-2"
-                          >
-                            Ban User
-                          </button>
-                        )}
-                      </span>
-                    </div>
-                    <div className="admin-detail-item">
-                      <span className="admin-detail-label">Date:</span>
-                      <span>{new Date(selectedReport.createdAt).toLocaleString()}</span>
-                    </div>
-                  </div>
+              
+              {/* Report Reason Section */}
+              <div className="admin-detail-section">
+                <h3 className="admin-detail-title">Reason for Report</h3>
+                <div className="admin-detail-reason">
+                  {selectedReport.reason}
                 </div>
-                
-                {/* Report Reason Section */}
-                <div className="admin-detail-section">
-                  <h3 className="admin-detail-title">Reason for Report</h3>
-                  <div className="admin-detail-reason">
-                    {selectedReport.reason}
-                  </div>
+              </div>
+              
+              {/* Reported Content Section */}
+              {contentLoading ? (
+                <div className="admin-content-loading">
+                  <div className="loading-spinner"></div>
+                  <p>Loading content...</p>
                 </div>
-                
-                {/* Reported Content Section */}
-                {reportedContent && (
-                  <div className="admin-detail-section">
-                    <h3 className="admin-detail-title">Reported Content</h3>
-                    {reportedContent.error ? (
-                      <div className="admin-alert-error">{reportedContent.message}</div>
-                    ) : (
-                      <div className="admin-reported-content">
-                        {reportedContent.title && (
-                          <h4 className="admin-content-title">{reportedContent.title}</h4>
-                        )}
-                        <div className="admin-content-body">
-                          {reportedContent.content}
-                        </div>
+              ) : reportedContent ? (
+                <div className="admin-detail-section">
+                  <h3 className="admin-detail-title">Reported Content</h3>
+                  {reportedContent.error ? (
+                    <div className="admin-alert-error">{reportedContent.message}</div>
+                  ) : (
+                    <div className="admin-reported-content">
+                      {reportedContent.title && (
+                        <h4 className="admin-content-title">{reportedContent.title}</h4>
+                      )}
+                      <div className="admin-content-body">
+                        {reportedContent.content}
                       </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Action Buttons */}
-                <div className="admin-detail-actions">
-                  <button 
-                    onClick={() => handleResolveReport(selectedReport.id)}
-                    className="admin-btn-success"
-                  >
-                    Resolve Report
-                  </button>
-                  <button 
-                    onClick={() => handleDismissReport(selectedReport.id)}
-                    className="admin-btn-secondary"
-                  >
-                    Dismiss Report
-                  </button>
-                  {selectedReport.reporter && (
-                    <button 
-                      onClick={() => selectedReport.reporter && handleBanUser(selectedReport.reporter.id, selectedReport.reporter.username)}
-                      className="admin-btn-danger"
-                    >
-                      Ban Reporter
-                    </button>
+                    </div>
                   )}
                 </div>
+              ) : null}
+              
+              {/* Action Buttons */}
+              <div className="admin-detail-actions">
+                <button 
+                  onClick={() => handleResolveReport(selectedReport.id)}
+                  className="admin-btn-success"
+                >
+                  Resolve Report
+                </button>
+                <button 
+                  onClick={() => handleDismissReport(selectedReport.id)}
+                  className="admin-btn-secondary"
+                >
+                  Dismiss Report
+                </button>
+                {selectedReport.reporter && (
+                  <button 
+                    onClick={() => selectedReport.reporter && handleBanUser(selectedReport.reporter.id, selectedReport.reporter.username)}
+                    className="admin-btn-danger"
+                  >
+                    Ban Reporter
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Ban User Confirmation Modal */}
