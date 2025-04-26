@@ -32,7 +32,8 @@ export const createReport = async (report: CreateReportRequest): Promise<Report>
 
 export const getReports = async (): Promise<Report[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/reports`, {
+    // Updated to use the correct dashboard-reports endpoint
+    const response = await fetch(`${API_BASE_URL}/api/admin/dashboard-reports`, {
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`
       }
@@ -44,7 +45,10 @@ export const getReports = async (): Promise<Report[]> => {
       throw new Error(errorData?.message || 'Failed to fetch reports');
     }
 
-    return response.json();
+    return response.json().then(data => {
+      // Handle paginated response
+      return data.content || data;
+    });
   } catch (error) {
     console.error('Error in getReports:', error);
     throw error;
@@ -53,8 +57,8 @@ export const getReports = async (): Promise<Report[]> => {
 
 export const resolveReport = async (reportId: number, action: string): Promise<Report> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}/resolve?action=${encodeURIComponent(action)}`, {
-      method: 'POST',
+    const response = await fetch(`${API_BASE_URL}/api/admin/reports/${reportId}/${action}`, {
+      method: 'PUT',  // Changed from POST to PUT to match the backend @PutMapping
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${getAuthToken()}`
@@ -76,9 +80,11 @@ export const resolveReport = async (reportId: number, action: string): Promise<R
 
 export const dismissReport = async (reportId: number): Promise<Report> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}/dismiss`, {
-      method: 'POST',
+    // Use the same pattern as resolveReport but with 'dismiss' action
+    const response = await fetch(`${API_BASE_URL}/api/admin/reports/${reportId}/dismiss`, {
+      method: 'PUT',  // Changed to PUT to match the AdminDashboardController pattern
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${getAuthToken()}`
       }
     });
