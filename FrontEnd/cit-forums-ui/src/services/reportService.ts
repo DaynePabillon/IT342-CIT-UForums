@@ -3,63 +3,95 @@ import { getAuthToken } from './authService';
 import { API_BASE_URL } from '../config';
 
 export const createReport = async (report: CreateReportRequest): Promise<Report> => {
-  const response = await fetch(`${API_BASE_URL}/api/reports/new`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${getAuthToken()}`
-    },
-    body: JSON.stringify(report)
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reports`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+      body: JSON.stringify({
+        reportedContentType: report.reportedContentType,
+        reportedContentId: report.reportedContentId,
+        reason: report.reason
+      })
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to create report');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error('Report creation failed:', errorData || response.statusText);
+      throw new Error(errorData?.message || 'Failed to create report');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error in createReport:', error);
+    throw error;
   }
-
-  return response.json();
 };
 
 export const getReports = async (): Promise<Report[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/admin/reports`, {
-    headers: {
-      'Authorization': `Bearer ${getAuthToken()}`
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reports`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error('Fetching reports failed:', errorData || response.statusText);
+      throw new Error(errorData?.message || 'Failed to fetch reports');
     }
-  });
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch reports');
+    return response.json();
+  } catch (error) {
+    console.error('Error in getReports:', error);
+    throw error;
   }
-
-  return response.json();
 };
 
 export const resolveReport = async (reportId: number, action: string): Promise<Report> => {
-  const response = await fetch(`${API_BASE_URL}/api/admin/reports/${reportId}/resolve?action=${encodeURIComponent(action)}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${getAuthToken()}`
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}/resolve?action=${encodeURIComponent(action)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error('Resolving report failed:', errorData || response.statusText);
+      throw new Error(errorData?.message || 'Failed to resolve report');
     }
-  });
 
-  if (!response.ok) {
-    throw new Error('Failed to resolve report');
+    return response.json();
+  } catch (error) {
+    console.error('Error in resolveReport:', error);
+    throw error;
   }
-
-  return response.json();
 };
 
 export const dismissReport = async (reportId: number): Promise<Report> => {
-  const response = await fetch(`${API_BASE_URL}/api/admin/reports/${reportId}/dismiss`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${getAuthToken()}`
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}/dismiss`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error('Dismissing report failed:', errorData || response.statusText);
+      throw new Error(errorData?.message || 'Failed to dismiss report');
     }
-  });
 
-  if (!response.ok) {
-    throw new Error('Failed to dismiss report');
+    return response.json();
+  } catch (error) {
+    console.error('Error in dismissReport:', error);
+    throw error;
   }
-
-  return response.json();
 };
