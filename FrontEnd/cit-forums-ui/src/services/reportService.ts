@@ -9,11 +9,11 @@ export const createReport = async (report: CreateReportRequest): Promise<Report>
     // Log the request for debugging
     console.log('Creating report with data:', report);
     
-    // Map the frontend field names to the backend field names
+    // Send the exact field names that the backend expects
     const response = await axiosInstance.post('/api/reports/new', {
-      contentType: report.reportedContentType,  // Changed from reportedContentType to contentType
-      contentId: report.reportedContentId,      // Changed from reportedContentId to contentId
-      reason: report.reason
+      reason: report.reason,
+      contentType: report.reportedContentType,
+      contentId: report.reportedContentId
     });
 
     // Log the response status for debugging
@@ -25,6 +25,8 @@ export const createReport = async (report: CreateReportRequest): Promise<Report>
     console.error('Error in createReport:', error);
     if (error instanceof AxiosError && error.response) {
       console.error('Error details:', error.response.data || 'No response data');
+      console.error('Status code:', error.response.status);
+      console.error('Headers:', error.response.headers);
     }
     throw error;
   }
@@ -32,21 +34,13 @@ export const createReport = async (report: CreateReportRequest): Promise<Report>
 
 export const getReports = async (): Promise<Report[]> => {
   try {
-    // Log the request for debugging
-    console.log('Fetching reports from:', `${API_BASE_URL}/api/admin/dashboard-reports`);
-    
-    // Use axiosInstance for consistent error handling
     const response = await axiosInstance.get('/api/admin/dashboard-reports');
-    
-    // Log the response for debugging
-    console.log('Reports response:', response.data);
-    
-    // Handle paginated response
-    return response.data.content || response.data;
+    return response.data;
   } catch (error) {
     console.error('Error in getReports:', error);
     if (error instanceof AxiosError && error.response) {
       console.error('Error details:', error.response.data || 'No response data');
+      console.error('Status code:', error.response.status);
     }
     throw error;
   }
@@ -54,20 +48,13 @@ export const getReports = async (): Promise<Report[]> => {
 
 export const resolveReport = async (reportId: number, action: string): Promise<Report> => {
   try {
-    // Log the request for debugging
-    console.log(`Resolving report ${reportId} with action ${action}`);
-    
-    // Use axiosInstance for consistent error handling
-    const response = await axiosInstance.put(`/api/admin/reports/${reportId}/${action}`);
-    
-    // Log the response for debugging
-    console.log('Resolve report response:', response.data);
-    
+    const response = await axiosInstance.put(`/api/reports/${reportId}/resolve?action=${action}`);
     return response.data;
   } catch (error) {
     console.error('Error in resolveReport:', error);
     if (error instanceof AxiosError && error.response) {
       console.error('Error details:', error.response.data || 'No response data');
+      console.error('Status code:', error.response.status);
     }
     throw error;
   }
@@ -75,20 +62,13 @@ export const resolveReport = async (reportId: number, action: string): Promise<R
 
 export const dismissReport = async (reportId: number): Promise<Report> => {
   try {
-    // Log the request for debugging
-    console.log(`Dismissing report ${reportId}`);
-    
-    // Use axiosInstance for consistent error handling
-    const response = await axiosInstance.put(`/api/admin/reports/${reportId}/dismiss`);
-    
-    // Log the response for debugging
-    console.log('Dismiss report response:', response.data);
-    
+    const response = await axiosInstance.put(`/api/reports/${reportId}/dismiss`);
     return response.data;
   } catch (error) {
     console.error('Error in dismissReport:', error);
     if (error instanceof AxiosError && error.response) {
       console.error('Error details:', error.response.data || 'No response data');
+      console.error('Status code:', error.response.status);
     }
     throw error;
   }
