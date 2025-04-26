@@ -9,14 +9,16 @@ export const createReport = async (report: CreateReportRequest): Promise<Report>
     // Log the request for debugging
     console.log('Creating report with data:', report);
     
+    // Map the frontend field names to the backend field names
     const response = await axiosInstance.post('/api/reports/new', {
-      reportedContentType: report.reportedContentType,
-      reportedContentId: report.reportedContentId,
+      contentType: report.reportedContentType,  // Changed from reportedContentType to contentType
+      contentId: report.reportedContentId,      // Changed from reportedContentId to contentId
       reason: report.reason
     });
 
     // Log the response status for debugging
     console.log('Report creation response status:', response.status);
+    console.log('Report creation response data:', response.data);
     
     return response.data;
   } catch (error) {
