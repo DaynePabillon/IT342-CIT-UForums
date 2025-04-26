@@ -222,6 +222,22 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member findByNameOrEmail(String name, String email) {
         logger.info("Finding member by name: {} or email: {}", name, email);
+        
+        // Check if the input might be a user ID
+        try {
+            Long userId = Long.parseLong(name);
+            logger.info("Input appears to be a user ID: {}", userId);
+            Optional<Member> memberById = memberRepository.findById(userId);
+            if (memberById.isPresent()) {
+                logger.info("Found member by ID: {}", userId);
+                return memberById.get();
+            }
+            logger.warn("No member found with ID: {}, falling back to name/email search", userId);
+        } catch (NumberFormatException e) {
+            logger.debug("Input is not a numeric ID, continuing with name/email search");
+        }
+        
+        // If not a user ID or no member found by ID, try by name or email
         List<Member> members = memberRepository.findByNameOrEmail(name, email);
         if (members.isEmpty()) {
             logger.error("Member not found for name: {} or email: {}", name, email);
