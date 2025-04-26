@@ -150,7 +150,7 @@ public class ReportController {
 
     @GetMapping("/my-reports")
     @Operation(summary = "Get current user's reports", description = "Returns a list of reports created by the authenticated user")
-    public ResponseEntity<List<ReportDto>> getMyReports(Authentication authentication) {
+    public ResponseEntity<?> getMyReports(Authentication authentication) {
         try {
             String username = authentication.getName();
             Member reporter = memberService.findByNameOrEmail(username, username);
