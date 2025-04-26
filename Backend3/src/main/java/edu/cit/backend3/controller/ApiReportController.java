@@ -6,6 +6,8 @@ import edu.cit.backend3.repository.ReportRepository;
 import edu.cit.backend3.repository.MemberRepository;
 import edu.cit.backend3.service.MemberService;
 import edu.cit.backend3.dto.response.ApiResponse;
+import edu.cit.backend3.dto.ReportDto;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -39,20 +42,23 @@ public class ApiReportController {
     @Autowired
     private MemberService memberService;
     
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     @Operation(
         summary = "Create a new report",
         description = "Submit a report for inappropriate content"
     )
     public ResponseEntity<?> createReport(
-            @RequestBody Report reportRequest,
+            @RequestBody ReportDto reportRequest,
             Principal principal) {
         
         try {
+            logger.info("Creating report: {}", reportRequest);
+            
             // Find the current user
             Member reporter = memberService.findByNameOrEmail(principal.getName(), principal.getName());
             if (reporter == null) {
+                logger.error("Reporter not found: {}", principal.getName());
                 return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, "Reporter not found"));
             }
@@ -66,9 +72,14 @@ public class ApiReportController {
             report.setStatus("PENDING");
             report.setCreatedAt(LocalDateTime.now());
             
+            logger.info("Saving report: {}", report);
             Report savedReport = reportRepository.save(report);
+            logger.info("Report saved successfully with ID: {}", savedReport.getId());
             
-            return ResponseEntity.ok(new ApiResponse(true, "Report submitted successfully", savedReport));
+            // Convert to DTO for response
+            ReportDto responseDto = ReportDto.fromEntity(savedReport);
+            
+            return ResponseEntity.ok(new ApiResponse(true, "Report submitted successfully", responseDto));
         } catch (Exception e) {
             logger.error("Error creating report", e);
             return ResponseEntity.badRequest()

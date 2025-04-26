@@ -3,6 +3,9 @@ package edu.cit.backend3.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Data
@@ -14,6 +17,8 @@ public class Report {
 
     @ManyToOne
     @JoinColumn(name = "reporter_id", nullable = false)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private Member reporter;
 
     @Column(nullable = false)
@@ -30,6 +35,8 @@ public class Report {
 
     @ManyToOne
     @JoinColumn(name = "resolver_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private Member resolver;
 
     private String action; // action taken to resolve the report

@@ -4,6 +4,7 @@ import edu.cit.backend3.models.Report;
 import edu.cit.backend3.models.Member;
 import edu.cit.backend3.service.ReportService;
 import edu.cit.backend3.service.MemberService;
+import edu.cit.backend3.dto.ReportDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,11 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -34,11 +37,27 @@ public class ReportController {
     @Autowired
     private MemberService memberService;
 
-    @PostMapping
+    // Define a static inner class for the report request
+    public static class ReportRequest {
+        private String reason;
+        private String reportedContentType;
+        private Long reportedContentId;
+        
+        public String getReason() { return reason; }
+        public void setReason(String reason) { this.reason = reason; }
+        
+        public String getReportedContentType() { return reportedContentType; }
+        public void setReportedContentType(String reportedContentType) { this.reportedContentType = reportedContentType; }
+        
+        public Long getReportedContentId() { return reportedContentId; }
+        public void setReportedContentId(Long reportedContentId) { this.reportedContentId = reportedContentId; }
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Create a new report", description = "Creates a new report for content that violates community guidelines")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Report created successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Report.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReportDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -49,201 +68,181 @@ public class ReportController {
                 .body("Content ID and Content Type are required fields");
         }
         
-        logger.info("Authentication name: {}", authentication.getName());
-        
-        Member reporter;
         try {
-            reporter = memberService.findByNameOrEmail(authentication.getName(), authentication.getName());
-        } catch (Exception e) {
-            logger.error("Failed to find reporter: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("User not found or not authenticated properly");
-        }
-        
-        if (reporter == null) {
-            logger.error("Reporter is null for user: {}", authentication.getName());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("User not found");
-        }
-        
-        logger.info("Found reporter: {}, ID: {}", reporter.getName(), reporter.getId());
-        
-        // Create a Report object from the request
-        Report report = new Report();
-        report.setReporter(reporter);
-        report.setReason(reportRequest.getReason());
-        report.setContentType(reportRequest.getReportedContentType());
-        report.setContentId(reportRequest.getReportedContentId());
-        report.setStatus("PENDING");
-        
-        try {
+            logger.info("Creating report for {} with ID {}", reportRequest.getReportedContentType(), reportRequest.getReportedContentId());
+            
+            // Get the current user
+            String username = authentication.getName();
+            Member reporter = memberService.findByNameOrEmail(username, username);
+            
+            if (reporter == null) {
+                logger.error("User not found: {}", username);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("User not found");
+            }
+            
+            // Create the report
+            Report report = new Report();
+            report.setReporter(reporter);
+            report.setReason(reportRequest.getReason());
+            report.setContentType(reportRequest.getReportedContentType());
+            report.setContentId(reportRequest.getReportedContentId());
+            
+            // Save the report
             Report savedReport = reportService.createReport(report);
-            return ResponseEntity.ok(savedReport);
+            
+            // Convert to DTO for response
+            ReportDto reportDto = ReportDto.fromEntity(savedReport);
+            
+            return ResponseEntity.ok(reportDto);
         } catch (Exception e) {
-            logger.error("Error creating report: {}", e.getMessage(), e);
+            logger.error("Error creating report", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error creating report: " + e.getMessage());
+                .body("An error occurred while creating the report: " + e.getMessage());
         }
     }
 
-    @GetMapping
-    @Operation(summary = "Get all reports", description = "Retrieves all reports in the system")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reports retrieved successfully"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<?> getAllReports() {
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get all reports", description = "Returns a list of all reports")
+    public ResponseEntity<List<ReportDto>> getAllReports() {
         try {
             List<Report> reports = reportService.getAllReports();
-            logger.info("Retrieved {} reports", reports.size());
-            return ResponseEntity.ok(reports);
+            List<ReportDto> reportDtos = reports.stream()
+                .map(ReportDto::fromEntity)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(reportDtos);
         } catch (Exception e) {
-            logger.error("Error getting all reports: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error getting all reports: " + e.getMessage());
+            logger.error("Error fetching reports", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get report by ID", description = "Returns a report by its ID")
+    public ResponseEntity<?> getReportById(@PathVariable Long id) {
+        try {
+            Report report = reportService.getReportById(id);
+            if (report == null) {
+                return ResponseEntity.notFound().build();
+            }
+            ReportDto reportDto = ReportDto.fromEntity(report);
+            return ResponseEntity.ok(reportDto);
+        } catch (Exception e) {
+            logger.error("Error fetching report with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/status/{status}")
-    @Operation(summary = "Get reports by status", description = "Retrieves reports filtered by their status (PENDING, RESOLVED, DISMISSED)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reports retrieved successfully"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<?> getReportsByStatus(
-            @Parameter(description = "Status to filter by (PENDING, RESOLVED, DISMISSED)", required = true)
-            @PathVariable String status) {
+    @Operation(summary = "Get reports by status", description = "Returns a list of reports filtered by their status")
+    public ResponseEntity<List<ReportDto>> getReportsByStatus(@PathVariable String status) {
         try {
-            return ResponseEntity.ok(reportService.getReportsByStatus(status));
+            List<Report> reports = reportService.getReportsByStatus(status);
+            List<ReportDto> reportDtos = reports.stream()
+                .map(ReportDto::fromEntity)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(reportDtos);
         } catch (Exception e) {
-            logger.error("Error getting reports by status: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error getting reports by status: " + e.getMessage());
+            logger.error("Error fetching reports by status", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/my-reports")
-    @Operation(summary = "Get current user's reports", description = "Retrieves all reports created by the authenticated user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User's reports retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "User not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<?> getMyReports(Authentication authentication) {
-        Member reporter;
+    @Operation(summary = "Get current user's reports", description = "Returns a list of reports created by the authenticated user")
+    public ResponseEntity<List<ReportDto>> getMyReports(Authentication authentication) {
         try {
-            reporter = memberService.findByNameOrEmail(authentication.getName(), authentication.getName());
+            String username = authentication.getName();
+            Member reporter = memberService.findByNameOrEmail(username, username);
+            
+            if (reporter == null) {
+                logger.error("User not found: {}", username);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("User not found");
+            }
+            
+            List<Report> reports = reportService.getReportsByReporter(reporter);
+            List<ReportDto> reportDtos = reports.stream()
+                .map(ReportDto::fromEntity)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(reportDtos);
         } catch (Exception e) {
-            logger.error("Failed to find reporter: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Failed to find user: " + e.getMessage());
-        }
-        
-        if (reporter == null) {
-            logger.error("Reporter is null for user: {}", authentication.getName());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("User not found");
-        }
-        
-        logger.info("Found reporter: {}, ID: {}", reporter.getName(), reporter.getId());
-        
-        try {
-            return ResponseEntity.ok(reportService.getReportsByReporter(reporter));
-        } catch (Exception e) {
-            logger.error("Error getting user's reports: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error getting user's reports: " + e.getMessage());
+            logger.error("Error fetching user's reports", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PostMapping("/{reportId}/resolve")
-    @Operation(summary = "Resolve a report", description = "Marks a report as resolved with the specified action")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Report resolved successfully"),
-            @ApiResponse(responseCode = "404", description = "Report not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
+    @PutMapping(value = "/{id}/resolve", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Resolve a report", description = "Marks a report as resolved")
     public ResponseEntity<?> resolveReport(
-            @Parameter(description = "ID of the report to resolve", required = true)
-            @PathVariable Long reportId,
-            @Parameter(description = "Action taken to resolve the report", required = true)
-            @RequestParam String action) {
+            @PathVariable Long id,
+            @RequestParam(required = false) String action,
+            Authentication authentication) {
         try {
-            return ResponseEntity.ok(reportService.resolveReport(reportId, action));
+            // Get the current user
+            String username = authentication.getName();
+            Member resolver = memberService.findByNameOrEmail(username, username);
+            
+            if (resolver == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("User not found");
+            }
+            
+            Report report = reportService.resolveReport(id, resolver, action);
+            if (report == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            ReportDto reportDto = ReportDto.fromEntity(report);
+            return ResponseEntity.ok(reportDto);
         } catch (Exception e) {
-            logger.error("Error resolving report: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error resolving report: " + e.getMessage());
+            logger.error("Error resolving report with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PostMapping("/{reportId}/dismiss")
-    @Operation(summary = "Dismiss a report", description = "Marks a report as dismissed (no action needed)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Report dismissed successfully"),
-            @ApiResponse(responseCode = "404", description = "Report not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
+    @PutMapping(value = "/{id}/dismiss", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Dismiss a report", description = "Marks a report as dismissed")
     public ResponseEntity<?> dismissReport(
-            @Parameter(description = "ID of the report to dismiss", required = true)
-            @PathVariable Long reportId) {
+            @PathVariable Long id,
+            Authentication authentication) {
         try {
-            return ResponseEntity.ok(reportService.dismissReport(reportId));
+            // Get the current user
+            String username = authentication.getName();
+            Member resolver = memberService.findByNameOrEmail(username, username);
+            
+            if (resolver == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("User not found");
+            }
+            
+            Report report = reportService.dismissReport(id, resolver);
+            if (report == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            ReportDto reportDto = ReportDto.fromEntity(report);
+            return ResponseEntity.ok(reportDto);
         } catch (Exception e) {
-            logger.error("Error dismissing report: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error dismissing report: " + e.getMessage());
+            logger.error("Error dismissing report with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/content/{contentType}/{contentId}")
-    @Operation(summary = "Get reports by content", description = "Retrieves reports for the specified content")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reports retrieved successfully"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<?> getReportsByContent(
-            @Parameter(description = "Type of the content to filter by", required = true)
+    @Operation(summary = "Get reports by content", description = "Returns a list of reports for the specified content")
+    public ResponseEntity<List<ReportDto>> getReportsByContent(
             @PathVariable String contentType,
-            @Parameter(description = "ID of the content to filter by", required = true)
             @PathVariable Long contentId) {
         try {
-            return ResponseEntity.ok(reportService.getReportsByContent(contentType, contentId));
+            List<Report> reports = reportService.getReportsByContent(contentType, contentId);
+            List<ReportDto> reportDtos = reports.stream()
+                .map(ReportDto::fromEntity)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(reportDtos);
         } catch (Exception e) {
-            logger.error("Error getting reports by content: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error getting reports by content: " + e.getMessage());
-        }
-    }
-    
-    // Inner class to match frontend request format
-    public static class ReportRequest {
-        private String reportedContentType;
-        private Long reportedContentId;
-        private String reason;
-        
-        public String getReportedContentType() {
-            return reportedContentType;
-        }
-        
-        public void setReportedContentType(String reportedContentType) {
-            this.reportedContentType = reportedContentType;
-        }
-        
-        public Long getReportedContentId() {
-            return reportedContentId;
-        }
-        
-        public void setReportedContentId(Long reportedContentId) {
-            this.reportedContentId = reportedContentId;
-        }
-        
-        public String getReason() {
-            return reason;
-        }
-        
-        public void setReason(String reason) {
-            this.reason = reason;
+            logger.error("Error fetching reports by content", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

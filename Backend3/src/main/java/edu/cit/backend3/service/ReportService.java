@@ -22,6 +22,10 @@ public class ReportService {
     public List<Report> getAllReports() {
         return reportRepository.findAll();
     }
+    
+    public Report getReportById(Long id) {
+        return reportRepository.findById(id).orElse(null);
+    }
 
     public List<Report> getReportsByStatus(String status) {
         return reportRepository.findByStatus(status);
