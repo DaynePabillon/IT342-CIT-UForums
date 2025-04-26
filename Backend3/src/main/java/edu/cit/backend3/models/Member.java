@@ -80,10 +80,6 @@ public class Member {
     @Column(name = "bio", length = 500)
     private String bio;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean enabled = true;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "member_roles",
