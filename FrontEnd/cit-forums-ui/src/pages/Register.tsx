@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register, RegisterRequest } from '../services/authService';
+import { BiShow, BiHide } from 'react-icons/bi';
 
 const Register: React.FC = () => {
-  const [formData, setFormData] = useState<RegisterRequest>({
+  const [formData, setFormData] = useState<RegisterRequest & { confirmPassword: string }>({
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     firstName: '',
     lastName: '',
     phoneNumber: '',
@@ -18,6 +20,9 @@ const Register: React.FC = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [passwordsMatch, setPasswordsMatch] = useState<boolean>(true);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -63,18 +68,42 @@ const Register: React.FC = () => {
         ...formData,
         [name]: value,
       });
+      
+      // Check if passwords match when either password or confirmPassword changes
+      if (name === 'password' || name === 'confirmPassword') {
+        const password = name === 'password' ? value : formData.password;
+        const confirmPassword = name === 'confirmPassword' ? value : formData.confirmPassword;
+        setPasswordsMatch(password === confirmPassword || confirmPassword === '');
+      }
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setPasswordsMatch(false);
+      setError('Passwords do not match');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
 
     try {
       console.log('Registering with data:', formData);
-      // Register the user
-      const success = await register(formData);
+      // Register the user (exclude confirmPassword from the request)
+      const { confirmPassword, ...registerData } = formData;
+      const success = await register(registerData);
       
       if (success) {
         console.log('Registration successful, redirecting to login with:', formData.name);
@@ -116,172 +145,203 @@ const Register: React.FC = () => {
                       <div className="mt-5">
                         <div className="d-flex align-items-center mb-3">
                           <i className="bi bi-check-circle-fill me-3 fs-5"></i>
-                          <span>Access exclusive academic resources</span>
+                          <span>Access to all forums and discussions</span>
                         </div>
                         <div className="d-flex align-items-center mb-3">
                           <i className="bi bi-check-circle-fill me-3 fs-5"></i>
-                          <span>Connect with fellow students</span>
+                          <span>Create threads and share your thoughts</span>
                         </div>
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center mb-3">
                           <i className="bi bi-check-circle-fill me-3 fs-5"></i>
-                          <span>Stay updated with campus events</span>
+                          <span>Connect with fellow students and faculty</span>
                         </div>
                       </div>
                     </div>
-                    {/* Decorative circles */}
-                    <div className="position-absolute" style={{ bottom: '20px', right: '20px', width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
-                    <div className="position-absolute" style={{ top: '40px', right: '-30px', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
+                    
+                    {/* Decorative background elements */}
+                    <div className="position-absolute top-0 end-0 p-5 opacity-10">
+                      <i className="bi bi-chat-square-text-fill" style={{ fontSize: '8rem' }}></i>
+                    </div>
+                    <div className="position-absolute bottom-0 start-0 p-5 opacity-10">
+                      <i className="bi bi-people-fill" style={{ fontSize: '8rem' }}></i>
+                    </div>
                   </div>
                 </div>
                 
                 {/* Right side - Registration form */}
-                <div className="col-md-7">
-                  <div className="card-body p-4 p-lg-5">
-                    <div className="text-center mb-4">
-                      <h2 className="h3 fw-bold">Create Your Account</h2>
-                      <p className="text-muted">Fill in your information to get started</p>
+                <div className="col-md-7 p-0">
+                  <div className="p-4 p-lg-5">
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                      <h3 className="fw-bold m-0">Create an Account</h3>
+                      <img src="/logo.png" alt="CIT-U Forums Logo" height="40" />
                     </div>
                     
-                    {error && (
-                      <div className="alert alert-danger d-flex align-items-center" role="alert">
-                        <i className="bi bi-exclamation-triangle-fill me-2"></i>
-                        <div>{error}</div>
-                      </div>
-                    )}
+                    {error && <div className="alert alert-danger">{error}</div>}
                     
                     <form onSubmit={handleSubmit}>
-                      {/* Personal Information Section */}
+                      {/* Account Information */}
                       <div className="mb-4">
-                        <h5 className="form-section-title"><i className="bi bi-person-fill me-2"></i>Personal Information</h5>
+                        <h5 className="form-section-title">
+                          <i className="bi bi-person-badge-fill me-2"></i>Account Information
+                        </h5>
                         <div className="row g-3">
                           <div className="col-md-6">
-                            <label htmlFor="firstName" className="form-label">First Name</label>
-                            <input
-                              type="text"
-                              className="form-control form-control-lg bg-light"
-                              id="firstName"
-                              name="firstName"
-                              value={formData.firstName}
-                              onChange={handleChange}
-                              required
-                            />
+                            <label htmlFor="name" className="form-label">Username</label>
+                            <div className="input-group mb-3">
+                              <span className="input-group-text bg-light"><i className="bi bi-person"></i></span>
+                              <input
+                                type="text"
+                                className="form-control form-control-lg bg-light"
+                                id="name"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                placeholder="Choose a username"
+                                required
+                              />
+                            </div>
                           </div>
                           <div className="col-md-6">
-                            <label htmlFor="lastName" className="form-label">Last Name</label>
-                            <input
-                              type="text"
-                              className="form-control form-control-lg bg-light"
-                              id="lastName"
-                              name="lastName"
-                              value={formData.lastName}
-                              onChange={handleChange}
-                              required
-                            />
+                            <label htmlFor="email" className="form-label">Email Address</label>
+                            <div className="input-group mb-3">
+                              <span className="input-group-text bg-light"><i className="bi bi-envelope"></i></span>
+                              <input
+                                type="email"
+                                className="form-control form-control-lg bg-light"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="Enter your email"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <label htmlFor="password" className="form-label">Password</label>
+                            <div className="input-group mb-3">
+                              <span className="input-group-text bg-light"><i className="bi bi-lock"></i></span>
+                              <input
+                                type={showPassword ? "text" : "password"}
+                                className="form-control form-control-lg bg-light"
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="Create a password"
+                                required
+                              />
+                              <button
+                                className="btn btn-outline-secondary"
+                                type="button"
+                                onClick={togglePasswordVisibility}
+                              >
+                                {showPassword ? <BiHide /> : <BiShow />}
+                              </button>
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                            <div className="input-group mb-3">
+                              <span className="input-group-text bg-light"><i className="bi bi-lock-fill"></i></span>
+                              <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                className={`form-control form-control-lg bg-light ${!passwordsMatch ? 'is-invalid' : ''}`}
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                placeholder="Confirm your password"
+                                required
+                              />
+                              <button
+                                className="btn btn-outline-secondary"
+                                type="button"
+                                onClick={toggleConfirmPasswordVisibility}
+                              >
+                                {showConfirmPassword ? <BiHide /> : <BiShow />}
+                              </button>
+                              {!passwordsMatch && (
+                                <div className="invalid-feedback">
+                                  Passwords do not match
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Account Information Section */}
+                      {/* Personal Information - Collapsible */}
                       <div className="mb-4">
-                        <h5 className="form-section-title"><i className="bi bi-shield-lock-fill me-2"></i>Account Information</h5>
-                        <div className="mb-3">
-                          <label htmlFor="name" className="form-label">Username</label>
-                          <div className="input-group">
-                            <span className="input-group-text bg-light"><i className="bi bi-person"></i></span>
-                            <input
-                              type="text"
-                              className="form-control form-control-lg bg-light"
-                              id="name"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleChange}
-                              required
-                            />
-                          </div>
-                          <small className="form-text text-muted">
-                            <i className="bi bi-info-circle me-1"></i>
-                            Username can only contain letters, numbers, dots, underscores, and hyphens. <strong>No spaces allowed.</strong>
-                          </small>
-                        </div>
+                        <button 
+                          className="btn btn-link text-decoration-none p-0 mb-3 w-100 text-start" 
+                          type="button" 
+                          data-bs-toggle="collapse" 
+                          data-bs-target="#personalInfo" 
+                          aria-expanded="false" 
+                          aria-controls="personalInfo"
+                        >
+                          <h5 className="form-section-title d-flex justify-content-between align-items-center">
+                            <span><i className="bi bi-person-vcard-fill me-2"></i>Personal Information</span>
+                            <i className="bi bi-chevron-down"></i>
+                          </h5>
+                        </button>
                         
-                        <div className="mb-3">
-                          <label htmlFor="email" className="form-label">Email</label>
-                          <div className="input-group">
-                            <span className="input-group-text bg-light"><i className="bi bi-envelope"></i></span>
-                            <input
-                              type="email"
-                              className="form-control form-control-lg bg-light"
-                              id="email"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleChange}
-                              required
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="mb-3">
-                          <label htmlFor="password" className="form-label">Password</label>
-                          <div className="input-group">
-                            <span className="input-group-text bg-light"><i className="bi bi-lock"></i></span>
-                            <input
-                              type="password"
-                              className="form-control form-control-lg bg-light"
-                              id="password"
-                              name="password"
-                              value={formData.password}
-                              onChange={handleChange}
-                              required
-                            />
+                        <div className="collapse" id="personalInfo">
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <label htmlFor="firstName" className="form-label">First Name</label>
+                              <input
+                                type="text"
+                                className="form-control form-control-lg bg-light"
+                                id="firstName"
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <label htmlFor="lastName" className="form-label">Last Name</label>
+                              <input
+                                type="text"
+                                className="form-control form-control-lg bg-light"
+                                id="lastName"
+                                name="lastName"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                              <input
+                                type="text"
+                                className="form-control form-control-lg bg-light"
+                                id="phoneNumber"
+                                name="phoneNumber"
+                                value={formData.phoneNumber}
+                                onChange={handleChange}
+                                placeholder="09XXXXXXXXX"
+                              />
+                              <small className="text-muted">Format: 09XXXXXXXXX (11 digits)</small>
+                            </div>
+                            <div className="col-md-6">
+                              <label htmlFor="studentNumber" className="form-label">Student ID</label>
+                              <input
+                                type="text"
+                                className="form-control form-control-lg bg-light"
+                                id="studentNumber"
+                                name="studentNumber"
+                                value={formData.studentNumber}
+                                onChange={handleChange}
+                                placeholder="XX-XXXX-XXX"
+                              />
+                              <small className="text-muted">Format: XX-XXXX-XXX</small>
+                            </div>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Student Information Section */}
-                      <div className="mb-4">
-                        <h5 className="form-section-title"><i className="bi bi-mortarboard-fill me-2"></i>Student Information</h5>
-                        <div className="mb-3">
-                          <label htmlFor="studentNumber" className="form-label">Student ID</label>
-                          <div className="input-group">
-                            <span className="input-group-text bg-light"><i className="bi bi-card-heading"></i></span>
-                            <input
-                              type="text"
-                              className="form-control form-control-lg bg-light"
-                              id="studentNumber"
-                              name="studentNumber"
-                              value={formData.studentNumber}
-                              onChange={handleChange}
-                              placeholder="12-3456-789"
-                            />
-                          </div>
-                          <small className="form-text text-muted">
-                            <i className="bi bi-info-circle me-1"></i>
-                            Student ID must be in format ##-####-###. <strong>Numbers only, no letters.</strong>
-                          </small>
-                        </div>
-                        
-                        <div className="mb-3">
-                          <label htmlFor="phoneNumber" className="form-label">Mobile Number</label>
-                          <div className="input-group">
-                            <span className="input-group-text bg-light"><i className="bi bi-phone"></i></span>
-                            <input
-                              type="text"
-                              className="form-control form-control-lg bg-light"
-                              id="phoneNumber"
-                              name="phoneNumber"
-                              value={formData.phoneNumber}
-                              onChange={handleChange}
-                              placeholder="09123456789"
-                            />
-                          </div>
-                          <small className="form-text text-muted">
-                            <i className="bi bi-info-circle me-1"></i>
-                            Mobile number must be 11 digits without dashes or spaces. <strong>Numbers only, no letters.</strong>
-                          </small>
-                        </div>
-                      </div>
-                      
-                      {/* Contact Information Section - Collapsible */}
+                      {/* Contact Information - Collapsible */}
                       <div className="mb-4">
                         <button 
                           className="btn btn-link text-decoration-none p-0 mb-3 w-100 text-start" 
@@ -373,7 +433,7 @@ const Register: React.FC = () => {
                         <button 
                           type="submit" 
                           className="btn btn-primary btn-lg py-3"
-                          disabled={loading}
+                          disabled={loading || !passwordsMatch}
                         >
                           {loading ? (
                             <>

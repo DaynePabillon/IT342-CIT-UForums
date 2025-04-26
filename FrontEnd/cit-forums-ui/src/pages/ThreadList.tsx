@@ -159,6 +159,14 @@ const ThreadList: React.FC = () => {
     }
   };
 
+  const handleBackToForums = () => {
+    navigate('/forums', { 
+      state: { 
+        refresh: true
+      } 
+    });
+  };
+
   const getCategoryBadgeClass = (category: ForumCategory): string => {
     switch (category) {
       case ForumCategory.FREEDOM_WALL:
@@ -236,6 +244,12 @@ const ThreadList: React.FC = () => {
 
   return (
     <div className="container">
+      <div className="mb-3">
+        <button onClick={handleBackToForums} className="btn btn-outline-secondary">
+          <i className="bi bi-arrow-left me-2"></i>Back to Forums
+        </button>
+      </div>
+      
       {successMessage && (
         <div className="alert alert-success alert-dismissible fade show" role="alert">
           {successMessage}
