@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config';
 
 export const createReport = async (report: CreateReportRequest): Promise<Report> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/reports`, {
+    const response = await fetch(`${API_BASE_URL}/api/reports/new`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ export const createReport = async (report: CreateReportRequest): Promise<Report>
 
 export const getReports = async (): Promise<Report[]> => {
   try {
-    // Updated to use the correct dashboard-reports endpoint
+    // Use the correct dashboard-reports endpoint from AdminDashboardController
     const response = await fetch(`${API_BASE_URL}/api/admin/dashboard-reports`, {
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`
@@ -57,8 +57,9 @@ export const getReports = async (): Promise<Report[]> => {
 
 export const resolveReport = async (reportId: number, action: string): Promise<Report> => {
   try {
+    // Use the correct endpoint from AdminDashboardController
     const response = await fetch(`${API_BASE_URL}/api/admin/reports/${reportId}/${action}`, {
-      method: 'PUT',  // Changed from POST to PUT to match the backend @PutMapping
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${getAuthToken()}`
@@ -80,9 +81,9 @@ export const resolveReport = async (reportId: number, action: string): Promise<R
 
 export const dismissReport = async (reportId: number): Promise<Report> => {
   try {
-    // Use the same pattern as resolveReport but with 'dismiss' action
+    // For dismiss, we can use the same endpoint as resolve but with 'dismiss' action
     const response = await fetch(`${API_BASE_URL}/api/admin/reports/${reportId}/dismiss`, {
-      method: 'PUT',  // Changed to PUT to match the AdminDashboardController pattern
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${getAuthToken()}`
