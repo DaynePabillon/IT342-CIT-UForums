@@ -66,7 +66,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav className="navbar navbar-expand-lg navbar-dark">
       <div className="container">
         <Link className="navbar-brand" to="/">
           CIT Forums
@@ -102,7 +102,7 @@ const Navbar: React.FC = () => {
             </li>
             {admin && (
               <li className="nav-item">
-                <Link className="nav-link" to="/admin/dashboard">
+                <Link className="nav-link" to="/admin">
                   <i className="bi bi-speedometer2 me-1"></i>
                   Moderator Dashboard
                 </Link>
