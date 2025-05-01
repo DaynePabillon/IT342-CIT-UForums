@@ -66,48 +66,63 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark">
-      <div className="container">
-        <Link className="navbar-brand" to="/">
-          CIT Forums
-        </Link>
-        {/* Add Report link */}
-        {authenticated && (
-          <Link className="nav-link text-white" to="#" onClick={() => setShowContentSelector(true)}>
-            Report
+    <nav className="navbar navbar-dark" style={{ backgroundColor: '#800000', padding: '0.5rem 1rem' }}>
+      <div className="container-fluid">
+        <div className="d-flex align-items-center">
+          <Link className="navbar-brand me-3" to="/" style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.5rem', marginRight: '1.5rem' }}>
+            CIT Forums
           </Link>
-        )}
-        {/* Add Forums link */}
-        <Link className="nav-link text-white" to="/forums">
-          Forums
-        </Link>
-        {/* Add Admin Dashboard link (only visible to admins) */}
-        {admin && (
-          <Link className="nav-link text-white" to="/admin/dashboard">
-            Admin Dashboard
+          
+          {authenticated && (
+            <Link 
+              className="nav-link text-white me-3" 
+              to="#" 
+              onClick={() => setShowContentSelector(true)}
+              style={{ marginRight: '1.5rem' }}
+            >
+              <i className="bi bi-flag me-1"></i>
+              Report
+            </Link>
+          )}
+          
+          <Link 
+            className="nav-link text-white me-3" 
+            to="/forums"
+            style={{ marginRight: '1.5rem' }}
+          >
+            Forums
           </Link>
-        )}
+          
+          {admin && (
+            <Link 
+              className="nav-link text-white me-3" 
+              to="/admin/dashboard"
+              style={{ marginRight: '1.5rem' }}
+            >
+              Admin Dashboard
+            </Link>
+          )}
+        </div>
         
-        {/* Right side of navbar */}
-        <div className="ms-auto d-flex">
+        <div className="d-flex align-items-center">
           {authenticated ? (
             <>
-              <span className="nav-link text-white">
+              <span className="text-white me-3" style={{ marginRight: '1rem' }}>
                 Welcome, {username}
               </span>
-              <Link className="nav-link text-white" to="/profile">
+              <Link className="text-white me-3" to="/profile" style={{ marginRight: '1rem', textDecoration: 'none' }}>
                 My Profile
               </Link>
-              <Link className="nav-link text-white" to="#" onClick={handleLogout}>
+              <Link className="text-white" to="#" onClick={handleLogout} style={{ textDecoration: 'none' }}>
                 Logout
               </Link>
             </>
           ) : (
             <>
-              <Link className="nav-link text-white" to="/login">
+              <Link className="text-white me-3" to="/login" style={{ marginRight: '1rem', textDecoration: 'none' }}>
                 Login
               </Link>
-              <Link className="nav-link text-white" to="/register">
+              <Link className="text-white" to="/register" style={{ textDecoration: 'none' }}>
                 Register
               </Link>
             </>
