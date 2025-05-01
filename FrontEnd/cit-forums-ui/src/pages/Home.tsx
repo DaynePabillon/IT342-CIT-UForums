@@ -64,7 +64,7 @@ const Home: React.FC = () => {
           <p className="lead">
             Join discussions, share knowledge, and connect with peers in the Cebu Institute of Technology University community
           </p>
-          <Link to="/#/forums" className="btn btn-secondary btn-lg">
+          <Link to="/forums" className="btn btn-secondary btn-lg">
             Browse All Forums
           </Link>
         </div>
@@ -92,7 +92,7 @@ const Home: React.FC = () => {
                   <p>{forum.description}</p>
                 </div>
                 <div className="forum-card-footer">
-                  <Link to={`/#/forums/${forum.id}/threads`} className="btn btn-primary">
+                  <Link to={`/forums/${forum.id}/threads`} className="btn btn-primary">
                     View Threads
                   </Link>
                   <div className="thread-stats">
@@ -115,10 +115,10 @@ const Home: React.FC = () => {
           <h3>Join the CIT-U community today!</h3>
           <p>Sign up to participate in discussions, create threads, and connect with fellow students.</p>
           <div>
-            <Link to="/#/register" className="btn btn-primary mx-2">
+            <Link to="/register" className="btn btn-primary mx-2">
               Sign Up
             </Link>
-            <Link to="/#/login" className="btn btn-outline-primary mx-2">
+            <Link to="/login" className="btn btn-outline-primary mx-2">
               Login
             </Link>
           </div>
@@ -130,9 +130,9 @@ const Home: React.FC = () => {
           <h4>Admin Quick Access</h4>
           <p>Access admin functions directly:</p>
           <div className="d-flex gap-2">
-            <Link to="/#/admin/dashboard" className="btn btn-warning">Admin Dashboard</Link>
-            <Link to="/#/admin/reports" className="btn btn-info">Reports</Link>
-            <Link to="/#/admin/users" className="btn btn-secondary">Users</Link>
+            <Link to="/admin/dashboard" className="btn btn-warning">Admin Dashboard</Link>
+            <Link to="/admin/reports" className="btn btn-info">Reports</Link>
+            <Link to="/admin/users" className="btn btn-secondary">Users</Link>
           </div>
         </div>
       )}

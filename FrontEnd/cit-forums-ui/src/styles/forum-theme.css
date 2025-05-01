@@ -23,10 +23,10 @@
 }
 
 .thread-card .card-header {
-  background: linear-gradient(135deg, var(--cit-maroon) 0%, var(--cit-maroon-dark) 100%);
+  background: var(--cit-maroon) !important;
   border-bottom: none;
   padding: 1rem 1.25rem;
-  color: var(--cit-gold);
+  color: var(--cit-gold) !important;
 }
 
 .thread-content {
@@ -115,10 +115,22 @@
 .btn-primary {
   background-color: var(--cit-maroon) !important;
   border-color: var(--cit-maroon-dark) !important;
+  color: white !important;
 }
 
 .btn-primary:hover {
   background-color: var(--cit-maroon-light) !important;
+}
+
+.btn-secondary {
+  background-color: var(--cit-gold) !important;
+  border-color: var(--cit-gold-dark) !important;
+  color: var(--cit-maroon) !important;
+  font-weight: bold;
+}
+
+.btn-secondary:hover {
+  background-color: var(--cit-gold-light) !important;
 }
 
 /* Category badges */
@@ -127,6 +139,14 @@
 .badge-technology, .badge-sports, .badge-entertainment {
   background-color: var(--cit-gold) !important;
   color: var(--cit-maroon) !important;
+  font-weight: bold;
+}
+
+/* All badges */
+.badge {
+  background-color: var(--cit-gold) !important;
+  color: var(--cit-maroon) !important;
+  font-weight: bold;
 }
 
 /* Navbar */
@@ -134,7 +154,35 @@
   background-color: var(--cit-maroon) !important;
 }
 
-.navbar-brand, .nav-link:hover {
+.navbar-brand {
+  color: var(--cit-gold) !important;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.nav-link {
+  color: white !important;
+}
+
+.nav-link:hover {
+  color: var(--cit-gold) !important;
+}
+
+/* Section headers */
+.section-header h2 {
+  color: var(--cit-maroon) !important;
+  font-weight: bold;
+  border-left: 4px solid var(--cit-gold);
+  padding-left: 10px;
+}
+
+/* Footer */
+footer {
+  background: linear-gradient(135deg, var(--cit-maroon) 0%, var(--cit-maroon-dark) 100%) !important;
+  color: white !important;
+}
+
+footer a, footer h5 {
   color: var(--cit-gold) !important;
 }
 
