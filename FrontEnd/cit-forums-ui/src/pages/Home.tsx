@@ -58,9 +58,9 @@ const Home: React.FC = () => {
 
   return (
     <div className="container">
-      <div className="hero-section bg-gradient-to-r from-vista-blue to-university-orange">
+      <div className="hero-section bg-university-orange">
         <div className="content">
-          <h1 className="text-american-yellow">Welcome to CIT-U Forums</h1>
+          <h1 className="text-white">Welcome to CIT-U Forums</h1>
           <p className="lead text-white">
             Join discussions, share knowledge, and connect with peers in the Cebu Institute of Technology University community
           </p>
@@ -112,7 +112,7 @@ const Home: React.FC = () => {
       )}
 
       {!authenticated && (
-        <div className="cta-section bg-gradient-to-r from-american-yellow to-orange-ryb">
+        <div className="cta-section bg-american-yellow">
           <h3 className="text-vista-blue">Join the CIT-U community today!</h3>
           <p>Sign up to participate in discussions, create threads, and connect with fellow students.</p>
           <div>

@@ -38,7 +38,7 @@ const App: React.FC = () => {
     <AuthProvider>
       <GuidelinesProvider>
         <DevelopmentNoticeProvider>
-          <div className="App bg-white"> 
+          <div className="App bg-[#F5F7FA]"> 
             <Navbar />
             <main className="container mt-4">
               <Routes>
