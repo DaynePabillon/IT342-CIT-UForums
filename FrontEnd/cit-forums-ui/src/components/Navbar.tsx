@@ -103,16 +103,7 @@ const Navbar: React.FC = () => {
             {admin && (
               <li className="nav-item">
                 <Link className="nav-link" to="/admin/dashboard">
-                  <i className="bi bi-speedometer2 me-1"></i>
-                  Moderator Dashboard
-                </Link>
-              </li>
-            )}
-            {admin && (
-              <li className="nav-item">
-                <Link className="nav-link" to="/admin/reports">
-                  <i className="bi bi-flag-fill me-1"></i>
-                  Reports
+                  Admin Dashboard
                 </Link>
               </li>
             )}
