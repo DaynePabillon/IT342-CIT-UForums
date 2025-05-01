@@ -66,7 +66,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
         <Link className="navbar-brand" to="/">
           CIT Forums
@@ -102,12 +102,13 @@ const Navbar: React.FC = () => {
             </li>
             {admin && (
               <li className="nav-item">
-                <Link className="nav-link" to="/admin">
-                  Admin Dashboard
+                <Link className="nav-link" to="/admin/dashboard">
+                  <i className="bi bi-speedometer2 me-1"></i>
+                  Moderator Dashboard
                 </Link>
               </li>
             )}
-            {isAdmin() && (
+            {admin && (
               <li className="nav-item">
                 <Link className="nav-link" to="/admin/reports">
                   <i className="bi bi-flag-fill me-1"></i>
@@ -177,4 +178,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+export default Navbar; 
