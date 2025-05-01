@@ -1,5 +1,15 @@
 /* CIT-U Forums Custom Theme Styles */
 
+/* CIT-U Colors */
+:root {
+  --cit-maroon: #800000;
+  --cit-gold: #FFD700;
+  --cit-maroon-light: #A00000;
+  --cit-maroon-dark: #600000;
+  --cit-gold-light: #FFE44D;
+  --cit-gold-dark: #CCB000;
+}
+
 /* Thread Card Styles */
 .thread-card {
   transition: all 0.2s ease;
@@ -13,9 +23,10 @@
 }
 
 .thread-card .card-header {
-  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  background: linear-gradient(135deg, var(--cit-maroon) 0%, var(--cit-maroon-dark) 100%);
   border-bottom: none;
   padding: 1rem 1.25rem;
+  color: var(--cit-gold);
 }
 
 .thread-content {
@@ -33,14 +44,14 @@
 }
 
 .comment-card:hover {
-  border-left-color: #0d6efd;
+  border-left-color: var(--cit-maroon);
   background-color: #fff;
 }
 
 /* Comment Form Styles */
 .comment-form-card textarea:focus {
   box-shadow: none;
-  border-color: #0d6efd;
+  border-color: var(--cit-maroon);
   background-color: #fff !important;
 }
 
@@ -50,7 +61,7 @@
 }
 
 .thread-card:hover .avatar {
-  background-color: #e7f1ff !important;
+  background-color: #fff3e0 !important;
 }
 
 /* Animations */
@@ -77,7 +88,7 @@
 
 .thread-actions button:hover, .comment-header button:hover {
   background-color: #e9ecef;
-  color: #0d6efd;
+  color: var(--cit-maroon);
 }
 
 /* Comment Indentation for Replies (if implemented) */
@@ -87,11 +98,44 @@
 
 /* CIT-U Specific Theme Elements */
 .cit-u-accent {
-  color: #0d6efd;
+  color: var(--cit-maroon);
 }
 
 .cit-u-bg-accent {
-  background-color: #0d6efd;
+  background-color: var(--cit-maroon);
+}
+
+/* Forum category headers */
+.forum-card-header {
+  background-color: var(--cit-maroon) !important;
+  color: var(--cit-gold) !important;
+}
+
+/* View Threads buttons */
+.btn-primary {
+  background-color: var(--cit-maroon) !important;
+  border-color: var(--cit-maroon-dark) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--cit-maroon-light) !important;
+}
+
+/* Category badges */
+.badge-freedom-wall, .badge-confession, .badge-academic,
+.badge-events, .badge-general, .badge-announcements,
+.badge-technology, .badge-sports, .badge-entertainment {
+  background-color: var(--cit-gold) !important;
+  color: var(--cit-maroon) !important;
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--cit-maroon) !important;
+}
+
+.navbar-brand, .nav-link:hover {
+  color: var(--cit-gold) !important;
 }
 
 /* Responsive Adjustments */
