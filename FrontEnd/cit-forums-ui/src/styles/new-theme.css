@@ -1,0 +1,372 @@
+/* CIT-U Forums New Color Palette */
+:root {
+  /* New Color Palette */
+  --vista-blue: #84A0D9;
+  --american-yellow: #F2B705;
+  --orange-ryb: #F29F05;
+  --university-orange: #F27405;
+  --ferrari-red: #F21B07;
+  
+  /* Hex codes from the image */
+  --vista-blue-hex: #84A0D9;
+  --american-yellow-hex: #F2B705;
+  --orange-ryb-hex: #F29F05;
+  --university-orange-hex: #F27405;
+  --ferrari-red-hex: #F21B07;
+  
+  /* Background color */
+  --background-white: #FFFFFF;
+  
+  /* Text colors */
+  --text-dark: #333333;
+  --text-light: #FFFFFF;
+  
+  /* Accent colors */
+  --accent-light: #F8F9FA;
+  --border-color: #E0E0E0;
+}
+
+/* Global Styles */
+body {
+  background-color: var(--background-white);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: var(--text-dark);
+  min-height: 100vh;
+}
+
+/* Navigation */
+.navbar {
+  background: linear-gradient(90deg, var(--vista-blue) 0%, var(--university-orange) 100%) !important;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+  color: var(--background-white) !important;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.nav-link {
+  color: var(--background-white) !important;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--american-yellow) !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--vista-blue) !important;
+  border-color: var(--vista-blue) !important;
+  color: var(--text-light) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--university-orange) !important;
+  border-color: var(--university-orange) !important;
+}
+
+.btn-secondary {
+  background-color: var(--american-yellow) !important;
+  border-color: var(--american-yellow) !important;
+  color: var(--text-dark) !important;
+}
+
+.btn-secondary:hover {
+  background-color: var(--orange-ryb) !important;
+  border-color: var(--orange-ryb) !important;
+}
+
+.btn-danger {
+  background-color: var(--ferrari-red) !important;
+  border-color: var(--ferrari-red) !important;
+}
+
+/* Cards */
+.card {
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+  background-color: var(--background-white) !important;
+}
+
+.card-header {
+  background: linear-gradient(90deg, var(--vista-blue) 0%, var(--university-orange) 100%) !important;
+  color: var(--text-light) !important;
+  font-weight: bold;
+}
+
+/* Forms */
+.form-control:focus {
+  border-color: var(--vista-blue) !important;
+  box-shadow: 0 0 0 0.2rem rgba(132, 160, 217, 0.25) !important;
+}
+
+/* Forum Categories */
+.badge {
+  padding: 0.5em 1em;
+  font-size: 0.875em;
+  font-weight: 600;
+}
+
+.badge-freedom-wall {
+  background-color: var(--ferrari-red) !important;
+  color: var(--text-light) !important;
+}
+
+.badge-confession {
+  background-color: var(--vista-blue) !important;
+  color: var(--text-light) !important;
+}
+
+.badge-academic {
+  background-color: var(--university-orange) !important;
+  color: var(--text-light) !important;
+}
+
+.badge-events {
+  background-color: var(--orange-ryb) !important;
+  color: var(--text-light) !important;
+}
+
+.badge-general {
+  background-color: var(--american-yellow) !important;
+  color: var(--text-dark) !important;
+}
+
+/* Alerts */
+.alert-danger {
+  background-color: #fff3f3 !important;
+  border-color: var(--ferrari-red) !important;
+  color: var(--ferrari-red) !important;
+}
+
+.alert-success {
+  background-color: #f3fff3 !important;
+  border-color: var(--university-orange) !important;
+  color: var(--university-orange) !important;
+}
+
+/* Forum List */
+.forum-list {
+  margin-top: 2rem;
+}
+
+.forum-title {
+  color: var(--vista-blue);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.forum-title:hover {
+  color: var(--university-orange);
+  text-decoration: none;
+}
+
+/* Thread List */
+.thread-list {
+  margin-top: 2rem;
+}
+
+.thread-title {
+  color: var(--vista-blue);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.thread-title:hover {
+  color: var(--university-orange);
+  text-decoration: none;
+}
+
+/* Thread specific styles */
+.thread-card {
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thread-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.thread-card .card-header {
+  background: linear-gradient(135deg, var(--vista-blue) 0%, var(--university-orange) 100%);
+  border-bottom: none;
+  padding: 1rem 1.25rem;
+}
+
+/* Forum Card Styles */
+.forum-card {
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background-color: var(--background-white);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.forum-card:hover {
+  border-color: var(--american-yellow);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.forum-card-header {
+  background: linear-gradient(90deg, var(--vista-blue) 0%, var(--university-orange) 100%);
+  color: var(--text-light);
+  padding: 12px 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.forum-card-header .category-badge {
+  background-color: var(--american-yellow);
+  color: var(--text-dark);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, var(--vista-blue) 0%, var(--university-orange) 100%);
+  color: var(--text-light);
+  padding: 48px 24px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.hero-section h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--american-yellow);
+}
+
+/* Section Headers */
+.section-header {
+  border-left: 5px solid var(--american-yellow);
+  padding-left: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--vista-blue);
+  margin: 0;
+}
+
+/* Call to Action */
+.cta-section {
+  background: linear-gradient(135deg, var(--american-yellow) 0%, var(--orange-ryb) 100%);
+  border-radius: 8px;
+  padding: 32px;
+  text-align: center;
+  margin-top: 32px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.cta-section h3 {
+  color: var(--text-dark);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* Loading Indicator */
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid var(--vista-blue);
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+/* Category filter styling */
+.category-filter .btn-primary {
+  background-color: var(--vista-blue);
+  border-color: var(--vista-blue);
+}
+
+.category-filter .btn-outline-primary {
+  color: var(--vista-blue);
+  border-color: var(--vista-blue);
+}
+
+.category-filter .btn-outline-primary:hover {
+  background-color: var(--vista-blue);
+  color: var(--text-light);
+}
+
+/* Comment styles */
+.comment-card {
+  transition: all 0.2s ease;
+  border-left: 3px solid #e9ecef;
+  border-radius: 0.5rem;
+  margin-left: 1rem;
+  background-color: var(--accent-light);
+}
+
+.comment-card:hover {
+  border-left-color: var(--vista-blue);
+  background-color: var(--background-white);
+}
+
+/* Utility classes for the new colors */
+.text-vista-blue {
+  color: var(--vista-blue) !important;
+}
+
+.text-american-yellow {
+  color: var(--american-yellow) !important;
+}
+
+.text-orange-ryb {
+  color: var(--orange-ryb) !important;
+}
+
+.text-university-orange {
+  color: var(--university-orange) !important;
+}
+
+.text-ferrari-red {
+  color: var(--ferrari-red) !important;
+}
+
+.bg-vista-blue {
+  background-color: var(--vista-blue) !important;
+}
+
+.bg-american-yellow {
+  background-color: var(--american-yellow) !important;
+}
+
+.bg-orange-ryb {
+  background-color: var(--orange-ryb) !important;
+}
+
+.bg-university-orange {
+  background-color: var(--university-orange) !important;
+}
+
+.bg-ferrari-red {
+  background-color: var(--ferrari-red) !important;
+}
