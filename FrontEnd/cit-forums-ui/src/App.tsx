@@ -8,6 +8,7 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import './App.css';
 import './styles/custom.css';
 import './styles/forum-theme.css';
+import './styles/new-theme.css'; 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -37,7 +38,7 @@ const App: React.FC = () => {
     <AuthProvider>
       <GuidelinesProvider>
         <DevelopmentNoticeProvider>
-          <div className="App">
+          <div className="App bg-white"> 
             <Navbar />
             <main className="container mt-4">
               <Routes>

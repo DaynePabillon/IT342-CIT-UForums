@@ -58,10 +58,10 @@ const Home: React.FC = () => {
 
   return (
     <div className="container">
-      <div className="hero-section">
+      <div className="hero-section bg-gradient-to-r from-vista-blue to-university-orange">
         <div className="content">
-          <h1>Welcome to CIT-U Forums</h1>
-          <p className="lead">
+          <h1 className="text-american-yellow">Welcome to CIT-U Forums</h1>
+          <p className="lead text-white">
             Join discussions, share knowledge, and connect with peers in the Cebu Institute of Technology University community
           </p>
           <Link to="/forums" className="btn btn-secondary btn-lg">
@@ -71,7 +71,7 @@ const Home: React.FC = () => {
       </div>
 
       <div className="section-header">
-        <h2>Announcements, Events & Academic</h2>
+        <h2 className="text-vista-blue">Announcements, Events & Academic</h2>
         <Link to="/forums" className="btn btn-sm btn-outline-primary">View All</Link>
       </div>
 
@@ -112,8 +112,8 @@ const Home: React.FC = () => {
       )}
 
       {!authenticated && (
-        <div className="cta-section">
-          <h3>Join the CIT-U community today!</h3>
+        <div className="cta-section bg-gradient-to-r from-american-yellow to-orange-ryb">
+          <h3 className="text-vista-blue">Join the CIT-U community today!</h3>
           <p>Sign up to participate in discussions, create threads, and connect with fellow students.</p>
           <div>
             <Link to="/register" className="btn btn-primary mx-2">
@@ -128,12 +128,12 @@ const Home: React.FC = () => {
 
       {isAdminUser && (
         <div className="admin-access-section mt-4 p-3 bg-light rounded">
-          <h4>Admin Quick Access</h4>
+          <h4 className="text-university-orange">Admin Quick Access</h4>
           <p>Access admin functions directly:</p>
           <div className="d-flex gap-2">
-            <Link to="/admin/dashboard" className="btn btn-warning">Admin Dashboard</Link>
-            <Link to="/admin/reports" className="btn btn-info">Reports</Link>
-            <Link to="/admin/users" className="btn btn-secondary">Users</Link>
+            <Link to="/admin/dashboard" className="btn bg-vista-blue text-white">Admin Dashboard</Link>
+            <Link to="/admin/reports" className="btn bg-american-yellow text-dark">Reports</Link>
+            <Link to="/admin/users" className="btn bg-university-orange text-white">Users</Link>
           </div>
         </div>
       )}
