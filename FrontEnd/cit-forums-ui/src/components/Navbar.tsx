@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
     setAuthenticated(false);
     setUsername('');
     setAdmin(false);
-    navigate('/login');
+    navigate('/#/login');
   };
 
   const handleContentSelect = (type: 'THREAD' | 'COMMENT', id: number, title: string) => {
@@ -68,7 +68,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark">
       <div className="container">
-        <Link className="navbar-brand" to="/">
+        <Link className="navbar-brand" to="/#/">
           CIT Forums
         </Link>
         <button
@@ -96,13 +96,13 @@ const Navbar: React.FC = () => {
               </li>
             )}
             <li className="nav-item">
-              <Link className="nav-link" to="/forums">
+              <Link className="nav-link" to="/#/forums">
                 Forums
               </Link>
             </li>
             {admin && (
               <li className="nav-item">
-                <Link className="nav-link" to="/admin">
+                <Link className="nav-link" to="/#/admin/dashboard">
                   <i className="bi bi-speedometer2 me-1"></i>
                   Moderator Dashboard
                 </Link>
@@ -110,7 +110,7 @@ const Navbar: React.FC = () => {
             )}
             {admin && (
               <li className="nav-item">
-                <Link className="nav-link" to="/admin/reports">
+                <Link className="nav-link" to="/#/admin/reports">
                   <i className="bi bi-flag-fill me-1"></i>
                   Reports
                 </Link>
@@ -126,7 +126,7 @@ const Navbar: React.FC = () => {
                   </span>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/profile">
+                  <Link className="nav-link" to="/#/profile">
                     My Profile
                   </Link>
                 </li>
@@ -139,12 +139,12 @@ const Navbar: React.FC = () => {
             ) : (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/login">
+                  <Link className="nav-link" to="/#/login">
                     Login
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/register">
+                  <Link className="nav-link" to="/#/register">
                     Register
                   </Link>
                 </li>

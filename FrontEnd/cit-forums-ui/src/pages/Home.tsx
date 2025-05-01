@@ -58,21 +58,20 @@ const Home: React.FC = () => {
 
   return (
     <div className="container">
-      <div className="hero-section bg-university-orange">
+      <div className="hero-section">
         <div className="content">
-          <h1 className="text-white">Welcome to CIT-U Forums</h1>
-          <p className="lead text-white">
+          <h1>Welcome to CIT-U Forums</h1>
+          <p className="lead">
             Join discussions, share knowledge, and connect with peers in the Cebu Institute of Technology University community
           </p>
-          <Link to="/forums" className="btn btn-secondary btn-lg">
+          <Link to="/#/forums" className="btn btn-secondary btn-lg">
             Browse All Forums
           </Link>
         </div>
       </div>
 
       <div className="section-header">
-        <h2 className="text-vista-blue">Announcements, Events & Academic</h2>
-        <Link to="/forums" className="btn btn-sm btn-outline-primary">View All</Link>
+        <h2>Announcements, Events & Academic</h2>
       </div>
 
       {forums.length === 0 ? (
@@ -93,7 +92,7 @@ const Home: React.FC = () => {
                   <p>{forum.description}</p>
                 </div>
                 <div className="forum-card-footer">
-                  <Link to={`/forums/${forum.id}/threads`} className="btn btn-primary">
+                  <Link to={`/#/forums/${forum.id}/threads`} className="btn btn-primary">
                     View Threads
                   </Link>
                   <div className="thread-stats">
@@ -112,14 +111,14 @@ const Home: React.FC = () => {
       )}
 
       {!authenticated && (
-        <div className="cta-section bg-american-yellow">
-          <h3 className="text-vista-blue">Join the CIT-U community today!</h3>
+        <div className="cta-section">
+          <h3>Join the CIT-U community today!</h3>
           <p>Sign up to participate in discussions, create threads, and connect with fellow students.</p>
           <div>
-            <Link to="/register" className="btn btn-primary mx-2">
+            <Link to="/#/register" className="btn btn-primary mx-2">
               Sign Up
             </Link>
-            <Link to="/login" className="btn btn-outline-primary mx-2">
+            <Link to="/#/login" className="btn btn-outline-primary mx-2">
               Login
             </Link>
           </div>
@@ -128,12 +127,12 @@ const Home: React.FC = () => {
 
       {isAdminUser && (
         <div className="admin-access-section mt-4 p-3 bg-light rounded">
-          <h4 className="text-university-orange">Admin Quick Access</h4>
+          <h4>Admin Quick Access</h4>
           <p>Access admin functions directly:</p>
           <div className="d-flex gap-2">
-            <Link to="/admin/dashboard" className="btn bg-vista-blue text-white">Admin Dashboard</Link>
-            <Link to="/admin/reports" className="btn bg-american-yellow text-dark">Reports</Link>
-            <Link to="/admin/users" className="btn bg-university-orange text-white">Users</Link>
+            <Link to="/#/admin/dashboard" className="btn btn-warning">Admin Dashboard</Link>
+            <Link to="/#/admin/reports" className="btn btn-info">Reports</Link>
+            <Link to="/#/admin/users" className="btn btn-secondary">Users</Link>
           </div>
         </div>
       )}
