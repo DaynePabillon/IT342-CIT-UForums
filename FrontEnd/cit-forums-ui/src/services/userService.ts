@@ -21,6 +21,15 @@ export const getCurrentUser = async (): Promise<UserProfile> => {
     const user = response.data;
     console.log('Fetched current user data:', user);
     
+    // Handle both role (string) and roles (array) formats from the backend
+    let userRoles: string[] = [];
+    if (user.roles && Array.isArray(user.roles)) {
+      userRoles = user.roles;
+    } else if (user.role) {
+      // If backend sends a single role string, convert it to an array
+      userRoles = [user.role];
+    }
+    
     // Always update the stored profile with fresh data from the server
     const userProfile: UserProfile = {
       id: user.id,
@@ -28,7 +37,7 @@ export const getCurrentUser = async (): Promise<UserProfile> => {
       email: user.email || '',
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      roles: user.roles || []
+      roles: userRoles
     };
     
     console.log('Updating stored user profile with server data:', userProfile);
@@ -49,6 +58,15 @@ export const updateProfile = async (data: UpdateProfileRequest): Promise<UserPro
     console.log('Profile update response:', response.data);
     const updatedUser = response.data;
     
+    // Handle both role (string) and roles (array) formats from the backend
+    let userRoles: string[] = [];
+    if (updatedUser.roles && Array.isArray(updatedUser.roles)) {
+      userRoles = updatedUser.roles;
+    } else if (updatedUser.role) {
+      // If backend sends a single role string, convert it to an array
+      userRoles = [updatedUser.role];
+    }
+    
     // Update the stored profile with the new data
     const userProfile: UserProfile = {
       id: updatedUser.id,
@@ -56,7 +74,7 @@ export const updateProfile = async (data: UpdateProfileRequest): Promise<UserPro
       email: updatedUser.email || '',
       firstName: updatedUser.firstName || '',
       lastName: updatedUser.lastName || '',
-      roles: updatedUser.roles || []
+      roles: userRoles
     };
     
     console.log('Saving updated user profile to local storage:', userProfile);
