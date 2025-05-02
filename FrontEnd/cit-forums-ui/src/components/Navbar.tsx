@@ -30,7 +30,16 @@ const Navbar: React.FC = () => {
         console.log('Current user data:', currentUser);
         if (currentUser) {
           setUsername(currentUser.name || 'User');
-          setAdmin(currentUser.roles?.includes('ROLE_ADMIN') || false);
+          
+          // Check for admin role using multiple approaches
+          // 1. Check if roles array includes ROLE_ADMIN (using the type-safe approach)
+          // 2. Use the isAdmin helper function which handles different role formats
+          const isAdminUser = 
+            (Array.isArray(currentUser.roles) && currentUser.roles.includes('ROLE_ADMIN')) || 
+            isAdmin();
+          
+          console.log('Is admin user:', isAdminUser);
+          setAdmin(isAdminUser);
         } else {
           setUsername('User');
           setAdmin(false);
