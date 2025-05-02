@@ -29,7 +29,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         // Check if the user has admin role
         const userProfile = getUserProfile();
-        if (userProfile?.roles?.includes('ROLE_ADMIN')) {
+        const hasAdminRole = checkAdminStatus();
+        if (hasAdminRole) {
           setIsAdmin(true);
           localStorage.setItem('adminToken', token);
         }
@@ -65,10 +66,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAdminStatus = (): boolean => {
     const userProfile = getUserProfile();
-    const hasAdminRole = userProfile?.roles?.includes('ROLE_ADMIN') || false;
+    if (!userProfile) return false;
+    
+    // Check for admin role in multiple ways
+    // 1. Check if roles array includes ROLE_ADMIN
+    const hasAdminRoleInArray = userProfile.roles && 
+                               Array.isArray(userProfile.roles) && 
+                               userProfile.roles.includes('ROLE_ADMIN');
+    
+    // 2. Check if role property is ROLE_ADMIN (backend format)
+    // Use type assertion to access the 'role' property that might exist in the raw data
+    const hasAdminRoleAsString = (userProfile as any).role === 'ROLE_ADMIN';
+    
+    // 3. Check for adminToken as fallback
     const adminToken = localStorage.getItem('adminToken');
     
-    return hasAdminRole || !!adminToken;
+    // Log for debugging
+    console.log('Admin status check:', { 
+      hasAdminRoleInArray, 
+      hasAdminRoleAsString, 
+      hasAdminToken: !!adminToken,
+      userProfile
+    });
+    
+    return hasAdminRoleInArray || hasAdminRoleAsString || !!adminToken;
   };
 
   return (
