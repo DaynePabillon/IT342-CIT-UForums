@@ -116,14 +116,12 @@ export const login = async (credentials: LoginRequest): Promise<boolean> => {
       console.log('Setting user profile:', userProfile);
       setUserProfile(userProfile);
       
-      // Force reload of the page to ensure clean state
-      window.location.reload();
+      // On successful login, return true without forcing page reload
+      return true;
     } else {
       console.warn('No user data in login response');
       return false;
     }
-    
-    return true;
   } catch (error) {
     console.error('Login error:', error);
     // Clear any partial auth data on error
