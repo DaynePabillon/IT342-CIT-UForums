@@ -90,16 +90,19 @@
 }
 
 /* Registration form styles */
+.register-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.register-container {
+  flex: 1 0 auto;
+}
+
 .register-form-container {
   max-width: 800px;
   margin: 0 auto;
-  position: relative;
-  z-index: 15;
-}
-
-.register-container .card {
-  position: relative;
-  z-index: 15;
 }
 
 .form-section-title {
