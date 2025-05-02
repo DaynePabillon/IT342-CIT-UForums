@@ -88,3 +88,31 @@
   background-color: var(--cit-gold);
   color: var(--cit-maroon);
 }
+
+/* Registration form styles */
+.register-form-container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.register-container .row {
+  min-height: 100vh;
+}
+
+.register-container .col-md-7 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.form-section-title {
+  color: #333;
+  font-weight: 600;
+}
+
+.feature-card {
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}

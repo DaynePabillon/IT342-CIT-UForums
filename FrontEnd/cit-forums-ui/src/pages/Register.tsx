@@ -162,7 +162,7 @@ const Register: React.FC = () => {
           </div>
           
           {/* Right side - Registration form */}
-          <div className="col-md-7 d-flex align-items-center bg-light overflow-auto" style={{ maxHeight: '100vh' }}>
+          <div className="col-md-7 d-flex align-items-start bg-light">
             <div className="register-form-container w-100 p-4 p-md-5">
               <div className="text-center mb-4">
                 <img src="/logo.png" alt="CIT-U Forums Logo" className="mb-3" style={{ maxHeight: '60px' }} />
@@ -177,8 +177,8 @@ const Register: React.FC = () => {
               )}
               
               <form onSubmit={handleSubmit}>
-                <div className="card border-0 shadow-sm mb-4">
-                  <div className="card-body p-4">
+                <div className="card border-0 shadow-sm mb-3">
+                  <div className="card-body p-3 p-md-4">
                     <div className="row g-3">
                       {/* Account Information */}
                       <div className="col-12 mb-3">
@@ -264,8 +264,8 @@ const Register: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="card border-0 shadow-sm mb-4">
-                  <div className="card-body p-4">
+                <div className="card border-0 shadow-sm mb-3">
+                  <div className="card-body p-3 p-md-4">
                     {/* Personal Information - Not Collapsible, Always Visible */}
                     <div className="mb-4">
                       <h5 className="form-section-title">
@@ -416,8 +416,8 @@ const Register: React.FC = () => {
                 </div>
                 
                 {/* Submit Button - Fixed at the bottom with padding */}
-                <div className="card border-0 shadow-sm mb-5">
-                  <div className="card-body p-4">
+                <div className="card border-0 shadow-sm mb-3">
+                  <div className="card-body p-3 p-md-4">
                     <div className="d-grid gap-2">
                       <button 
                         type="submit" 
