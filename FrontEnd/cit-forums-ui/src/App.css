@@ -93,6 +93,13 @@
 .register-form-container {
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+  z-index: 15;
+}
+
+.register-container .card {
+  position: relative;
+  z-index: 15;
 }
 
 .form-section-title {

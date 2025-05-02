@@ -368,7 +368,7 @@ const Register: React.FC = () => {
                       <button 
                         type="submit" 
                         className="btn py-2"
-                        style={{ backgroundColor: '#8B0000', color: 'white' }}
+                        style={{ backgroundColor: '#8B0000', color: 'white', position: 'relative', zIndex: 20 }}
                         disabled={loading || !passwordsMatch}
                       >
                         {loading ? (

@@ -2,9 +2,9 @@
   background-color: #8B0000; /* Changed to maroon to match the CIT-U branding */
   color: #fff;
   padding: 20px 0;
-  margin-top: 40px;
+  margin-top: 60px;
   position: relative;
-  z-index: 10;
+  z-index: 5;
 }
 
 .footer-content {
@@ -83,7 +83,9 @@
 
 /* Special styling for the register page */
 .register-container .site-footer {
-  margin-top: 80px; /* Increase margin for register page */
+  margin-top: 120px; /* Increase margin for register page */
+  position: relative;
+  z-index: 5;
 }
 
 @media (max-width: 768px) {
