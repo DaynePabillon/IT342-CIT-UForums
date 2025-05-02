@@ -23,10 +23,17 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({ children }) =
         return <div className="loading-indicator">Checking admin access...</div>;
     }
 
-    if (!isAuthenticated || !isAdmin) {
-        return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    // If user is not authenticated at all, redirect to the main login page
+    if (!isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location, message: "Please log in to access the admin area." }} replace />;
+    }
+    
+    // If user is authenticated but not an admin, redirect to the home page with a message
+    if (!isAdmin) {
+        return <Navigate to="/" state={{ from: location, message: "You do not have admin privileges." }} replace />;
     }
 
+    // User is authenticated and has admin privileges, allow access
     return <>{children}</>;
 };
 

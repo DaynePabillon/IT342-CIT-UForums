@@ -19,7 +19,6 @@ import Thread from './pages/Thread';
 import Profile from './pages/Profile';
 import CreateThread from './pages/CreateThread';
 import CreateForum from './pages/CreateForum';
-import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminReports from './pages/AdminReports';
 import AdminUsers from './pages/AdminUsers';
@@ -52,8 +51,7 @@ const App: React.FC = () => {
                 <Route path="/forums/:forumId/threads/create" element={<CreateThread />} />
                 <Route path="/forums/:forumId/threads/:threadId" element={<Thread />} />
                 
-                {/* Admin Routes */}
-                <Route path="/admin/login" element={<AdminLogin />} />
+                {/* Admin Routes - protected by ProtectedAdminRoute which handles authentication */}
                 <Route path="/admin/dashboard" element={
                   <ProtectedAdminRoute>
                     <AdminDashboard />
