@@ -364,7 +364,7 @@ const Register: React.FC = () => {
                       />
                     </div>
                     
-                    <div className="d-grid gap-2 mt-4">
+                    <div className="d-grid gap-2 mt-4 mb-5">
                       <button 
                         type="submit" 
                         className="btn py-2"

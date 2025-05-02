@@ -1,15 +1,17 @@
 .site-footer {
-  background: linear-gradient(90deg, var(--vista-blue) 0%, var(--university-orange) 100%);
+  background-color: #8B0000; /* Changed to maroon to match the CIT-U branding */
   color: #fff;
-  padding: 40px 0 20px;
-  margin-top: 60px;
+  padding: 20px 0;
+  margin-top: 40px;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-content {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .footer-section {
@@ -20,7 +22,7 @@
 }
 
 .footer-section h3 {
-  color: var(--american-yellow); /* Using our new color variable */
+  color: #FFD700; /* Gold color for headings */
   font-size: 1.2rem;
   margin-bottom: 15px;
   padding-bottom: 10px;
@@ -51,16 +53,16 @@
 }
 
 .footer-links a:hover {
-  color: var(--american-yellow);
-  text-decoration: none;
+  color: #FFD700;
+  text-decoration: underline;
 }
 
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding-top: 20px;
+  padding-top: 15px;
   text-align: center;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: #fff;
 }
 
 .footer-bottom p {
@@ -68,15 +70,20 @@
 }
 
 .footer-bottom a {
-  color: #fff;
+  color: #FFD700;
   text-decoration: none;
   margin: 0 8px;
   transition: color 0.3s;
 }
 
 .footer-bottom a:hover {
-  color: var(--american-yellow);
-  text-decoration: none;
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Special styling for the register page */
+.register-container .site-footer {
+  margin-top: 80px; /* Increase margin for register page */
 }
 
 @media (max-width: 768px) {
@@ -86,5 +93,10 @@
   
   .footer-section {
     padding-right: 0;
+  }
+  
+  /* Ensure footer doesn't overlap content on mobile */
+  .site-footer {
+    margin-top: 60px;
   }
 }
