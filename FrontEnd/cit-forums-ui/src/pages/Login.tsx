@@ -62,8 +62,10 @@ const Login: React.FC = () => {
     try {
       const success = await login(formData);
       if (success) {
+        // Only navigate on successful login
         navigate('/');
       } else {
+        // On failed login, just show error message and stay on the same page
         setError('Login failed. Please check your credentials.');
       }
     } catch (err: any) {

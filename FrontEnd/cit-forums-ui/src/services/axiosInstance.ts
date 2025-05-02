@@ -18,7 +18,7 @@ axiosInstance.interceptors.request.use(
         delete config.headers.Authorization;
         
         // Get the token from localStorage
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('token');
         
         // If token exists, add it to headers
         if (token) {
@@ -44,7 +44,7 @@ axiosInstance.interceptors.response.use(
             if (error.response.status === 401) {
                 console.log('Received 401 Unauthorized response, clearing auth data');
                 // Clear tokens
-                localStorage.removeItem('auth_token');
+                localStorage.removeItem('token');
                 
                 // Remove Authorization header
                 delete axiosInstance.defaults.headers.common['Authorization'];
@@ -52,10 +52,13 @@ axiosInstance.interceptors.response.use(
                 // Dispatch unauthorized event
                 window.dispatchEvent(new Event('unauthorized'));
                 
-                // Redirect to login page if not already there
-                if (!window.location.pathname.includes('/login')) {
+                // Only redirect to login page if not already on login or register page
+                const currentPath = window.location.pathname + window.location.hash;
+                if (!currentPath.includes('/login') && !currentPath.includes('/register')) {
                     console.log('Redirecting to login page');
-                    window.location.href = '/login';
+                    window.location.href = '/#/login';
+                } else {
+                    console.log('Already on login/register page, not redirecting');
                 }
             }
             // Handle 403 Forbidden
@@ -67,4 +70,4 @@ axiosInstance.interceptors.response.use(
     }
 );
 
-export default axiosInstance; 
+export default axiosInstance;
