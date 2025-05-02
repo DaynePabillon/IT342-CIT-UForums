@@ -91,17 +91,12 @@
 
 /* Registration form styles */
 .register-form-container {
-  max-width: 100%;
+  max-width: 800px;
   margin: 0 auto;
 }
 
 .register-container .row {
   min-height: 100vh;
-}
-
-.register-container .col-md-7 {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
 }
 
 .form-section-title {
