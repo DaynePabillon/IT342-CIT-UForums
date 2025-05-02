@@ -95,10 +95,6 @@
   margin: 0 auto;
 }
 
-.register-container .row {
-  min-height: 100vh;
-}
-
 .form-section-title {
   color: #333;
   font-weight: 600;

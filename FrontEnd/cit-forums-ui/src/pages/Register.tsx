@@ -162,7 +162,7 @@ const Register: React.FC = () => {
           </div>
           
           {/* Right side - Registration form */}
-          <div className="col-md-7 d-flex align-items-center justify-content-center bg-light">
+          <div className="col-md-7 bg-light">
             <div className="register-form-container p-4 p-md-5" style={{ maxWidth: '700px' }}>
               <div className="text-center mb-4">
                 <img src="/logo.png" alt="CIT-U Forums Logo" className="mb-3" style={{ maxHeight: '60px' }} />
