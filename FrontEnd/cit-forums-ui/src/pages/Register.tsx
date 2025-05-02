@@ -116,7 +116,7 @@ const Register: React.FC = () => {
       if (success) {
         console.log('Registration successful, redirecting to login with:', formData.name);
         // After successful registration, redirect to login
-        navigate('/login', { 
+        navigate('/#/login', { 
           state: { 
             message: 'Registration successful! Please login with your new account.',
             usernameOrEmail: formData.name // Pre-fill username field on login page
@@ -162,7 +162,7 @@ const Register: React.FC = () => {
           </div>
           
           {/* Right side - Registration form */}
-          <div className="col-md-7 d-flex align-items-center bg-light">
+          <div className="col-md-7 d-flex align-items-center bg-light overflow-auto" style={{ maxHeight: '100vh' }}>
             <div className="register-form-container w-100 p-4 p-md-5">
               <div className="text-center mb-4">
                 <img src="/logo.png" alt="CIT-U Forums Logo" className="mb-3" style={{ maxHeight: '60px' }} />
@@ -412,9 +412,13 @@ const Register: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Submit Button */}
-                    <div className="d-grid gap-2 mt-4">
+                  </div>
+                </div>
+                
+                {/* Submit Button - Fixed at the bottom with padding */}
+                <div className="card border-0 shadow-sm mb-5">
+                  <div className="card-body p-4">
+                    <div className="d-grid gap-2">
                       <button 
                         type="submit" 
                         className="btn py-3"
@@ -435,7 +439,7 @@ const Register: React.FC = () => {
                     <div className="mt-4 text-center">
                       <p className="mb-0">
                         Already have an account?{' '}
-                        <Link to="/login" className="fw-semibold text-decoration-none">Sign in</Link>
+                        <Link to="/#/login" className="fw-semibold text-decoration-none">Sign in</Link>
                       </p>
                     </div>
                   </div>

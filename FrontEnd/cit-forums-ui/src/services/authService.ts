@@ -142,6 +142,16 @@ export const register = async (userData: RegisterRequest): Promise<boolean> => {
   }
 };
 
+// Redirect to login page if not authenticated
+export const redirectToLogin = () => {
+  window.location.href = '/#/login';
+};
+
+// Redirect to home page
+export const redirectToHome = () => {
+  window.location.href = '/#/';
+};
+
 export const logout = (): void => {
   console.log('Logging out user');
   
@@ -160,8 +170,8 @@ export const logout = (): void => {
   
   console.log('All authentication data cleared');
   
-  // Force a complete reload of the application to clear any in-memory state
-  window.location.href = '/';
+  // Redirect to login page
+  window.location.href = '/#/login';
 };
 
 export const isAuthenticated = (): boolean => {

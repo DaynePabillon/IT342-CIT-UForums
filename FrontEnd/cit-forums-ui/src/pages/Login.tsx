@@ -22,7 +22,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     // Check if user is already logged in
     if (isAuthenticated()) {
-      navigate('/');
+      navigate('/#/');
     }
     
     // Check for messages from other pages (like registration)
@@ -62,7 +62,7 @@ const Login: React.FC = () => {
     try {
       const success = await login(formData);
       if (success) {
-        navigate('/');
+        navigate('/#/');
       } else {
         setError('Login failed. Please check your credentials.');
       }
@@ -183,7 +183,7 @@ const Login: React.FC = () => {
                             Remember me
                           </label>
                         </div>
-                        <Link to="/forgot-password" className="text-decoration-none">Forgot Password?</Link>
+                        <Link to="/#/forgot-password" className="text-decoration-none">Forgot Password?</Link>
                       </div>
                       
                       <div className="d-grid gap-2">
@@ -207,10 +207,10 @@ const Login: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="text-center">
+                <div className="mt-4 text-center">
                   <p className="mb-0">
                     Don't have an account?{' '}
-                    <Link to="/register" className="fw-semibold text-decoration-none">Sign up</Link>
+                    <Link to="/#/register" className="fw-semibold text-decoration-none">Create one</Link>
                   </p>
                 </div>
               </form>
