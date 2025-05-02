@@ -1,7 +1,7 @@
 import axiosInstance from './axiosInstance';
 
 const API_URL = '/api/auth'; // This will be proxied to http://localhost:8080/api/auth
-const TOKEN_KEY = 'auth_token'; // Use the same key as in axiosConfig.ts
+const TOKEN_KEY = 'token'; // Use the same key as in axiosConfig.ts
 
 export interface LoginRequest {
   usernameOrEmail: string;
@@ -61,16 +61,16 @@ export const setUserProfile = (profile: UserProfile): void => {
     removeUserProfile();
     return;
   }
-  localStorage.setItem('user_profile', JSON.stringify(profile));
+  localStorage.setItem('user', JSON.stringify(profile));
 };
 
 export const getUserProfile = (): UserProfile | null => {
-  const profile = localStorage.getItem('user_profile');
+  const profile = localStorage.getItem('user');
   return profile ? JSON.parse(profile) : null;
 };
 
 export const removeUserProfile = (): void => {
-  localStorage.removeItem('user_profile');
+  localStorage.removeItem('user');
 };
 
 // Login a user
@@ -142,36 +142,25 @@ export const register = async (userData: RegisterRequest): Promise<boolean> => {
   }
 };
 
-// Redirect to login page if not authenticated
-export const redirectToLogin = () => {
-  window.location.href = '/#/login';
-};
-
-// Redirect to home page
-export const redirectToHome = () => {
-  window.location.href = '/#/';
-};
-
 export const logout = (): void => {
   console.log('Logging out user');
   
-  // Clear all authentication tokens
-  removeAuthToken();
-  removeUserProfile();
+  // Clear token
   localStorage.removeItem('token');
-  localStorage.removeItem('adminToken');
-  localStorage.removeItem('user_profile');
+  console.log('Token removed from localStorage');
   
-  // Clear any session storage data
-  sessionStorage.clear();
+  // Clear user profile
+  localStorage.removeItem('user');
+  console.log('User profile removed from localStorage');
   
-  // Clear any axios cached headers
-  delete axiosInstance.defaults.headers.common['Authorization'];
+  // Clear any other auth-related data
+  localStorage.removeItem('expiresAt');
+  console.log('Token expiration removed from localStorage');
   
   console.log('All authentication data cleared');
   
-  // Redirect to login page
-  window.location.href = '/#/login';
+  // Force a complete reload of the application to clear any in-memory state
+  window.location.href = '/';
 };
 
 export const isAuthenticated = (): boolean => {

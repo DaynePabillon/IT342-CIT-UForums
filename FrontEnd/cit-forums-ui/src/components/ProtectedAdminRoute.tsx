@@ -62,13 +62,13 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({ children }) =
     // If user is not authenticated at all, redirect to the main login page
     if (!isAuthenticated) {
         console.log('ProtectedAdminRoute - User is not authenticated, redirecting to login');
-        return <Navigate to="/#/login" state={{ from: location, message: "Please log in to access the admin area." }} replace />;
+        return <Navigate to="/login" state={{ from: location, message: "Please log in to access the admin area." }} replace />;
     }
     
     // If user is authenticated but not an admin, redirect to the home page with a message
     if (!isAdmin) {
         console.log('ProtectedAdminRoute - User is authenticated but not admin, redirecting to home');
-        return <Navigate to="/#/" state={{ from: location, message: "You do not have admin privileges." }} replace />;
+        return <Navigate to="/" state={{ from: location, message: "You do not have admin privileges." }} replace />;
     }
 
     // User is authenticated and has admin privileges, allow access
