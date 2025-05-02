@@ -73,10 +73,13 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
+                console.log('AdminDashboard - Checking admin status, isAdmin:', isAdmin);
                 if (!isAdmin) {
+                    console.log('AdminDashboard - User is not admin, redirecting to login');
                     navigate('/admin/login');
                     return;
                 }
+                console.log('AdminDashboard - User is admin, loading data');
                 await loadData();
             } catch (err) {
                 console.error('Error checking admin status:', err);
@@ -90,10 +93,17 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
+                console.log('AdminDashboard - Fetching dashboard data');
                 setLoading(true);
+                setError(null);
+                
                 // Fetch dashboard overview
+                console.log('AdminDashboard - Making API call to /api/admin/dashboard');
                 const response = await axiosInstance.get('/api/admin/dashboard');
+                console.log('AdminDashboard - API response received:', response);
+                
                 const dashboardData = response.data;
+                console.log('AdminDashboard - Dashboard data:', dashboardData);
                 
                 // Update stats with actual counts
                 setStats({
@@ -107,12 +117,25 @@ const AdminDashboard: React.FC = () => {
                 setRecentReports(dashboardData.recentReports || []);
                 setRecentUsers(dashboardData.recentUsers || []);
 
-                setError(null);
-            } catch (err) {
-                console.error('Error fetching dashboard data:', err);
-                setError('Failed to load dashboard data');
-            } finally {
+                console.log('AdminDashboard - Data processed successfully');
                 setLoading(false);
+            } catch (err: any) {
+                console.error('Error fetching dashboard data:', err);
+                setError(err?.message || 'Failed to load dashboard data');
+                setLoading(false);
+                
+                // Log detailed error information
+                if (err?.response) {
+                    console.error('Error response:', {
+                        status: err.response.status,
+                        data: err.response.data,
+                        headers: err.response.headers
+                    });
+                } else if (err?.request) {
+                    console.error('Error request:', err.request);
+                } else {
+                    console.error('Error message:', err.message);
+                }
             }
         };
 
@@ -121,85 +144,14 @@ const AdminDashboard: React.FC = () => {
 
     const loadData = async () => {
         try {
-            // Load dashboard data first
-            setLoading(true);
-            const dashboardResponse = await axiosInstance.get('/api/admin/dashboard');
-            const dashboardData = dashboardResponse.data;
-            
-            // Update stats with actual counts
-            setStats({
-                totalUsers: dashboardData.totalUsers || 0,
-                totalThreads: dashboardData.totalThreads || 0,
-                totalReports: dashboardData.totalReports || 0,
-                activeReports: dashboardData.activeReports || 0
-            });
-            
-            // Set recent reports and users
-            setRecentReports(dashboardData.recentReports || []);
-            setRecentUsers(dashboardData.recentUsers || []);
-            setLoading(false);
-            
-            // Load users
-            setUserLoading(true);
-            try {
-                const usersData = await getUsers();
-                // Map the API users to our local User interface
-                if (usersData && usersData.content) {
-                    setUsers(usersData.content.map((user: any) => ({
-                        id: user.id,
-                        username: user.username,
-                        email: user.email,
-                        role: user.role,
-                        active: user.status === 'ACTIVE',
-                        createdAt: user.createdAt
-                    })));
-                } else {
-                    setUsers([]);
-                }
-            } catch (userErr) {
-                console.error('Error loading users:', userErr);
-                setUserError('Failed to load user data');
-                setUsers([]);
-            } finally {
-                setUserLoading(false);
-            }
-
-            // Load reports
-            setModerationLoading(true);
-            try {
-                const reportsData = await getReportedContent();
-                if (reportsData && reportsData.content) {
-                    setReportedContent(reportsData.content);
-                } else {
-                    setReportedContent([]);
-                }
-            } catch (reportErr) {
-                console.error('Error loading reports:', reportErr);
-                setModerationLoading(false);
-                setReportedContent([]);
-            } finally {
-                setModerationLoading(false);
-            }
-
-            // Load analytics - only if needed
-            if (true) {
-                setAnalyticsLoading(true);
-                try {
-                    const forumStatsData = await getForumStats();
-                    setForumStats(forumStatsData);
-                    const userStatsData = await getUserStats();
-                    setUserStats(userStatsData);
-                } catch (analyticsErr) {
-                    console.error('Error loading analytics:', analyticsErr);
-                    setAnalyticsError('Failed to load analytics data');
-                } finally {
-                    setAnalyticsLoading(false);
-                }
-            }
+            console.log('AdminDashboard - Loading all dashboard data');
+            await Promise.all([
+                loadUsers(),
+                loadReportedContent(),
+                loadAnalytics()
+            ]);
         } catch (err) {
-            console.error('Error loading data:', err);
-            setError('Failed to load dashboard data');
-            setLoading(false);
+            console.error('Error loading dashboard data:', err);
         }
     };
 
