@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createReport } from '../services/reportService';
 import { isAuthenticated } from '../services/authService';
 import { Thread as ThreadModel } from '../models/Thread';
+import { getCommentsByThreadId } from '../services/commentService';
 
 interface ThreadProps {
   thread: ThreadModel;
@@ -11,6 +12,23 @@ interface ThreadProps {
 const Thread: React.FC<ThreadProps> = ({ thread, onDelete }) => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [commentCount, setCommentCount] = useState(thread.commentCount);
+
+  // Fetch actual comment count from the API
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const comments = await getCommentsByThreadId(thread.id);
+        setCommentCount(comments.length);
+      } catch (err) {
+        console.error('Failed to fetch comments:', err);
+        // If there's an error, fall back to the thread.commentCount
+        setCommentCount(thread.commentCount);
+      }
+    };
+
+    fetchCommentCount();
+  }, [thread.id, thread.commentCount]);
 
   const handleReport = async () => {
     try {
@@ -75,7 +93,7 @@ const Thread: React.FC<ThreadProps> = ({ thread, onDelete }) => {
           <div className="thread-actions d-flex align-items-center">
             <span className="me-3 text-muted">
               <i className="bi bi-chat-left-text me-1"></i>
-              {thread.commentCount} {thread.commentCount === 1 ? 'comment' : 'comments'}
+              {commentCount} {commentCount === 1 ? 'comment' : 'comments'}
             </span>
             
             {isAuthenticated() && (
