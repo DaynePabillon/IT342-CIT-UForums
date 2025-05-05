@@ -22,54 +22,80 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .openapi("3.0.1") // Explicitly set OpenAPI version
-                .info(new Info()
-                        .title("CIT Forums API")
-                        .version("1.0.0")
-                        .description("API documentation for CIT Forums application - a specialized forum platform for Cebu Institute of Technology University")
-                        .contact(new Contact()
-                                .name("CIT Forums Team")
-                                .email("admin@citforums.com")
-                                .url("https://citforums.com"))
-                        .license(new License()
-                                .name("MIT License")
-                                .url("https://opensource.org/licenses/MIT")))
-                .servers(List.of(
-                        new Server()
-                                .url("{scheme}://{host}")
-                                .description("API Server")
-                                .variables(new ServerVariables()
-                                        .addServerVariable("scheme", new ServerVariable()
-                                                .setDefault("https")
-                                                .enum_(Arrays.asList("http", "https"))
-                                                .description("URI scheme"))
-                                        .addServerVariable("host", new ServerVariable()
-                                                .setDefault("it342-cit-uforums.onrender.com")
-                                                .enum_(Arrays.asList(
-                                                        "it342-cit-uforums.onrender.com", 
-                                                        "localhost:8080", 
-                                                        "localhost:8000"))
-                                                .description("Host name")))
-                ))
-                .tags(Arrays.asList(
-                        new Tag().name("Authentication").description("Operations related to user authentication and registration"),
-                        new Tag().name("Forums").description("Operations for managing forums and categories"),
-                        new Tag().name("Threads").description("Operations for managing discussion threads"),
-                        new Tag().name("Posts").description("Operations for managing posts within threads"),
-                        new Tag().name("Comments").description("Operations for managing comments on posts"),
-                        new Tag().name("Users").description("Operations for user management"),
-                        new Tag().name("Reports").description("Operations for content reporting and moderation"),
-                        new Tag().name("Admin Dashboard").description("Administrative operations for system monitoring and management")
-                ))
-                .components(new Components()
-                        .addSecuritySchemes("bearerAuth",
-                                new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
-                                        .description("JWT token authentication. Enter your token in the format: Bearer <token>"))
-                )
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+        OpenAPI openAPI = new OpenAPI();
+        openAPI.openapi("3.0.1"); // Explicitly set OpenAPI version
+
+        Info info = new Info();
+        info.title("CIT Forums API");
+        info.version("1.0.0");
+        info.description("API documentation for CIT Forums application - a specialized forum platform for Cebu Institute of Technology University");
+
+        Contact contact = new Contact();
+        contact.name("CIT Forums Team");
+        contact.email("admin@citforums.com");
+        contact.url("https://citforums.com");
+        info.contact(contact);
+
+        License license = new License();
+        license.name("MIT License");
+        license.url("https://opensource.org/licenses/MIT");
+        info.license(license);
+
+        openAPI.info(info);
+
+        Server server = new Server();
+        server.url("{scheme}://{host}");
+        server.description("API Server");
+        server.variables(createServerVariables());
+
+        openAPI.servers(List.of(server));
+
+        Tag[] tags = new Tag[] {
+                new Tag().name("Authentication").description("Operations related to user authentication and registration"),
+                new Tag().name("Forums").description("Operations for managing forums and categories"),
+                new Tag().name("Threads").description("Operations for managing discussion threads"),
+                new Tag().name("Posts").description("Operations for managing posts within threads"),
+                new Tag().name("Comments").description("Operations for managing comments on posts"),
+                new Tag().name("Users").description("Operations for user management"),
+                new Tag().name("Reports").description("Operations for content reporting and moderation"),
+                new Tag().name("Admin Dashboard").description("Administrative operations for system monitoring and management")
+        };
+
+        openAPI.tags(Arrays.asList(tags));
+
+        Components components = new Components();
+        SecurityScheme securityScheme = new SecurityScheme();
+        securityScheme.type(SecurityScheme.Type.HTTP);
+        securityScheme.scheme("bearer");
+        securityScheme.bearerFormat("JWT");
+        securityScheme.description("JWT token authentication. Enter your token in the format: Bearer <token>");
+        components.addSecuritySchemes("bearerAuth", securityScheme);
+        openAPI.components(components);
+
+        SecurityRequirement securityRequirement = new SecurityRequirement();
+        securityRequirement.addList("bearerAuth");
+        openAPI.addSecurityItem(securityRequirement);
+
+        return openAPI;
+    }
+
+    private ServerVariables createServerVariables() {
+        ServerVariables serverVariables = new ServerVariables();
+        ServerVariable scheme = new ServerVariable();
+        scheme.setDefault("https");
+        scheme.enum_(Arrays.asList("http", "https"));
+        scheme.description("URI scheme");
+        serverVariables.addServerVariable("scheme", scheme);
+
+        ServerVariable host = new ServerVariable();
+        host.setDefault("it342-cit-uforums.onrender.com");
+        host.enum_(Arrays.asList(
+                "it342-cit-uforums.onrender.com", 
+                "localhost:8080", 
+                "localhost:8000"));
+        host.description("Host name");
+        serverVariables.addServerVariable("host", host);
+
+        return serverVariables;
     }
 }
