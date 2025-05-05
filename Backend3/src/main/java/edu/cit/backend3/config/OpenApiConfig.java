@@ -83,13 +83,13 @@ public class OpenApiConfig {
         ServerVariables serverVariables = new ServerVariables();
         ServerVariable scheme = new ServerVariable();
         scheme.setDefault("https");
-        scheme.enum_(Arrays.asList("http", "https"));
+        scheme.setEnum(Arrays.asList("http", "https"));
         scheme.description("URI scheme");
         serverVariables.addServerVariable("scheme", scheme);
 
         ServerVariable host = new ServerVariable();
         host.setDefault("it342-cit-uforums.onrender.com");
-        host.enum_(Arrays.asList(
+        host.setEnum(Arrays.asList(
                 "it342-cit-uforums.onrender.com", 
                 "localhost:8080", 
                 "localhost:8000"));
