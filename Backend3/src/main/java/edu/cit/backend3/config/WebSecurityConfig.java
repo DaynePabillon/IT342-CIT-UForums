@@ -90,13 +90,15 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/members/me").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/threads/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
-                // Swagger UI and API docs
+                // Swagger UI and API docs - allow all Swagger endpoints
                 .requestMatchers("/swagger-ui.html").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-resources/**").permitAll()
                 .requestMatchers("/swagger-ui-standalone.html").permitAll()
                 .requestMatchers("/openapi.json").permitAll()
                 .requestMatchers("/openapi/**").permitAll()
+                .requestMatchers("/webjars/**").permitAll()
                 // Admin endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Static resources
