@@ -37,21 +37,20 @@ public class OpenApiConfig {
                                 .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
                         new Server()
-                                .url("{scheme}://localhost:8080")
-                                .description("Local development server")
-                                .variables(new ServerVariables()
-                                        .addServerVariable("scheme", new ServerVariable()
-                                                .default_("http")
-                                                .enum_(Arrays.asList("http", "https"))
-                                                .description("URI scheme"))),
-                        new Server()
-                                .url("{scheme}://it342-cit-uforums.onrender.com")
-                                .description("Production server")
+                                .url("{scheme}://{host}")
+                                .description("API Server")
                                 .variables(new ServerVariables()
                                         .addServerVariable("scheme", new ServerVariable()
                                                 .default_("https")
                                                 .enum_(Arrays.asList("http", "https"))
-                                                .description("URI scheme")))
+                                                .description("URI scheme"))
+                                        .addServerVariable("host", new ServerVariable()
+                                                .default_("it342-cit-uforums.onrender.com")
+                                                .enum_(Arrays.asList(
+                                                        "it342-cit-uforums.onrender.com", 
+                                                        "localhost:8080", 
+                                                        "localhost:8000"))
+                                                .description("Host name")))
                 ))
                 .tags(Arrays.asList(
                         new Tag().name("Authentication").description("Operations related to user authentication and registration"),
