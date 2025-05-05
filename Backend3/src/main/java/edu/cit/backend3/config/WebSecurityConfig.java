@@ -90,19 +90,14 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/members/me").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/threads/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
-                // Swagger UI and API docs - allow all Swagger endpoints
-                .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
-                .requestMatchers("/v3/api-docs/**").permitAll()
-                .requestMatchers("/swagger-resources/**").permitAll()
-                .requestMatchers("/swagger-ui-standalone.html").permitAll()
-                .requestMatchers("/openapi.json").permitAll()
-                .requestMatchers("/openapi/**").permitAll()
-                .requestMatchers("/webjars/**").permitAll()
+                // Swagger UI and API docs
+                .requestMatchers("/swagger/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                .requestMatchers("/swagger/v3/api-docs/**", "/swagger/swagger-ui/**", "/swagger/swagger-ui.html", "/swagger/swagger-config").permitAll()
                 // Admin endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Static resources
                 .requestMatchers("/", "/error", "/login", "/register", "/manifest.json", "/favicon.ico").permitAll()
+                .requestMatchers("/error/**").permitAll()
                 .requestMatchers("/*.js", "/*.css", "/*.html", "/*.json", "/*.ico", "/static/**", "/assets/**").permitAll()
                 // Protected URLs
                 .anyRequest().authenticated())

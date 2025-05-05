@@ -23,21 +23,22 @@ public class SimpleCorsFilter implements Filter {
         String requestURI = request.getRequestURI();
         String origin = request.getHeader("Origin");
         
-        // For Swagger UI and API docs, allow any origin
-        if (origin != null && (requestURI.contains("/swagger-ui") || 
-                              requestURI.contains("/v3/api-docs") || 
-                              requestURI.contains("/swagger-resources") || 
-                              requestURI.contains("/webjars/") || 
-                              requestURI.contains("/openapi"))) {
-            response.setHeader("Access-Control-Allow-Origin", origin);
-        }
-        // For other endpoints, allow specific origins
-        else if (origin != null && (origin.equals("https://it342-cit-uforums-site.onrender.com") || 
+        // Allow any origin for Swagger UI and API documentation endpoints
+        if (request.getRequestURI().contains("/swagger") || 
+            request.getRequestURI().contains("/v3/api-docs") || 
+            request.getRequestURI().contains("/swagger-resources") || 
+            request.getRequestURI().contains("/webjars") ||
+            request.getRequestURI().contains("/error")) {
+            response.setHeader("Access-Control-Allow-Origin", "*");
+        } else {
+            // For other endpoints, allow specific origins
+            if (origin != null && (origin.equals("https://it342-cit-uforums-site.onrender.com") || 
                               origin.equals("http://localhost:3000") ||
                               origin.equals("http://localhost:8000") ||
                               origin.equals("http://127.0.0.1:8000") ||
                               origin.equals("http://127.0.0.1:3000"))) {
-            response.setHeader("Access-Control-Allow-Origin", origin);
+                response.setHeader("Access-Control-Allow-Origin", origin);
+            }
         }
         
         // Allow credentials
