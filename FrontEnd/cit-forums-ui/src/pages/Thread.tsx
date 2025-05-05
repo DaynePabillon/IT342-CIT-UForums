@@ -121,19 +121,19 @@ const ThreadPage: React.FC = () => {
           title: thread.title,
           content: thread.content,
           forumId: thread.forumId,
-          commentCount: thread.commentCount,
+          commentCount: comments.length, 
           createdBy: thread.createdBy,
           createdAt: thread.createdAt,
           updatedAt: thread.updatedAt,
-          isLocked: false, // Add proper lock status if available
-          isPinned: false // Add proper pin status if available
+          isLocked: false, 
+          isPinned: false 
         }}
         onDelete={handleThreadDelete}
       />
 
       {/* Comments Section */}
       <div className="comments-section mt-4">
-        <h3>Comments ({thread.commentCount})</h3>
+        <h3>Comments ({comments.length})</h3>
         {comments.length > 0 ? (
           comments.map((comment) => (
             <CommentComponent
@@ -158,8 +158,6 @@ const ThreadPage: React.FC = () => {
         {userAuthenticated && (
           <CommentForm 
             threadId={parseInt(threadId!)} 
-            // Don't pass postId when commenting directly on a thread
-            // This will use the thread's direct comment endpoint
             onCommentAdded={handleCommentAdded} 
           />
         )}
