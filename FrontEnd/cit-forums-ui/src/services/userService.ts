@@ -4,10 +4,16 @@ import { getUserProfile, setUserProfile, removeUserProfile, UserProfile } from '
 const API_URL = '/api/members';
 
 interface UpdateProfileRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  name: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  name?: string;
+  phoneNumber?: string;
+  city?: string;
+  province?: string;
+  address?: string;
+  bio?: string;
+  studentNumber?: string;
 }
 
 interface ChangePasswordRequest {
@@ -37,6 +43,12 @@ export const getCurrentUser = async (): Promise<UserProfile> => {
       email: user.email || '',
       firstName: user.firstName || '',
       lastName: user.lastName || '',
+      phoneNumber: user.phoneNumber || '',
+      city: user.city || '',
+      province: user.province || '',
+      address: user.address || '',
+      bio: user.bio || '',
+      studentNumber: user.studentNumber || '',
       roles: userRoles
     };
     
@@ -74,6 +86,12 @@ export const updateProfile = async (data: UpdateProfileRequest): Promise<UserPro
       email: updatedUser.email || '',
       firstName: updatedUser.firstName || '',
       lastName: updatedUser.lastName || '',
+      phoneNumber: updatedUser.phoneNumber || '',
+      city: updatedUser.city || '',
+      province: updatedUser.province || '',
+      address: updatedUser.address || '',
+      bio: updatedUser.bio || '',
+      studentNumber: updatedUser.studentNumber || '',
       roles: userRoles
     };
     

@@ -32,6 +32,7 @@ interface ProfileData {
   province: string;
   address: string;
   bio: string;
+  studentNumber: string;
 }
 
 const Profile: React.FC = () => {
@@ -46,6 +47,7 @@ const Profile: React.FC = () => {
     province: '',
     address: '',
     bio: '',
+    studentNumber: ''
   });
   const [threads, setThreads] = useState<UserThreadData[]>([]);
   const [comments, setComments] = useState<UserCommentData[]>([]);
@@ -92,6 +94,7 @@ const Profile: React.FC = () => {
             province: currentUser.province || '',
             address: currentUser.address || '',
             bio: currentUser.bio || '',
+            studentNumber: currentUser.studentNumber || ''
           });
           
           // Also update the stored profile to ensure consistency
@@ -178,6 +181,11 @@ const Profile: React.FC = () => {
         updatedFields.bio = profileData.bio;
         hasChanges = true;
       }
+
+      if (profileData.studentNumber !== currentUser.studentNumber) {
+        updatedFields.studentNumber = profileData.studentNumber;
+        hasChanges = true;
+      }
       
       console.log('Fields to update:', updatedFields, 'Has changes:', hasChanges);
       
@@ -199,13 +207,8 @@ const Profile: React.FC = () => {
           province: updatedUser.province || '',
           address: updatedUser.address || '',
           bio: updatedUser.bio || '',
+          studentNumber: updatedUser.studentNumber || ''
         });
-        
-        // Force a refresh of the user data in localStorage and session
-        await getCurrentUser(); // This will update the stored profile
-        
-        // Force a page reload to update the header and all components
-        window.location.reload();
       } else {
         setSuccess('No changes were made to your profile.');
         setIsEditing(false);
@@ -216,234 +219,277 @@ const Profile: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="container mt-4">
-        <div className="text-center">Loading profile...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mt-4">
+    <div className="container">
       <div className="row">
         <div className="col-md-3">
-          <div className="list-group">
-            <button
-              className={`list-group-item list-group-item-action ${activeTab === 'profile' ? 'active' : ''}`}
-              onClick={() => setActiveTab('profile')}
-            >
-              Profile
-            </button>
-            <button
-              className={`list-group-item list-group-item-action ${activeTab === 'threads' ? 'active' : ''}`}
-              onClick={() => setActiveTab('threads')}
-            >
-              My Threads ({threads.length})
-            </button>
-            <button
-              className={`list-group-item list-group-item-action ${activeTab === 'comments' ? 'active' : ''}`}
-              onClick={() => setActiveTab('comments')}
-            >
-              My Comments ({comments.length})
-            </button>
+          <div className="card mb-4">
+            <div className="card-header bg-primary text-white">
+              <h3 className="mb-0">Navigation</h3>
+            </div>
+            <div className="list-group list-group-flush">
+              <button
+                className={`list-group-item list-group-item-action ${activeTab === 'profile' ? 'active' : ''}`}
+                onClick={() => setActiveTab('profile')}
+              >
+                Profile Information
+              </button>
+              <button
+                className={`list-group-item list-group-item-action ${activeTab === 'threads' ? 'active' : ''}`}
+                onClick={() => setActiveTab('threads')}
+              >
+                My Threads
+              </button>
+              <button
+                className={`list-group-item list-group-item-action ${activeTab === 'comments' ? 'active' : ''}`}
+                onClick={() => setActiveTab('comments')}
+              >
+                My Comments
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="col-md-9">
-          {error && <div className="alert alert-danger mb-3">{error}</div>}
-          {success && <div className="alert alert-success mb-3">{success}</div>}
-          
-          {activeTab === 'profile' && (
-            <div className="card">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <h3 className="mb-0">Profile Information</h3>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setIsEditing(!isEditing)}
-                >
-                  {isEditing ? 'Cancel' : 'Edit Profile'}
-                </button>
-              </div>
-              <div className="card-body">
-                {isEditing ? (
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                      <label className="form-label">Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="name"
-                        value={profileData.name}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Email</label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        name="email"
-                        value={profileData.email}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">First Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="firstName"
-                        value={profileData.firstName}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Last Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="lastName"
-                        value={profileData.lastName}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Phone Number</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="phoneNumber"
-                        value={profileData.phoneNumber}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">City</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="city"
-                        value={profileData.city}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Province</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="province"
-                        value={profileData.province}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Address</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="address"
-                        value={profileData.address}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Bio</label>
-                      <textarea
-                        className="form-control"
-                        name="bio"
-                        value={profileData.bio}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <button type="submit" className="btn btn-success">
-                      Save Changes
-                    </button>
-                  </form>
-                ) : (
-                  <div>
-                    <p><strong>Name:</strong> {profileData.name}</p>
-                    <p><strong>Email:</strong> {profileData.email}</p>
-                    <p><strong>First Name:</strong> {profileData.firstName}</p>
-                    <p><strong>Last Name:</strong> {profileData.lastName}</p>
-                    <p><strong>Phone Number:</strong> {profileData.phoneNumber}</p>
-                    <p><strong>City:</strong> {profileData.city}</p>
-                    <p><strong>Province:</strong> {profileData.province}</p>
-                    <p><strong>Address:</strong> {profileData.address}</p>
-                    <p><strong>Bio:</strong> {profileData.bio}</p>
-                  </div>
-                )}
+          {loading ? (
+            <div className="d-flex justify-content-center">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
               </div>
             </div>
-          )}
-
-          {activeTab === 'threads' && (
-            <div className="card">
-              <div className="card-header">
-                <h3 className="mb-0">My Threads</h3>
-              </div>
-              <div className="card-body bg-white">
-                {threads.length === 0 ? (
-                  <p className="text-center text-muted">You haven't created any threads yet</p>
-                ) : (
-                  <div className="list-group">
-                    {threads.map(thread => (
-                      <Link
-                        key={thread.id}
-                        to={`/forums/${thread.forumId}/threads/${thread.id}`}
-                        className="list-group-item list-group-item-action"
+          ) : error ? (
+            <div className="alert alert-danger">{error}</div>
+          ) : (
+            <>
+              {success && <div className="alert alert-success">{success}</div>}
+              
+              {activeTab === 'profile' && (
+                <div className="card">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <h3 className="mb-0">Profile Information</h3>
+                    {!isEditing && (
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => setIsEditing(true)}
                       >
-                        <div className="d-flex w-100 justify-content-between align-items-center">
-                          <h5 className="mb-1 text-primary">{thread.title}</h5>
-                          <small className="text-muted">
-                            {new Date(thread.createdAt).toLocaleDateString()}
-                          </small>
-                        </div>
-                        <p className="mb-1 text-dark">{thread.content?.substring(0, 150)}...</p>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <small className="text-muted">Forum: {thread.forumTitle}</small>
-                          <span className="badge bg-secondary">
-                            {thread.commentCount} {thread.commentCount === 1 ? 'comment' : 'comments'}
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
+                        Edit Profile
+                      </button>
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
-          )}
+                  <div className="card-body bg-white">
+                    {isEditing ? (
+                      <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                          <label htmlFor="name" className="form-label">Username</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="name"
+                            name="name"
+                            value={profileData.name}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="email" className="form-label">Email</label>
+                          <input
+                            type="email"
+                            className="form-control"
+                            id="email"
+                            name="email"
+                            value={profileData.email}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="firstName" className="form-label">First Name</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="firstName"
+                            name="firstName"
+                            value={profileData.firstName}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="lastName" className="form-label">Last Name</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="lastName"
+                            name="lastName"
+                            value={profileData.lastName}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="phoneNumber"
+                            name="phoneNumber"
+                            value={profileData.phoneNumber}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="studentNumber" className="form-label">Student Number</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="studentNumber"
+                            name="studentNumber"
+                            value={profileData.studentNumber}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="city" className="form-label">City</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="city"
+                            name="city"
+                            value={profileData.city}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="province" className="form-label">Province</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="province"
+                            name="province"
+                            value={profileData.province}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="address" className="form-label">Address</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="address"
+                            name="address"
+                            value={profileData.address}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="bio" className="form-label">Bio</label>
+                          <textarea
+                            className="form-control"
+                            id="bio"
+                            name="bio"
+                            rows={3}
+                            value={profileData.bio}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="d-flex gap-2">
+                          <button type="submit" className="btn btn-primary">
+                            Save Changes
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={() => setIsEditing(false)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div>
+                        <p><strong>Name:</strong> {profileData.name}</p>
+                        <p><strong>Email:</strong> {profileData.email}</p>
+                        <p><strong>First Name:</strong> {profileData.firstName}</p>
+                        <p><strong>Last Name:</strong> {profileData.lastName}</p>
+                        <p><strong>Phone Number:</strong> {profileData.phoneNumber}</p>
+                        <p><strong>Student Number:</strong> {profileData.studentNumber}</p>
+                        <p><strong>City:</strong> {profileData.city}</p>
+                        <p><strong>Province:</strong> {profileData.province}</p>
+                        <p><strong>Address:</strong> {profileData.address}</p>
+                        <p><strong>Bio:</strong> {profileData.bio}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
-          {activeTab === 'comments' && (
-            <div className="card">
-              <div className="card-header">
-                <h3 className="mb-0">My Comments</h3>
-              </div>
-              <div className="card-body bg-white">
-                {comments.length === 0 ? (
-                  <p className="text-center text-muted">You haven't posted any comments yet</p>
-                ) : (
-                  <div className="list-group">
-                    {comments.map(comment => (
-                      <Link
-                        key={comment.id}
-                        to={`/threads/${comment.threadId}`}
-                        className="list-group-item list-group-item-action"
-                      >
-                        <div className="d-flex w-100 justify-content-between align-items-center">
-                          <h6 className="mb-1 text-primary">Re: {comment.threadTitle}</h6>
-                          <small className="text-muted">
-                            {new Date(comment.createdAt).toLocaleDateString()}
-                          </small>
-                        </div>
-                        <p className="mb-1 text-dark">{comment.content}</p>
-                      </Link>
-                    ))}
+              {activeTab === 'threads' && (
+                <div className="card">
+                  <div className="card-header">
+                    <h3 className="mb-0">My Threads</h3>
                   </div>
-                )}
-              </div>
-            </div>
+                  <div className="card-body bg-white">
+                    {threads.length === 0 ? (
+                      <p className="text-center text-muted">You haven't created any threads yet</p>
+                    ) : (
+                      <div className="list-group">
+                        {threads.map(thread => (
+                          <Link
+                            key={thread.id}
+                            to={`/forums/${thread.forumId}/threads/${thread.id}`}
+                            className="list-group-item list-group-item-action"
+                          >
+                            <div className="d-flex w-100 justify-content-between align-items-center">
+                              <h5 className="mb-1 text-primary">{thread.title}</h5>
+                              <small className="text-muted">
+                                {new Date(thread.createdAt).toLocaleDateString()}
+                              </small>
+                            </div>
+                            <p className="mb-1 text-dark">{thread.content?.substring(0, 150)}...</p>
+                            <div className="d-flex justify-content-between align-items-center">
+                              <small className="text-muted">Forum: {thread.forumTitle}</small>
+                              <span className="badge bg-secondary">
+                                {thread.commentCount} {thread.commentCount === 1 ? 'comment' : 'comments'}
+                              </span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'comments' && (
+                <div className="card">
+                  <div className="card-header">
+                    <h3 className="mb-0">My Comments</h3>
+                  </div>
+                  <div className="card-body bg-white">
+                    {comments.length === 0 ? (
+                      <p className="text-center text-muted">You haven't posted any comments yet</p>
+                    ) : (
+                      <div className="list-group">
+                        {comments.map(comment => (
+                          <Link
+                            key={comment.id}
+                            to={`/threads/${comment.threadId}`}
+                            className="list-group-item list-group-item-action"
+                          >
+                            <div className="d-flex w-100 justify-content-between align-items-center">
+                              <h6 className="mb-1 text-primary">Re: {comment.threadTitle}</h6>
+                              <small className="text-muted">
+                                {new Date(comment.createdAt).toLocaleDateString()}
+                              </small>
+                            </div>
+                            <p className="mb-1 text-dark">{comment.content}</p>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
