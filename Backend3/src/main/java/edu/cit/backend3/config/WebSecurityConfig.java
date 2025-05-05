@@ -44,7 +44,13 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://it342-cit-uforums-site.onrender.com", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList(
+            "https://it342-cit-uforums-site.onrender.com", 
+            "http://localhost:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:8000",
+            "http://127.0.0.1:3000"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));

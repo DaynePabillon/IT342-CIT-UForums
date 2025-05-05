@@ -22,7 +22,10 @@ public class SimpleCorsFilter implements Filter {
         // Allow specific origins
         String origin = request.getHeader("Origin");
         if (origin != null && (origin.equals("https://it342-cit-uforums-site.onrender.com") || 
-                              origin.equals("http://localhost:3000"))) {
+                              origin.equals("http://localhost:3000") ||
+                              origin.equals("http://localhost:8000") ||
+                              origin.equals("http://127.0.0.1:8000") ||
+                              origin.equals("http://127.0.0.1:3000"))) {
             response.setHeader("Access-Control-Allow-Origin", origin);
         }
         
