@@ -86,7 +86,7 @@ const ThreadPage: React.FC = () => {
         state: { 
           refresh: true,
           updatedThreadId: thread.id,
-          updatedCommentCount: thread.commentCount
+          updatedCommentCount: comments.length
         } 
       });
     } else {
