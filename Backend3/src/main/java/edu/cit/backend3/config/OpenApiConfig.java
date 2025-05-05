@@ -8,6 +8,8 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.servers.ServerVariable;
+import io.swagger.v3.oas.models.servers.ServerVariables;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +37,21 @@ public class OpenApiConfig {
                                 .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8080")
+                                .url("{scheme}://localhost:8080")
                                 .description("Local development server")
+                                .variables(new ServerVariables()
+                                        .addServerVariable("scheme", new ServerVariable()
+                                                .default_("http")
+                                                .enum_(Arrays.asList("http", "https"))
+                                                .description("URI scheme"))),
+                        new Server()
+                                .url("{scheme}://it342-cit-uforums.onrender.com")
+                                .description("Production server")
+                                .variables(new ServerVariables()
+                                        .addServerVariable("scheme", new ServerVariable()
+                                                .default_("https")
+                                                .enum_(Arrays.asList("http", "https"))
+                                                .description("URI scheme")))
                 ))
                 .tags(Arrays.asList(
                         new Tag().name("Authentication").description("Operations related to user authentication and registration"),
