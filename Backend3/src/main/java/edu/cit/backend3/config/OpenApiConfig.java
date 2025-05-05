@@ -41,11 +41,11 @@ public class OpenApiConfig {
                                 .description("API Server")
                                 .variables(new ServerVariables()
                                         .addServerVariable("scheme", new ServerVariable()
-                                                .defaultValue("https")
+                                                .setDefault("https")
                                                 .enum_(Arrays.asList("http", "https"))
                                                 .description("URI scheme"))
                                         .addServerVariable("host", new ServerVariable()
-                                                .defaultValue("it342-cit-uforums.onrender.com")
+                                                .setDefault("it342-cit-uforums.onrender.com")
                                                 .enum_(Arrays.asList(
                                                         "it342-cit-uforums.onrender.com", 
                                                         "localhost:8080", 
