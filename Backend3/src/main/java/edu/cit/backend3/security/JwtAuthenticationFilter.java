@@ -16,6 +16,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,16 @@ import org.slf4j.LoggerFactory;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    
+    // List of path prefixes that should skip authentication
+    private static final List<String> SWAGGER_PATHS = Arrays.asList(
+        "/swagger", "/swagger-ui", "/v3/api-docs", "/swagger-resources", "/webjars"
+    );
+    
+    // List of public paths that should skip authentication
+    private static final List<String> PUBLIC_PATHS = Arrays.asList(
+        "/error", "/login", "/register", "/api/auth/", "/api/forums/"
+    );
 
     @Autowired
     private JwtTokenProvider tokenProvider;
@@ -39,9 +51,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        // Skip authentication for Swagger UI and error paths
+        // Skip authentication for Swagger UI and public paths
         String requestPath = request.getRequestURI();
+        
         if (shouldSkipAuthentication(request, requestPath)) {
+            logger.debug("Skipping JWT authentication for path: {}", requestPath);
             filterChain.doFilter(request, response);
             return;
         }
@@ -102,30 +116,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean shouldSkipAuthentication(HttpServletRequest request, String requestPath) {
-        // Skip authentication for Swagger UI, API docs, and error paths
-        return requestPath.contains("/swagger") || 
-               requestPath.contains("/v3/api-docs") || 
-               requestPath.contains("/swagger-ui") || 
-               requestPath.contains("/swagger-resources") || 
-               requestPath.contains("/webjars") ||
-               requestPath.contains("/error") ||
-               requestPath.equals("/") ||
-               requestPath.equals("/login") ||
-               requestPath.equals("/register") ||
-               // Public API endpoints
-               requestPath.startsWith("/api/auth/") ||
-               requestPath.startsWith("/api/forums/") ||
-               (requestPath.startsWith("/api/threads/") && request.getMethod().equals("GET")) ||
-               (requestPath.startsWith("/api/posts/") && request.getMethod().equals("GET")) ||
-               (requestPath.startsWith("/api/comments/") && request.getMethod().equals("GET")) ||
-               requestPath.startsWith("/actuator/") ||
-               // Static resources
-               requestPath.endsWith(".js") ||
-               requestPath.endsWith(".css") ||
-               requestPath.endsWith(".html") ||
-               requestPath.endsWith(".json") ||
-               requestPath.endsWith(".ico") ||
-               requestPath.startsWith("/static/") ||
-               requestPath.startsWith("/assets/");
+        // Skip authentication for static resources
+        if (requestPath.endsWith(".js") || requestPath.endsWith(".css") || 
+            requestPath.endsWith(".html") || requestPath.endsWith(".json") || 
+            requestPath.endsWith(".ico") || requestPath.startsWith("/static/") || 
+            requestPath.startsWith("/assets/")) {
+            return true;
+        }
+        
+        // Skip authentication for Swagger UI paths
+        for (String swaggerPath : SWAGGER_PATHS) {
+            if (requestPath.contains(swaggerPath)) {
+                return true;
+            }
+        }
+        
+        // Skip authentication for public paths
+        for (String publicPath : PUBLIC_PATHS) {
+            if (requestPath.contains(publicPath)) {
+                return true;
+            }
+        }
+        
+        // Skip authentication for GET requests to public API endpoints
+        if (request.getMethod().equals("GET") && (
+            requestPath.startsWith("/api/threads/") || 
+            requestPath.startsWith("/api/posts/") || 
+            requestPath.startsWith("/api/comments/"))) {
+            return true;
+        }
+        
+        return false;
     }
-} 
+}

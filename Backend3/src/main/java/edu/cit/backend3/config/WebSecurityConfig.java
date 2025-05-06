@@ -79,6 +79,17 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Swagger UI and API docs - explicitly permit all Swagger-related paths
+                .requestMatchers("/swagger/**").permitAll()
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger/swagger-ui/**").permitAll()
+                .requestMatchers("/swagger/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger/swagger-config").permitAll()
+                .requestMatchers("/swagger/v3/api-docs/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-resources/**").permitAll()
+                .requestMatchers("/webjars/**").permitAll()
                 // Public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/forums/**").permitAll()
@@ -90,9 +101,6 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/members/me").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/threads/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
-                // Swagger UI and API docs
-                .requestMatchers("/swagger/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                .requestMatchers("/swagger/v3/api-docs/**", "/swagger/swagger-ui/**", "/swagger/swagger-ui.html", "/swagger/swagger-config").permitAll()
                 // Admin endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Static resources
