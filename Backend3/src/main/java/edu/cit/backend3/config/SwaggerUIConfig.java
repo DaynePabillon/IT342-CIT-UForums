@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -14,7 +15,7 @@ public class SwaggerUIConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Add resource handlers for Swagger UI
+        // Add resource handlers for Swagger UI with proper paths
         registry.addResourceHandler("/swagger-ui/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/4.15.5/")
                 .resourceChain(false);
@@ -22,6 +23,15 @@ public class SwaggerUIConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/")
                 .resourceChain(false);
+    }
+    
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // Add view controllers for Swagger UI
+        registry.addRedirectViewController("/api-docs", "/v3/api-docs");
+        registry.addRedirectViewController("/swagger", "/swagger-ui/index.html");
+        registry.addViewController("/swagger-ui/")
+                .setViewName("forward:/swagger-ui/index.html");
     }
     
     @Override
@@ -46,7 +56,6 @@ public class SwaggerUIConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
     
-    // Additional configuration to ensure Swagger UI properly handles URL schemes
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
