@@ -39,6 +39,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        // Skip authentication for Swagger UI and error paths
+        String requestPath = request.getRequestURI();
+        if (shouldSkipAuthentication(request, requestPath)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         try {
             String jwt = getJwtFromRequest(request);
 
@@ -92,5 +99,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private boolean shouldSkipAuthentication(HttpServletRequest request, String requestPath) {
+        // Skip authentication for Swagger UI, API docs, and error paths
+        return requestPath.contains("/swagger") || 
+               requestPath.contains("/v3/api-docs") || 
+               requestPath.contains("/swagger-ui") || 
+               requestPath.contains("/swagger-resources") || 
+               requestPath.contains("/webjars") ||
+               requestPath.contains("/error") ||
+               requestPath.equals("/") ||
+               requestPath.equals("/login") ||
+               requestPath.equals("/register") ||
+               // Public API endpoints
+               requestPath.startsWith("/api/auth/") ||
+               requestPath.startsWith("/api/forums/") ||
+               (requestPath.startsWith("/api/threads/") && request.getMethod().equals("GET")) ||
+               (requestPath.startsWith("/api/posts/") && request.getMethod().equals("GET")) ||
+               (requestPath.startsWith("/api/comments/") && request.getMethod().equals("GET")) ||
+               requestPath.startsWith("/actuator/") ||
+               // Static resources
+               requestPath.endsWith(".js") ||
+               requestPath.endsWith(".css") ||
+               requestPath.endsWith(".html") ||
+               requestPath.endsWith(".json") ||
+               requestPath.endsWith(".ico") ||
+               requestPath.startsWith("/static/") ||
+               requestPath.startsWith("/assets/");
     }
 } 
