@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     // List of public paths that should skip authentication
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
-        "/error", "/login", "/register", "/api/auth/", "/api/forums/"
+        "/error", "/login", "/register", "/api/auth/", "/api/forums/", "/api/members/"
     );
 
     @Autowired
@@ -142,7 +142,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (request.getMethod().equals("GET") && (
             requestPath.startsWith("/api/threads/") || 
             requestPath.startsWith("/api/posts/") || 
-            requestPath.startsWith("/api/comments/"))) {
+            requestPath.startsWith("/api/comments/") ||
+            requestPath.startsWith("/api/members/"))) {
             return true;
         }
         

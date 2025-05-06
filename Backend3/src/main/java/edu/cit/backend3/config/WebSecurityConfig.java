@@ -96,6 +96,7 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/threads/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/members/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 // Member endpoints
                 .requestMatchers("/api/members/me").authenticated()
