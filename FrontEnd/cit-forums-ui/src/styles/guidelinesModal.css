@@ -37,8 +37,8 @@
 .guidelines-modal-header {
   padding: 20px;
   border-bottom: 1px solid #e0e0e0;
-  background: linear-gradient(90deg, var(--vista-blue) 0%, var(--university-orange) 100%);
-  color: white;
+  background-color: #333; /* Changed from #8b0000 (maroon) to #333 (dark gray) */
+  color: #FFD700; /* Changed text color to yellow */
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
@@ -56,13 +56,13 @@
 }
 
 .guidelines-modal-content h3 {
-  color: var(--vista-blue);
+  color: #FFD700; /* Changed from #8b0000 (maroon) to #FFD700 (yellow) */
   margin-top: 0;
   margin-bottom: 16px;
 }
 
 .guidelines-modal-content h4 {
-  color: var(--university-orange);
+  color: #333;
   margin-top: 20px;
   margin-bottom: 8px;
 }
@@ -96,7 +96,7 @@
 }
 
 .scroll-notice {
-  color: var(--american-yellow);
+  color: #FFD700; /* Changed from #8b0000 (maroon) to #FFD700 (yellow) */
   font-style: italic;
   font-size: 0.85rem;
   margin-left: 5px;
@@ -104,9 +104,9 @@
 
 .accept-button {
   padding: 10px 20px;
-  background-color: var(--vista-blue);
-  color: white;
-  border: none;
+  background-color: #333; /* Changed from #8b0000 (maroon) to #333 (dark gray) */
+  color: #FFD700; /* Changed text color to yellow */
+  border: 1px solid #FFD700; /* Added yellow border */
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
@@ -115,7 +115,7 @@
 }
 
 .accept-button:hover:not(:disabled) {
-  background-color: var(--university-orange);
+  background-color: #444; /* Changed hover color */
 }
 
 .accept-button:disabled {

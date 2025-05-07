@@ -85,6 +85,71 @@ public class AdminDashboardController {
         this.memberService = memberService;
     }
 
+    @GetMapping("/dashboard")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Get dashboard overview",
+            description = "Get an overview of the system for the admin dashboard",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<?> getDashboard() {
+        try {
+            logger.info("Fetching dashboard overview");
+            Map<String, Object> dashboardData = new HashMap<>();
+            
+            // Get total counts
+            long totalUsers = memberRepository.count();
+            long totalThreads = threadRepository.count();
+            long totalReports = reportRepository.count();
+            long activeReports = reportRepository.countByStatus("PENDING");
+            
+            dashboardData.put("totalUsers", totalUsers);
+            dashboardData.put("totalThreads", totalThreads);
+            dashboardData.put("totalReports", totalReports);
+            dashboardData.put("activeReports", activeReports);
+            
+            // Get recent reports
+            List<Report> recentReports = reportRepository.findTop5ByOrderByCreatedAtDesc();
+            List<Map<String, Object>> recentReportsData = recentReports.stream().map(report -> {
+                Map<String, Object> reportData = new HashMap<>();
+                reportData.put("id", report.getId());
+                reportData.put("contentType", report.getContentType());
+                reportData.put("contentId", report.getContentId());
+                reportData.put("reason", report.getReason());
+                reportData.put("status", report.getStatus());
+                reportData.put("createdAt", report.getCreatedAt());
+                
+                Map<String, Object> reporter = new HashMap<>();
+                reporter.put("id", report.getReporter().getId());
+                reporter.put("username", report.getReporter().getName());
+                reportData.put("reporter", reporter);
+                
+                return reportData;
+            }).collect(Collectors.toList());
+            
+            // Get recent users
+            List<Member> recentUsers = memberRepository.findTop5ByOrderByCreatedAtDesc();
+            List<Map<String, Object>> recentUsersData = recentUsers.stream().map(user -> {
+                Map<String, Object> userData = new HashMap<>();
+                userData.put("id", user.getId());
+                userData.put("username", user.getName());
+                userData.put("email", user.getEmail());
+                userData.put("role", user.getRole());
+                userData.put("status", user.getStatus());
+                userData.put("createdAt", user.getCreatedAt());
+                return userData;
+            }).collect(Collectors.toList());
+            
+            dashboardData.put("recentReports", recentReportsData);
+            dashboardData.put("recentUsers", recentUsersData);
+            
+            return ResponseEntity.ok(dashboardData);
+        } catch (Exception e) {
+            logger.error("Error fetching dashboard overview", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching dashboard overview");
+        }
+    }
+
     @GetMapping("/status")
     @Operation(
             summary = "Get system status",
@@ -213,157 +278,6 @@ public class AdminDashboardController {
             return ResponseEntity.ok(reports);
         } catch (Exception e) {
             logger.error("Error getting reports", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-    
-    @GetMapping("/dashboard")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(
-        summary = "Get dashboard overview",
-        description = "Get all dashboard statistics in a single call",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    public ResponseEntity<Map<String, Object>> getDashboardOverview() {
-        // Get counts
-        long totalUsers = memberRepository.count();
-        long totalThreads = threadRepository.count();
-        long totalReports = reportRepository.count();
-        long activeReports = reportRepository.countByStatus("PENDING");
-        
-        // Get recent reports
-        List<Report> recentReports = reportRepository.findAll(
-            PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
-        ).getContent();
-        
-        List<Map<String, Object>> recentReportsList = recentReports.stream()
-            .map(report -> {
-                Map<String, Object> reportMap = new HashMap<>();
-                reportMap.put("id", report.getId());
-                reportMap.put("contentType", report.getContentType());
-                reportMap.put("contentId", report.getContentId());
-                reportMap.put("reason", report.getReason());
-                reportMap.put("status", report.getStatus());
-                reportMap.put("createdAt", report.getCreatedAt());
-                
-                if (report.getReporter() != null) {
-                    Map<String, Object> reporter = new HashMap<>();
-                    reporter.put("id", report.getReporter().getId());
-                    reporter.put("username", report.getReporter().getName());
-                    reportMap.put("reporter", reporter);
-                }
-                
-                return reportMap;
-            })
-            .collect(Collectors.toList());
-        
-        // Get recent users
-        List<Member> recentUsers = memberRepository.findAll(
-            PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
-        ).getContent();
-        
-        List<Map<String, Object>> recentUsersList = recentUsers.stream()
-            .map(user -> {
-                Map<String, Object> userMap = new HashMap<>();
-                userMap.put("id", user.getId());
-                userMap.put("username", user.getName());
-                userMap.put("email", user.getEmail());
-                userMap.put("createdAt", user.getCreatedAt());
-                return userMap;
-            })
-            .collect(Collectors.toList());
-        
-        // Build response
-        Map<String, Object> response = new HashMap<>();
-        response.put("totalUsers", totalUsers);
-        response.put("totalThreads", totalThreads);
-        response.put("totalReports", totalReports);
-        response.put("activeReports", activeReports);
-        response.put("recentReports", recentReportsList);
-        response.put("recentUsers", recentUsersList);
-        
-        return ResponseEntity.ok(response);
-    }
-    
-    @GetMapping("/dashboard/user-stats")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(
-        summary = "Get user statistics",
-        description = "Get basic user statistics",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    public ResponseEntity<Map<String, Object>> getUserStats() {
-        try {
-            Map<String, Object> stats = new HashMap<>();
-            
-            // Get total user count
-            long totalUsers = memberRepository.count();
-            stats.put("totalUsers", totalUsers);
-            
-            // Get recent users
-            List<Member> recentUsers = memberRepository.findTop5ByOrderByCreatedAtDesc();
-            stats.put("recentUsers", recentUsers);
-            
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-    
-    @GetMapping("/dashboard/forum-stats")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(
-        summary = "Get forum statistics",
-        description = "Get basic forum statistics",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    public ResponseEntity<Map<String, Object>> getForumStats() {
-        try {
-            Map<String, Object> stats = new HashMap<>();
-            
-            // Get total forum count
-            long totalForums = forumRepository.count();
-            stats.put("totalForums", totalForums);
-            
-            // Get total thread count
-            long totalThreads = threadRepository.count();
-            stats.put("totalThreads", totalThreads);
-            
-            // Get recent threads
-            List<Thread> recentThreads = threadRepository.findTop5ByOrderByCreatedAtDesc();
-            stats.put("recentThreads", recentThreads);
-            
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-    
-    @GetMapping("/stats")
-    public ResponseEntity<Map<String, Object>> getStats() {
-        try {
-            Map<String, Object> stats = new HashMap<>();
-            
-            // Get total counts
-            long totalUsers = memberRepository.count();
-            long totalForums = forumRepository.count();
-            long totalThreads = threadRepository.count();
-            
-            stats.put("totalUsers", totalUsers);
-            stats.put("totalForums", totalForums);
-            stats.put("totalThreads", totalThreads);
-            
-            // Get recent users
-            List<Member> recentUsers = memberRepository.findTop5ByOrderByCreatedAtDesc();
-            stats.put("recentUsers", recentUsers);
-            
-            // Get recent threads
-            List<Thread> recentThreads = threadRepository.findTop5ByOrderByCreatedAtDesc();
-            stats.put("recentThreads", recentThreads);
-            
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            logger.error("Error getting stats", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

@@ -13,4 +13,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     long countByStatus(String status);
     List<Report> findByReporter(Member reporter);
     List<Report> findByContentTypeAndContentId(String contentType, Long contentId);
+    
+    // Find recent reports
+    List<Report> findTop5ByOrderByCreatedAtDesc();
 }

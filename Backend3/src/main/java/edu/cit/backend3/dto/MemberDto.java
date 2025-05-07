@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,6 +18,7 @@ public class MemberDto {
     private String firstName;
     private String lastName;
     private String role;
+    private List<String> roles;
     private String status;
     private String createdAt;
     private String phoneNumber;

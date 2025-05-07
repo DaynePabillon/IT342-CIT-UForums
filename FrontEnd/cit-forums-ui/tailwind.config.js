@@ -7,13 +7,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // New color palette
-        'vista-blue': '#84A0D9',
-        'american-yellow': '#F2B705',
-        'orange-ryb': '#F29F05',
-        'university-orange': '#F27405',
-        'ferrari-red': '#F21B07',
-        // Original colors (keeping for backward compatibility)
         maroon: {
           500: '#800000',
           600: '#6B0000',
@@ -31,6 +24,4 @@ module.exports = {
     },
   },
   plugins: [],
-  // Important: This ensures our custom CSS has higher priority
-  important: true,
 };

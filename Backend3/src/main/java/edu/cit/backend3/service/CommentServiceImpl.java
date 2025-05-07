@@ -2,6 +2,7 @@ package edu.cit.backend3.service;
 
 import edu.cit.backend3.dto.CommentDto;
 import edu.cit.backend3.dto.MemberSummaryDto;
+import edu.cit.backend3.dto.WebSocketMessage;
 import edu.cit.backend3.dto.request.CommentRequest;
 import edu.cit.backend3.models.Comment;
 import edu.cit.backend3.models.Member;
@@ -27,17 +28,20 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final ThreadRepository threadRepository;
     private final MemberService memberService;
+    private final WebSocketService webSocketService;
 
     @Autowired
     public CommentServiceImpl(
             CommentRepository commentRepository,
             PostRepository postRepository,
             ThreadRepository threadRepository,
-            MemberService memberService) {
+            MemberService memberService,
+            WebSocketService webSocketService) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.threadRepository = threadRepository;
         this.memberService = memberService;
+        this.webSocketService = webSocketService;
     }
 
     @Override
@@ -151,9 +155,17 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = getCommentEntity(commentId);
         
         comment.setContent(commentRequest.getContent());
+        comment.setUpdatedAt(java.time.LocalDateTime.now());
         comment.setEdited(true);
         
-        return mapToDto(commentRepository.save(comment));
+        Comment updatedComment = commentRepository.save(comment);
+        CommentDto commentDto = mapToDto(updatedComment);
+        
+        // Send WebSocket notification about the updated comment
+        WebSocketMessage<CommentDto> webSocketMessage = new WebSocketMessage<>(WebSocketMessage.MessageType.NEW_COMMENT, commentDto);
+        webSocketService.sendThreadMessage(updatedComment.getParentPost().getThread().getId(), webSocketMessage);
+        
+        return commentDto;
     }
 
     @Override

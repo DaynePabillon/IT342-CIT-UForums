@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { createThread } from '../services/threadService';
 import { getForumById, ForumCategory } from '../services/forumService';
 import { isAuthenticated } from '../services/authService';
+import websocketService, { MessageType, WebSocketMessage } from '../services/websocketService';
 import '../styles/custom.css';
 
 interface ForumData {
@@ -130,6 +131,21 @@ const CreateThread: React.FC = () => {
       
       const result = await createThread(threadData);
       console.log("Thread created successfully:", result);
+      
+      // Send WebSocket notification about the new thread
+      try {
+        const webSocketMessage: WebSocketMessage<any> = {
+          type: MessageType.NEW_THREAD,
+          content: result
+        };
+        
+        // Send the message to the forum-specific topic
+        console.log(`Sending WebSocket message to forum ${parsedId}:`, webSocketMessage);
+        websocketService.sendMessage(`/app/thread.new`, webSocketMessage);
+      } catch (wsError) {
+        console.error('Error sending WebSocket message:', wsError);
+        // Don't block the UI flow if WebSocket fails
+      }
       
       // Navigate to the thread list with a refresh flag
       navigate(`/forums/${parsedId}/threads`, { 

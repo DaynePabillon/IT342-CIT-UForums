@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createComment } from '../services/commentService';
 import { getUserProfile } from '../services/authService';
+import websocketService, { MessageType, WebSocketMessage } from '../services/websocketService';
 
 interface CommentFormProps {
   postId?: number;
@@ -28,6 +29,21 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, threadId, onCommentAd
         postId
       });
       console.log('Comment created successfully:', newComment);
+      
+      // Send WebSocket notification about the new comment
+      try {
+        const webSocketMessage: WebSocketMessage<any> = {
+          type: MessageType.NEW_COMMENT,
+          content: newComment
+        };
+        
+        // Send the message to the thread-specific topic
+        console.log(`Sending WebSocket message to thread ${threadId}:`, webSocketMessage);
+        websocketService.sendMessage(`/app/comment.new`, webSocketMessage);
+      } catch (wsError) {
+        console.error('Error sending WebSocket message:', wsError);
+        // Don't block the UI flow if WebSocket fails
+      }
       
       onCommentAdded(newComment);
       setContent('');

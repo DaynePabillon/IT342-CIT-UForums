@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getThreadById, Thread } from '../services/threadService';
 import { getCommentsByThreadId, Comment as CommentType, createComment } from '../services/commentService';
@@ -6,6 +6,7 @@ import { isAuthenticated } from '../services/authService';
 import CommentForm from '../components/CommentForm';
 import ThreadComponent from '../components/Thread';
 import CommentComponent from '../components/Comment';
+import websocketService, { MessageType, WebSocketMessage } from '../services/websocketService';
 
 const ThreadPage: React.FC = () => {
   const { forumId, threadId } = useParams<{ forumId: string; threadId: string }>();
@@ -15,6 +16,9 @@ const ThreadPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
+  
+  // Reference to store unsubscribe function
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const fetchThread = useCallback(async () => {
     if (!threadId) {
@@ -51,6 +55,60 @@ const ThreadPage: React.FC = () => {
     
     fetchThread();
   }, [fetchThread]);
+  
+  // Set up WebSocket subscription for real-time updates
+  useEffect(() => {
+    if (!threadId) return;
+    
+    // Subscribe to thread updates
+    const subscribeToThreadUpdates = () => {
+      if (unsubscribeRef.current) {
+        // Clean up previous subscription if exists
+        unsubscribeRef.current();
+      }
+      
+      console.log(`Subscribing to real-time updates for thread ${threadId}`);
+      
+      // Subscribe to thread-specific WebSocket topic
+      unsubscribeRef.current = websocketService.subscribeToThread<CommentType>(
+        parseInt(threadId),
+        (message: WebSocketMessage<CommentType>) => {
+          console.log('Received WebSocket message:', message);
+          
+          if (message.type === MessageType.NEW_COMMENT) {
+            // Add new comment to the list
+            setComments(prevComments => {
+              // Check if comment already exists to avoid duplicates
+              const exists = prevComments.some(c => c.id === message.content.id);
+              if (exists) {
+                return prevComments;
+              }
+              return [...prevComments, message.content];
+            });
+          } else if (message.type === MessageType.THREAD_UPDATE) {
+            // Update thread data
+            setThread(prevThread => {
+              if (!prevThread || prevThread.id !== message.content.id) {
+                return prevThread;
+              }
+              return { ...prevThread, ...message.content };
+            });
+          }
+        }
+      );
+    };
+    
+    subscribeToThreadUpdates();
+    
+    // Cleanup function to unsubscribe when component unmounts
+    return () => {
+      if (unsubscribeRef.current) {
+        console.log(`Unsubscribing from thread ${threadId} updates`);
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+    };
+  }, [threadId]);
 
   const handleCommentAdded = async (newComment: CommentType) => {
     console.log('Comment added:', newComment);
