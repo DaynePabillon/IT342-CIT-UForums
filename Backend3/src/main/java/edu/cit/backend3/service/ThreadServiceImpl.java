@@ -2,7 +2,6 @@ package edu.cit.backend3.service;
 
 import edu.cit.backend3.dto.MemberSummaryDto;
 import edu.cit.backend3.dto.ThreadDto;
-import edu.cit.backend3.dto.WebSocketMessage;
 import edu.cit.backend3.dto.request.ThreadRequest;
 import edu.cit.backend3.dto.request.PostRequest;
 import edu.cit.backend3.models.Forum;
@@ -30,20 +29,17 @@ public class ThreadServiceImpl implements ThreadService {
     private final PostRepository postRepository;
     private final ForumService forumService;
     private final MemberService memberService;
-    private final WebSocketService webSocketService;
 
     @Autowired
     public ThreadServiceImpl(
             ThreadRepository threadRepository,
             PostRepository postRepository,
             ForumService forumService,
-            MemberService memberService,
-            WebSocketService webSocketService) {
+            MemberService memberService) {
         this.threadRepository = threadRepository;
         this.postRepository = postRepository;
         this.forumService = forumService;
         this.memberService = memberService;
-        this.webSocketService = webSocketService;
     }
 
     @Override
@@ -80,14 +76,7 @@ public class ThreadServiceImpl implements ThreadService {
         // Add the post to the thread's posts list
         savedThread.getPosts().add(savedPost);
         
-        // Convert to DTO for response
-        ThreadDto threadDto = mapToDto(savedThread);
-        
-        // Send WebSocket notification about the new thread
-        WebSocketMessage<ThreadDto> webSocketMessage = new WebSocketMessage<>(WebSocketMessage.MessageType.NEW_THREAD, threadDto);
-        webSocketService.sendForumMessage(forumId, webSocketMessage);
-        
-        return threadDto;
+        return mapToDto(savedThread);
     }
 
     @Override
@@ -99,14 +88,7 @@ public class ThreadServiceImpl implements ThreadService {
         thread.setContent(threadRequest.getContent());
         thread.setUpdatedAt(LocalDateTime.now());
         
-        Thread updatedThread = threadRepository.save(thread);
-        ThreadDto threadDto = mapToDto(updatedThread);
-        
-        // Send WebSocket notification about the thread update
-        WebSocketMessage<ThreadDto> webSocketMessage = new WebSocketMessage<>(WebSocketMessage.MessageType.THREAD_UPDATE, threadDto);
-        webSocketService.sendThreadMessage(threadId, webSocketMessage);
-        
-        return threadDto;
+        return mapToDto(threadRepository.save(thread));
     }
 
     @Override

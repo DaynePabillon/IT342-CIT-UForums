@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getForumById, ForumCategory } from '../services/forumService';
 import { getThreadsByForumId, Thread } from '../services/threadService';
 import { isAuthenticated } from '../services/authService';
-import websocketService, { MessageType, WebSocketMessage } from '../services/websocketService';
 import '../styles/custom.css';
 
 interface ForumData {
@@ -28,9 +27,6 @@ const ThreadList: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [validForumId, setValidForumId] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  
-  // Reference to store unsubscribe function
-  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const fetchThreads = useCallback(async () => {
     if (!forumId) {
@@ -128,51 +124,7 @@ const ThreadList: React.FC = () => {
     
     setValidForumId(parsedId);
     fetchForum(parsedId);
-    
-    // Set up WebSocket subscription for real-time updates
-    const subscribeToForumUpdates = () => {
-      if (unsubscribeRef.current) {
-        // Clean up previous subscription if exists
-        unsubscribeRef.current();
-      }
-      
-      console.log(`Subscribing to real-time updates for forum ${parsedId}`);
-      
-      // Subscribe to forum-specific WebSocket topic
-      unsubscribeRef.current = websocketService.subscribeToForum<Thread>(
-        parsedId,
-        (message: WebSocketMessage<Thread>) => {
-          console.log('Received WebSocket message:', message);
-          
-          if (message.type === MessageType.NEW_THREAD) {
-            // Add new thread to the list
-            setThreads(prevThreads => {
-              // Check if thread already exists to avoid duplicates
-              const exists = prevThreads.some(t => t.id === message.content.id);
-              if (exists) {
-                return prevThreads;
-              }
-              return [message.content, ...prevThreads];
-            });
-          } else if (message.type === MessageType.FORUM_UPDATE) {
-            // Refresh threads if forum is updated
-            fetchThreads();
-          }
-        }
-      );
-    };
-    
-    subscribeToForumUpdates();
-    
-    // Cleanup function to unsubscribe when component unmounts
-    return () => {
-      if (unsubscribeRef.current) {
-        console.log(`Unsubscribing from forum ${parsedId} updates`);
-        unsubscribeRef.current();
-        unsubscribeRef.current = null;
-      }
-    };
-  }, [forumId, fetchThreads]);
+  }, [forumId]);
 
   // Add effect to refresh threads when component receives focus
   useEffect(() => {
