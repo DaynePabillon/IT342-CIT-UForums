@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/custom.css';
 import '../styles/adminTheme.css';
+import '../styles/adminReports.css';
 
 const AdminReports: React.FC = () => {
   // State Variables
@@ -54,8 +55,14 @@ const AdminReports: React.FC = () => {
 
     try {
       if (report.reportedContentType === 'THREAD') {
-        const threadData = await getThreadById(report.reportedContentId);
-        setReportedContent(threadData);
+        try {
+          const threadData = await getThreadById(report.reportedContentId);
+          setReportedContent(threadData);
+        } catch (threadErr) {
+          // If thread not found, it's likely deleted
+          console.log('Thread not found, likely deleted');
+          setReportedContent({ isDeleted: true, title: '[Deleted Thread]', content: 'This thread has been deleted.' });
+        }
       } else {
         // Handle comment content if needed
         setReportedContent({ content: 'Comment content will be displayed here' });
@@ -260,7 +267,14 @@ const AdminReports: React.FC = () => {
                       </div>
                     ) : reportedContent ? (
                       <div className="admin-reported-content">
-                        {selectedReport.reportedContentType === 'THREAD' && (
+                        {selectedReport.reportedContentType === 'THREAD' && reportedContent.isDeleted ? (
+                          <div className="admin-deleted-content">
+                            <h4 className="admin-content-title deleted-title">{reportedContent.title}</h4>
+                            <div className="admin-content-body deleted-content">
+                              <i className="bi bi-trash"></i> {reportedContent.content}
+                            </div>
+                          </div>
+                        ) : selectedReport.reportedContentType === 'THREAD' && (
                           <>
                             <h4 className="admin-content-title">{reportedContent.title}</h4>
                             <div className="admin-content-meta">
@@ -280,7 +294,7 @@ const AdminReports: React.FC = () => {
                   </div>
 
                   <div className="admin-actions-section">
-                    {selectedReport.reportedContentType === 'THREAD' && reportedContent && (
+                    {selectedReport.reportedContentType === 'THREAD' && reportedContent && !reportedContent.isDeleted && (
                       <button
                         className="admin-btn-danger admin-btn-action"
                         onClick={() => confirmDeleteThread(selectedReport.reportedContentId)}

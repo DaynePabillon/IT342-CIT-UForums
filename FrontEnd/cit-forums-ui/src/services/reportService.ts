@@ -43,22 +43,44 @@ export const getReports = async (): Promise<Report[]> => {
       console.log('Detected paginated response, mapping content');
       
       // Map the backend field names to frontend field names
-      return response.data.content.map((item: any) => ({
-        id: item.id,
-        reporterId: item.reporterId || (item.reporter ? item.reporter.id : null),
-        reporterUsername: item.reporterUsername || (item.reporter ? item.reporter.name : 'Unknown'),
-        reportedContentType: item.contentType, // Map contentType to reportedContentType
-        reportedContentId: item.contentId,     // Map contentId to reportedContentId
-        reason: item.reason,
-        status: item.status,
-        createdAt: item.createdAt,
-        resolvedAt: item.resolvedAt,
-        resolvedBy: item.resolverId,
-        resolvedByUsername: item.resolverUsername,
-        actionTaken: item.action,
-        // Include the original data for debugging
-        _originalData: item
-      }));
+      return response.data.content.map((item: any) => {
+        console.log('Processing report item:', item);
+        
+        // Extract reporter information
+        let reporterId = null;
+        let reporterUsername = 'Unknown';
+        
+        if (item.reporter) {
+          // If reporter is an object with id property
+          if (typeof item.reporter === 'object' && item.reporter !== null) {
+            reporterId = item.reporter.id;
+            // Try different properties that might contain the username
+            reporterUsername = item.reporter.name || item.reporter.username || 'Unknown';
+            console.log('Found reporter object:', item.reporter, 'Username:', reporterUsername);
+          } else {
+            // If reporter is just an ID
+            reporterId = item.reporter;
+            console.log('Found reporter ID:', reporterId);
+          }
+        }
+        
+        return {
+          id: item.id,
+          reporterId: reporterId,
+          reporterUsername: reporterUsername,
+          reportedContentType: item.contentType, // Map contentType to reportedContentType
+          reportedContentId: item.contentId,     // Map contentId to reportedContentId
+          reason: item.reason,
+          status: item.status,
+          createdAt: item.createdAt,
+          resolvedAt: item.resolvedAt,
+          resolvedBy: item.resolverId,
+          resolvedByUsername: item.resolverUsername,
+          actionTaken: item.action,
+          // Include the original data for debugging
+          _originalData: item
+        };
+      });
     }
     
     // If not paginated, assume it's already in the right format
@@ -112,22 +134,44 @@ export const getReportHistory = async (): Promise<Report[]> => {
       console.log('Detected paginated response, mapping content');
       
       // Map the backend field names to frontend field names
-      return response.data.content.map((item: any) => ({
-        id: item.id,
-        reporterId: item.reporterId || (item.reporter ? item.reporter.id : null),
-        reporterUsername: item.reporterUsername || (item.reporter ? item.reporter.name : 'Unknown'),
-        reportedContentType: item.contentType, // Map contentType to reportedContentType
-        reportedContentId: item.contentId,     // Map contentId to reportedContentId
-        reason: item.reason,
-        status: item.status,
-        createdAt: item.createdAt,
-        resolvedAt: item.resolvedAt,
-        resolvedBy: item.resolverId,
-        resolvedByUsername: item.resolverUsername,
-        actionTaken: item.action,
-        // Include the original data for debugging
-        _originalData: item
-      }));
+      return response.data.content.map((item: any) => {
+        console.log('Processing report history item:', item);
+        
+        // Extract reporter information
+        let reporterId = null;
+        let reporterUsername = 'Unknown';
+        
+        if (item.reporter) {
+          // If reporter is an object with id property
+          if (typeof item.reporter === 'object' && item.reporter !== null) {
+            reporterId = item.reporter.id;
+            // Try different properties that might contain the username
+            reporterUsername = item.reporter.name || item.reporter.username || 'Unknown';
+            console.log('Found reporter object:', item.reporter, 'Username:', reporterUsername);
+          } else {
+            // If reporter is just an ID
+            reporterId = item.reporter;
+            console.log('Found reporter ID:', reporterId);
+          }
+        }
+        
+        return {
+          id: item.id,
+          reporterId: reporterId,
+          reporterUsername: reporterUsername,
+          reportedContentType: item.contentType, // Map contentType to reportedContentType
+          reportedContentId: item.contentId,     // Map contentId to reportedContentId
+          reason: item.reason,
+          status: item.status,
+          createdAt: item.createdAt,
+          resolvedAt: item.resolvedAt,
+          resolvedBy: item.resolverId,
+          resolvedByUsername: item.resolverUsername,
+          actionTaken: item.action,
+          // Include the original data for debugging
+          _originalData: item
+        };
+      });
     }
     
     // If not paginated, assume it's already in the right format

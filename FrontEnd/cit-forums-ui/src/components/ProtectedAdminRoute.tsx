@@ -45,13 +45,10 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({ children }) =
         const adminStatus = checkAdminStatus();
         console.log('ProtectedAdminRoute - Admin status from context:', adminStatus);
         
-        // Force admin status to true for testing
-        // This is a temporary fix to bypass the admin check
-        // Remove this in production
-        const forceAdmin = true;
-        console.log('ProtectedAdminRoute - Forcing admin status for testing:', forceAdmin);
+        // Use the admin status from the context
+        console.log('ProtectedAdminRoute - Using admin status from context:', adminStatus);
         
-        setIsAdmin(forceAdmin || adminStatus);
+        setIsAdmin(adminStatus);
         setLoading(false);
     }, [checkAdminStatus]);
 

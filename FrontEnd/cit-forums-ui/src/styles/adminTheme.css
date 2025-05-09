@@ -64,10 +64,12 @@
 
 /* Card Styles */
 .admin-card {
-  background-color: var(--maroon-600);
+  background-color: #800000;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  color: #ffffff;
   border-left: 4px solid var(--gold-500);
 }
 
@@ -619,7 +621,9 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  color: #333;
+  color: #ffffff;
+  background-color: #6b0f0f;
+  min-height: 100vh;
 }
 
 /* Admin Reports Styling */
