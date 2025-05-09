@@ -8,6 +8,7 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import './App.css';
 import './styles/custom.css';
 import './styles/forum-theme.css';
+import './styles/adminReadability.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';

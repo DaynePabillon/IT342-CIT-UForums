@@ -1,0 +1,169 @@
+/* Admin Dashboard Readability Improvements */
+
+/* Base text color for all admin pages */
+.admin-dashboard,
+.admin-dashboard * {
+  color: #ffffff;
+}
+
+/* Dashboard cards and containers */
+.admin-card {
+  background-color: rgba(107, 15, 15, 0.9) !important;
+  color: #ffffff !important;
+}
+
+/* Dashboard stat cards */
+.admin-stat-card {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.admin-stat-card h3 {
+  color: #ffcc00 !important;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.admin-stat-card p {
+  color: #ffffff !important;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Section titles */
+.admin-section-title {
+  color: #ffcc00 !important;
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+}
+
+/* List items in dashboard */
+.admin-list-item {
+  background-color: rgba(139, 0, 0, 0.7) !important;
+  color: #ffffff !important;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-left: 3px solid #ffcc00;
+}
+
+.admin-list-item:hover {
+  background-color: rgba(139, 0, 0, 0.9) !important;
+}
+
+/* Text elements within list items */
+.admin-list-item span,
+.admin-list-item p {
+  color: #ffffff !important;
+}
+
+.admin-list-item .text-primary {
+  color: #ffcc00 !important;
+  font-weight: bold;
+}
+
+.admin-list-item .text-secondary {
+  color: #ffffff !important;
+  opacity: 0.9;
+}
+
+.admin-list-item .text-gray-400 {
+  color: #ffffff !important;
+  opacity: 0.7;
+}
+
+/* Status badges */
+.admin-badge-pending {
+  background-color: #f57c00;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.admin-badge-resolved {
+  background-color: #388e3c;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* User management specific */
+.admin-user-status {
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+.admin-user-role {
+  background-color: #1976d2;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: inline-block;
+}
+
+/* Table headers and content */
+.admin-table th {
+  color: #ffcc00 !important;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+}
+
+.admin-table td {
+  color: #ffffff !important;
+  padding: 10px;
+}
+
+.admin-table tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.admin-table tr:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Recent reports and users */
+.RESOLVED,
+.admin-report-item.resolved {
+  background-color: rgba(56, 142, 60, 0.7) !important;
+  border-left: 4px solid #2e7d32 !important;
+}
+
+.DISMISSED,
+.admin-report-item.dismissed {
+  background-color: rgba(117, 117, 117, 0.7) !important;
+  border-left: 4px solid #616161 !important;
+}
+
+/* Pagination */
+.admin-pagination-item {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #ffffff !important;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.admin-pagination-item:hover:not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.admin-pagination-item.active {
+  background-color: #8b0000;
+  font-weight: bold;
+}
+
+.admin-pagination-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
