@@ -82,6 +82,7 @@ const ThreadPage: React.FC = () => {
   // Function to navigate back with updated comment count
   const handleBackToForum = () => {
     if (thread && forumId) {
+      // Always pass the current comment count when navigating back
       navigate(`/forums/${forumId}/threads`, { 
         state: { 
           refresh: true,

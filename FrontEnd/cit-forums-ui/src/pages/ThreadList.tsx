@@ -70,15 +70,19 @@ const ThreadList: React.FC = () => {
       if (state.refresh) {
         // If we have specific thread update info, update just that thread
         if (state.updatedThreadId && typeof state.updatedCommentCount === 'number') {
+          console.log('Updating thread comment count:', state.updatedThreadId, state.updatedCommentCount);
           setThreads(prevThreads => 
-            prevThreads.map(thread => 
-              thread.id === state.updatedThreadId 
-                ? { ...thread, commentCount: state.updatedCommentCount as number } 
-                : thread
-            )
+            prevThreads.map(thread => {
+              if (thread.id === state.updatedThreadId) {
+                console.log(`Updating thread ${thread.id} comment count from ${thread.commentCount} to ${state.updatedCommentCount}`);
+                return { ...thread, commentCount: state.updatedCommentCount as number };
+              }
+              return thread;
+            })
           );
         } else {
           // Otherwise do a full refresh
+          console.log('Performing full thread refresh');
           fetchThreads();
         }
       }

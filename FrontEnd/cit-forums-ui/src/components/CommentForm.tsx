@@ -29,7 +29,10 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, threadId, onCommentAd
       });
       console.log('Comment created successfully:', newComment);
       
+      // Pass the new comment to the parent component
       onCommentAdded(newComment);
+      
+      // Clear the form
       setContent('');
     } catch (err: any) {
       console.error('Error creating comment:', err);
