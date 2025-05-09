@@ -249,9 +249,27 @@ public class ApiMemberController {
             @Parameter(description = "Number of items per page") 
             @RequestParam(defaultValue = "50") int size,
             Principal principal) {
-        MemberDto member = memberService.getMemberByUsernameOrEmail(principal.getName());
-        Page<ThreadDto> threads = memberService.getMemberThreads(member.getId(), page, size);
-        return ResponseEntity.ok(threads);
+        if (principal == null) {
+            logger.warn("User is not authenticated (principal is null)");
+            return ResponseEntity.status(401).body(null);
+        }
+        
+        String username = principal.getName();
+        logger.info("Getting threads for current member: {}", username);
+        
+        try {
+            MemberDto member = memberService.getMemberByUsernameOrEmail(username);
+            if (member == null) {
+                logger.error("Member not found for authenticated user: {}", username);
+                return ResponseEntity.status(404).body(null);
+            }
+            
+            Page<ThreadDto> threads = memberService.getMemberThreads(member.getId(), page, size);
+            return ResponseEntity.ok(threads);
+        } catch (Exception e) {
+            logger.error("Error getting current member threads", e);
+            return ResponseEntity.status(500).body(null);
+        }
     }
     
     @GetMapping("/me/comments")
