@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Report } from '../models/Report';
 import { getReports, resolveReport, dismissReport } from '../services/reportService';
-import { getThreadById } from '../services/adminService';
+import { getThreadById, deleteThread } from '../services/adminService';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/custom.css';
@@ -16,6 +16,8 @@ const AdminReports: React.FC = () => {
   const [reportedContent, setReportedContent] = useState<any | null>(null);
   const [contentLoading, setContentLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [threadToDelete, setThreadToDelete] = useState<number | null>(null);
   const navigate = useNavigate();
   const { checkAdminStatus } = useAuth();
 
@@ -69,7 +71,7 @@ const AdminReports: React.FC = () => {
   // Handle Resolve Report
   const handleResolveReport = async (reportId: number) => {
     try {
-      await resolveReport(reportId, 'Content removed');
+      await resolveReport(reportId, 'resolve');
       setReports(reports.filter(report => report.id !== reportId));
       setSelectedReport(null);
       setSuccessMessage('Report resolved successfully.');
@@ -96,22 +98,37 @@ const AdminReports: React.FC = () => {
     }
   };
 
+  // Show delete confirmation dialog
+  const confirmDeleteThread = (threadId: number) => {
+    setThreadToDelete(threadId);
+    setShowDeleteConfirm(true);
+  };
+
+  // Cancel thread deletion
+  const cancelDeleteThread = () => {
+    setShowDeleteConfirm(false);
+    setThreadToDelete(null);
+  };
+
   // Handle Delete Thread
-  const handleDeleteThread = async (threadId: number) => {
+  const handleDeleteThread = async () => {
+    if (!threadToDelete) return;
+    
     try {
-      // Call the API to delete the thread
-      await fetch(`/api/admin/threads/${threadId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      // Call the deleteThread function from adminService
+      await deleteThread(threadToDelete);
+      
+      // Also resolve the report since the thread has been deleted
+      if (selectedReport) {
+        await resolveReport(selectedReport.id, 'resolve');
+      }
       
       // Update UI
       setSuccessMessage('Thread deleted successfully.');
       setSelectedReport(null);
       setReportedContent(null);
+      setShowDeleteConfirm(false);
+      setThreadToDelete(null);
       
       // Refresh reports list
       const updatedReports = await getReports();
@@ -121,6 +138,8 @@ const AdminReports: React.FC = () => {
     } catch (err) {
       console.error('Error deleting thread:', err);
       setError('Failed to delete thread.');
+      setShowDeleteConfirm(false);
+      setThreadToDelete(null);
       setTimeout(() => setError(null), 3000);
     }
   };
@@ -264,7 +283,7 @@ const AdminReports: React.FC = () => {
                     {selectedReport.reportedContentType === 'THREAD' && reportedContent && (
                       <button
                         className="admin-btn-danger admin-btn-action"
-                        onClick={() => handleDeleteThread(selectedReport.reportedContentId)}
+                        onClick={() => confirmDeleteThread(selectedReport.reportedContentId)}
                       >
                         <i className="bi bi-trash"></i> Delete Thread
                       </button>
@@ -292,6 +311,32 @@ const AdminReports: React.FC = () => {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <h3 className="admin-modal-title">Confirm Thread Deletion</h3>
+            <p className="admin-modal-content">
+              Are you sure you want to delete this thread? This action cannot be undone.
+            </p>
+            <div className="admin-modal-actions">
+              <button 
+                onClick={handleDeleteThread}
+                className="admin-btn-danger"
+              >
+                Delete Thread
+              </button>
+              <button 
+                onClick={cancelDeleteThread}
+                className="admin-btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
