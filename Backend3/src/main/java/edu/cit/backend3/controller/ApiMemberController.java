@@ -54,15 +54,13 @@ public class ApiMemberController {
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<?> getCurrentMember() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            logger.warn("User is not authenticated");
+    public ResponseEntity<?> getCurrentMember(Principal principal) {
+        if (principal == null) {
+            logger.warn("User is not authenticated (principal is null)");
             return ResponseEntity.status(401).body("User is not authenticated");
         }
         
-        String username = authentication.getName();
+        String username = principal.getName();
         logger.info("Getting current member info for: {}", username);
         
         try {
