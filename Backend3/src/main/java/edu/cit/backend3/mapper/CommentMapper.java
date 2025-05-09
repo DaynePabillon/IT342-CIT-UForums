@@ -40,6 +40,11 @@ public class CommentMapper {
         if (comment.getThread() != null) {
             dto.setThreadId(comment.getThread().getId());
             dto.setThreadTitle(comment.getThread().getTitle());
+            
+            // Include the forum ID for proper navigation
+            if (comment.getThread().getForum() != null) {
+                dto.setForumId(comment.getThread().getForum().getId());
+            }
         }
 
         if (comment.getParentPost() != null) {

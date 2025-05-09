@@ -19,8 +19,9 @@ public class CommentDto {
     private MemberSummaryDto author;
     private Long threadId;
     private String threadTitle;
+    private Long forumId;
     private Long parentPostId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean edited;
-} 
+}
