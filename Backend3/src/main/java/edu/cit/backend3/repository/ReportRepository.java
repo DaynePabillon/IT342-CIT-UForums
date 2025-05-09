@@ -2,6 +2,8 @@ package edu.cit.backend3.repository;
 
 import edu.cit.backend3.models.Report;
 import edu.cit.backend3.models.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,9 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     long countByStatus(String status);
     List<Report> findByReporter(Member reporter);
     List<Report> findByContentTypeAndContentId(String contentType, Long contentId);
+    
+    // Find reports by status list (for report history)
+    Page<Report> findByStatusIn(List<String> statuses, Pageable pageable);
     
     // Find recent reports
     List<Report> findTop5ByOrderByCreatedAtDesc();

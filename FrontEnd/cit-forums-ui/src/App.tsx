@@ -21,6 +21,7 @@ import CreateThread from './pages/CreateThread';
 import CreateForum from './pages/CreateForum';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminReports from './pages/AdminReports';
+import AdminReportHistory from './pages/AdminReportHistory';
 import AdminUsers from './pages/AdminUsers';
 import axiosInstance from './services/axiosInstance';
 import { getAuthToken } from './services/authService';
@@ -65,6 +66,11 @@ const App: React.FC = () => {
                 <Route path="/admin/users" element={
                   <ProtectedAdminRoute>
                     <AdminUsers />
+                  </ProtectedAdminRoute>
+                } />
+                <Route path="/admin/report-history" element={
+                  <ProtectedAdminRoute>
+                    <AdminReportHistory />
                   </ProtectedAdminRoute>
                 } />
 

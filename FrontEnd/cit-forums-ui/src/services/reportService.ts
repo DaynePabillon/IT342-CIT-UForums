@@ -100,3 +100,44 @@ export const dismissReport = async (reportId: number): Promise<Report> => {
     throw error;
   }
 };
+
+export const getReportHistory = async (): Promise<Report[]> => {
+  try {
+    console.log('Fetching report history');
+    const response = await axiosInstance.get('/api/admin/reports/history');
+    console.log('Raw report history response:', response.data);
+    
+    // Check if the response is paginated (Spring Data format)
+    if (response.data && response.data.content && Array.isArray(response.data.content)) {
+      console.log('Detected paginated response, mapping content');
+      
+      // Map the backend field names to frontend field names
+      return response.data.content.map((item: any) => ({
+        id: item.id,
+        reporterId: item.reporterId || (item.reporter ? item.reporter.id : null),
+        reporterUsername: item.reporterUsername || (item.reporter ? item.reporter.name : 'Unknown'),
+        reportedContentType: item.contentType, // Map contentType to reportedContentType
+        reportedContentId: item.contentId,     // Map contentId to reportedContentId
+        reason: item.reason,
+        status: item.status,
+        createdAt: item.createdAt,
+        resolvedAt: item.resolvedAt,
+        resolvedBy: item.resolverId,
+        resolvedByUsername: item.resolverUsername,
+        actionTaken: item.action,
+        // Include the original data for debugging
+        _originalData: item
+      }));
+    }
+    
+    // If not paginated, assume it's already in the right format
+    return response.data;
+  } catch (error) {
+    console.error('Error in getReportHistory:', error);
+    if (error instanceof AxiosError && error.response) {
+      console.error('Error details:', error.response.data || 'No response data');
+      console.error('Status code:', error.response.status);
+    }
+    throw error;
+  }
+};

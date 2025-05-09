@@ -125,6 +125,13 @@ const Navbar: React.FC = () => {
               >
                 Reports
               </Link>
+              <Link 
+                className="nav-link text-white me-3" 
+                to="/admin/report-history"
+                style={{ marginRight: '1.5rem' }}
+              >
+                Report History
+              </Link>
             </>
           )}
         </div>

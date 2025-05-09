@@ -509,6 +509,34 @@ public class AdminDashboardController {
         }
     }
     
+    @GetMapping("/reports/history")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Get report history",
+        description = "Get all resolved and dismissed reports",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<?> getReportHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        try {
+            logger.info("Fetching report history");
+            
+            // Create pageable with sorting by createdAt in descending order
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            
+            // Find reports with status RESOLVED or DISMISSED
+            Page<Report> reports = reportRepository.findByStatusIn(
+                List.of("RESOLVED", "DISMISSED"), pageable);
+            
+            return ResponseEntity.ok(reports);
+        } catch (Exception e) {
+            logger.error("Error fetching report history: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error fetching report history: " + e.getMessage());
+        }
+    }
+    
     @PutMapping("/users/{userId}/status")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
