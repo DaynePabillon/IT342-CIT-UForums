@@ -103,13 +103,29 @@ const Navbar: React.FC = () => {
           </Link>
           
           {admin && (
-            <Link 
-              className="nav-link text-white me-3" 
-              to="/admin/dashboard"
-              style={{ marginRight: '1.5rem' }}
-            >
-              Admin Dashboard
-            </Link>
+            <>
+              <Link 
+                className="nav-link text-white me-3" 
+                to="/admin/dashboard"
+                style={{ marginRight: '1.5rem' }}
+              >
+                Admin Dashboard
+              </Link>
+              <Link 
+                className="nav-link text-white me-3" 
+                to="/admin/users"
+                style={{ marginRight: '1.5rem' }}
+              >
+                Users
+              </Link>
+              <Link 
+                className="nav-link text-white me-3" 
+                to="/admin/reports"
+                style={{ marginRight: '1.5rem' }}
+              >
+                Reports
+              </Link>
+            </>
           )}
         </div>
         

@@ -472,18 +472,6 @@ const AdminDashboard: React.FC = () => {
                 <h1 className="admin-title">Admin Dashboard</h1>
                 <div className="admin-header-actions">
                     <button 
-                        onClick={() => navigate('/admin/users')}
-                        className="admin-btn-primary mr-2"
-                    >
-                        Manage Users
-                    </button>
-                    <button 
-                        onClick={() => navigate('/admin/reports')}
-                        className="admin-btn-primary mr-2"
-                    >
-                        View Reports
-                    </button>
-                    <button 
                         onClick={handleLogout}
                         className="admin-btn-secondary"
                     >
