@@ -34,7 +34,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     // List of public paths that should skip authentication
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
-        "/error", "/login", "/register", "/api/auth/", "/api/forums/", "/api/members/"
+        "/error", "/login", "/register", "/api/auth/", "/api/forums/"
+    );
+    
+    // List of specific public member endpoints that don't require authentication
+    private static final List<String> PUBLIC_MEMBER_PATHS = Arrays.asList(
+        "/api/members/check", "/api/members/exists"
     );
 
     @Autowired
@@ -138,12 +143,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         
+        // Skip authentication for specific public member endpoints
+        for (String memberPath : PUBLIC_MEMBER_PATHS) {
+            if (requestPath.contains(memberPath)) {
+                return true;
+            }
+        }
+        
         // Skip authentication for GET requests to public API endpoints
         if (request.getMethod().equals("GET") && (
             requestPath.startsWith("/api/threads/") || 
             requestPath.startsWith("/api/posts/") || 
-            requestPath.startsWith("/api/comments/") ||
-            requestPath.startsWith("/api/members/"))) {
+            requestPath.startsWith("/api/comments/"))) {
+            return true;
+        }
+        
+        // Skip authentication for GET requests to specific member endpoints that don't start with /me
+        if (request.getMethod().equals("GET") && requestPath.startsWith("/api/members/")) {
+            // Don't skip authentication for /me endpoints
+            if (requestPath.contains("/me")) {
+                logger.debug("Not skipping authentication for protected endpoint: {}", requestPath);
+                return false;
+            }
             return true;
         }
         
