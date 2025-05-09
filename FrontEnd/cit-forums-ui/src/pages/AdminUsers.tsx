@@ -133,20 +133,6 @@ const AdminUsers: React.FC = () => {
       {/* Header */}
       <div className="admin-header">
         <h1 className="admin-title">User Management</h1>
-        <div className="admin-header-actions">
-          <button 
-            onClick={navigateToDashboard}
-            className="admin-btn-primary mr-2"
-          >
-            Dashboard
-          </button>
-          <button 
-            onClick={navigateToReports}
-            className="admin-btn-primary mr-2"
-          >
-            View Reports
-          </button>
-        </div>
       </div>
 
       {/* Success Message */}

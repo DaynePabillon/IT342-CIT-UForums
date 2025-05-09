@@ -470,14 +470,6 @@ const AdminDashboard: React.FC = () => {
         <div className="admin-dashboard">
             <div className="admin-header">
                 <h1 className="admin-title">Admin Dashboard</h1>
-                <div className="admin-header-actions">
-                    <button 
-                        onClick={handleLogout}
-                        className="admin-btn-secondary"
-                    >
-                        Logout
-                    </button>
-                </div>
             </div>
             {renderDashboard()}
         </div>
