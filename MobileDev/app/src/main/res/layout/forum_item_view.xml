@@ -1,0 +1,61 @@
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/forum_item_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:rippleColor="@color/ripple_effect_color"> <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/forum_item_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/title_text_color"  android:maxLines="2"
+        android:ellipsize="end"/>
+
+    <TextView
+        android:id="@+id/forum_item_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@color/description_text_color"  android:maxLines="3"
+        android:ellipsize="end"
+        android:layout_marginTop="4dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/forum_item_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/category_text_color" android:paddingVertical="4dp"
+            android:paddingHorizontal="8dp"
+            android:background="@drawable/category_badge_background"  android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/forum_item_post_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/post_count_text_color"  android:textStyle="italic"/>
+
+    </LinearLayout>
+</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

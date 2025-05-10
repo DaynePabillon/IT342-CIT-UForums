@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/comment_container"
+    android:padding="5dp"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="start"
+        >
+
+        <ImageView
+            android:id="@+id/commentbox_picture"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="5dp"
+            android:contentDescription="@string/CommentBoxImageDescription"
+            />
+
+        <TextView
+            android:id="@+id/commentbox_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:text="@string/CommentBoxName"
+            />
+        
+        <TextView
+            android:id="@+id/commentbox_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/lightgray"
+            android:textSize="12sp"
+            android:text="@string/CommentBoxDate"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/commentbox_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:text="@string/CommentBoxMessage"
+        />
+
+</LinearLayout>

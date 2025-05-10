@@ -7,7 +7,35 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray">#606060</color>
+    <color name="lightgray">#808080</color>
+    <color name="category_color">#909090</color>
+    <color name="containerRed">#800000</color>
+    <color name="buttonRed">#800000</color>
+    <color name="buttonYellow">#F4C522</color>
+    <color name="textViewClickable">#0D6EFD</color>
+    <color name="textViewClickable2">#F4C522</color>
+    <color name="errorColor1">#F4C522</color>"
+    <color name="helperTextColor1">#F4C522</color>
     <color name="primary_color">#F4C522</color>
     <color name="primary_color_0.75">#AFF4C522</color>
     <color name="secondary_color">#8A252C</color>
+
+
+    <!--ForumItemList-->
+    <color name="ripple_effect_color">#8A252C</color>
+    <color name="title_text_color">#AFF4C522</color>
+    <color name="description_text_color">#000</color>
+    <color name="category_text_color">#800000</color>
+    <color name="post_count_text_color">#AAAAAA</color>
+
+    <!--ThreadItemList-->
+    <color name="author_text_color">#AFF4C522</color>
+    <color name="date_text_color">#000</color>
+
+    <!-- Pagination -->
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="selected_page_number_color">#FF4081</color> <color name="default_page_number_color">#000000</color>
 </resources>

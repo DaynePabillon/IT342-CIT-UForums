@@ -1,0 +1,15 @@
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="SelectedPageNumberAppearance" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@color/selected_page_number_color</item> <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DefaultPageNumberAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/default_page_number_color</item>
+    </style>
+</resources>
